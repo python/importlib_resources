@@ -135,37 +135,4 @@ All functions raise `FileNotFoundError` if the resource does not exist.
 
 
 # Open Issues
-## Support bytes-based paths?
-Since import doesn't support bytes-based paths, maybe this API
-shouldn't go down that route either? There's no guarantee for support
-by loaders without extra effort and it's simply easier to not bother.
-
-## Return a string rather than a `pathlib.Path` instance from `path`?
-Using a higher-level API than strings is always better when it comes
-to paths, but it will require depending on a third-party package on
-PyPI for older versions of Python.
-
-## Provide a read() function?
-The function is equivalent to:
-```python
-def read(module_name, path):
-    """Read the bytes of the resource."""
-    with importlib.resources.open(...) as file:
-        return file.read()
-```
-
-That's only 2 lines which everyone knows how to write (the `def` and
-docstring equate to the same number of lines as the body of the
-function). The only real reason to support a `read()` function is
-potential performance benefits for loaders reading from e.g. a database.
-
-But even if a `io.BytesIO` instance is returned by `open()`, it isn't
-a costly operation to read all the bytes from the instance.
-```python
-data = b'...'
-bytes_file = io.BytesIO(data)  # No copying; storing a reference.
-with bytes_file as file:
-    file.read()  # No copying; returning the reference.
-```
-So the only true overhead is the memory cost of a `BytesIO` instance,
-which according to `sys.getsizeof(io.BytesIO())` is 88 bytes.
+Please see https://github.com/brettcannon/importlib_resources/issues .
