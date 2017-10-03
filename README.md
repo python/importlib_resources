@@ -90,6 +90,17 @@ def open(module_name: str, path: Path) -> BinaryIO:
     return module.__spec__.loader.open_resource(normalized_path)
 
 
+def read(module_name: str, path: Path, encoding: str = "utf-8",
+         errors: str = "strict") -> str:
+    """Return the decoded string of the resource.
+
+    The decoding-related arguments have the same semantics as those of
+    bytes.decode().
+    """
+    with open(module_name, path) as file:
+        return file.read().decode(encoding=encoding, errors=errors)
+
+
 @contextlib.contextmanager
 def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
     """A context manager providing a file path object to the resource.
