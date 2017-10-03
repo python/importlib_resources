@@ -146,4 +146,5 @@ All functions raise `FileNotFoundError` if the resource does not exist.
 
 
 # Open Issues
-Please see https://github.com/brettcannon/importlib_resources/issues .
+Please see the
+[issue tracker](https://github.com/brettcannon/importlib_resources/issues).
