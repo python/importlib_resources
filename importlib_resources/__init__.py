@@ -18,7 +18,7 @@ def _get_package(package_name):
 
 def _normalize_path(path):
     if os.path.isabs(path):
-        raise ValueError(f"{path!r} is absolute")
+        raise ValueError("{!r} is absolute".format(path))
     normalized_path = os.path.normpath(path)
     if normalized_path.startswith(".."):
         raise ValueError("{!r} attempts to traverse past package".format(path))
