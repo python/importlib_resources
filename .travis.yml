@@ -1,0 +1,12 @@
+language: python
+cache: pip
+python:
+  - "3.4"
+  - "3.5-dev"
+  - "3.6-dev"
+
+script:
+  - python3 -m unittest discover
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
