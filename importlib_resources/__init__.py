@@ -21,7 +21,7 @@ def _normalize_path(path):
         raise ValueError(f"{path!r} is absolute")
     normalized_path = os.path.normpath(path)
     if normalized_path.startswith(".."):
-        raise ValueError(f"{path!r} attempts to traverse past package")
+        raise ValueError("{path!r} attempts to traverse past package".format(path))
     else:
         return normalized_path
 
