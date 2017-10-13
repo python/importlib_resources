@@ -1,11 +1,14 @@
 import importlib
 import io
 import os.path
+import sys
 from typing import Union
 from typing.io import BinaryIO
 
-
-Path = Union[str, os.PathLike]
+if sys.version_info >= (3, 6):
+    Path = Union[str, os.PathLike]
+else:
+    Path = Union[str]
 
 
 def _get_package(package_name):

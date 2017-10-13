@@ -5,8 +5,12 @@ python:
   - "3.5-dev"
   - "3.6-dev"
 
+install:
+  - python3 -m pip install --upgrade mypy
+
 script:
   - python3 -m unittest discover
+  - mypy --ignore-missing-imports importlib_resources/*.py
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
