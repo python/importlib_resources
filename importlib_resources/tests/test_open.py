@@ -24,7 +24,7 @@ class CommonTests(unittest.TestCase):
 
     def test_absolute_path(self):
         # An absolute path is a ValueError.
-        path = pathlib.Path('data/test.file').resolve()
+        path = pathlib.Path(__spec__.origin).resolve()
         with self.assertRaises(ValueError):
             with resources.open(PACKAGE, path) as file:
                 pass
