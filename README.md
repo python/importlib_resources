@@ -65,10 +65,10 @@ from typing.io import BinaryIO
 Path = Union[str, os.PathLike]
 
 
-def _get_package(module_name):
-    module = importlib.import_module(module_name)
+def _get_package(package_name):
+    module = importlib.import_module(package_name)
     if module.__spec__.submodule_search_locations is None:
-        raise TypeError(f"{module_name!r} is not a package")
+        raise TypeError(f"{package_name!r} is not a package")
     else:
         return module
 
@@ -83,26 +83,26 @@ def _normalize_path(path):
         return normalized_path
 
 
-def open(module_name: str, path: Path) -> BinaryIO:
+def open(package_name: str, path: Path) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     normalized_path = _normalize_path(path)
-    module = _get_package(module_name)
+    module = _get_package(package_name)
     return module.__spec__.loader.open_resource(normalized_path)
 
 
-def read(module_name: str, path: Path, encoding: str = "utf-8",
+def read(package_name: str, path: Path, encoding: str = "utf-8",
          errors: str = "strict") -> str:
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    with open(module_name, path) as file:
+    with open(package_name, path) as file:
         return file.read().decode(encoding=encoding, errors=errors)
 
 
 @contextlib.contextmanager
-def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
+def path(package_name: str, path: Path) -> Iterator[pathlib.Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -112,7 +112,7 @@ def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
     exiting).
     """
     normalized_path = _normalize_path(path)
-    module = _get_package(module_name)
+    module = _get_package(package_name)
     try:
         yield pathlib.Path(module.__spec__.resource_path(normalized_path))
     except FileNotFoundError:
@@ -130,7 +130,7 @@ def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
                 pass
 ```
 
-If *module_name* has not been imported yet then it will be as a
+If *package_name* has not been imported yet then it will be as a
 side-effect of the call. The specified module is expected to be a
 package, otherwise `TypeError` is raised. The module is expected to
 have a loader specified on `__spec__.loader` which
