@@ -116,19 +116,17 @@ def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
     try:
         yield pathlib.Path(module.__spec__.resource_path(normalized_path))
     except FileNotFoundError:
-        raw_path = None
-        try:
-          with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             raw_path = temp_file.name
-            with module.__spec__.open_resource(normalized_path) as file:
-                temp_file.write(file.read())
-          yield pathlib.Path(raw_path)
-        finally:
-          if raw_path:
-              try:
-                  os.delete(raw_path)
-              except FileNotFoundError:
-                  pass
+            try:
+              with module.__spec__.open_resource(normalized_path) as file:
+                  temp_file.write(file.read())
+              temp_file.close()
+              yield pathlib.Path(raw_path)
+            finally:
+              os.delete(raw_path)
+            except FileNotFoundError:
+              pass
 ```
 
 If *module_name* has not been imported yet then it will be as a
