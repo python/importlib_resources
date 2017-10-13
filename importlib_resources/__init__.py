@@ -6,9 +6,29 @@ from typing import Union
 from typing.io import BinaryIO
 
 if sys.version_info >= (3, 6):
+    from os import fspath as _fspath
     Path = Union[str, os.PathLike]
 else:
     Path = Union[str]
+    def _fspath(path):
+        if isinstance(path, (str, bytes)):
+            return path
+
+        path_type = type(path)
+        try:
+            path = path_type.__fspath__(path)
+        except AttributeError:
+            if hasattr(path_type, '__fspath__'):
+                raise
+        else:
+            if isinstance(path, (str, bytes)):
+                return path
+            else:
+                raise TypeError("expected __fspath__() to return str or bytes, "
+                                "not " + type(path).__name__)
+
+        raise TypeError("expected str, bytes or os.PathLike object, not "
+                        + path_type.__name__)
 
 
 def _get_package(package_name):
@@ -20,6 +40,7 @@ def _get_package(package_name):
 
 
 def _normalize_path(path):
+    path = _fspath(path)
     if os.path.isabs(path):
         raise ValueError("{!r} is absolute".format(path))
     normalized_path = os.path.normpath(path)
