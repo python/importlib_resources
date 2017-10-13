@@ -16,6 +16,7 @@ class CommonTests(unittest.TestCase):
         with resources.open(PACKAGE, path) as file:
             pass  # No error.
 
+    @unittest.skipIf(sys.version_info < (3, 6), 'requires os.PathLike support')
     def test_pathlib_path(self):
         # Passing in a pathlib.PurePath object for the path should succeed.
         path = pathlib.PurePath('data')/'test.file'
@@ -24,7 +25,7 @@ class CommonTests(unittest.TestCase):
 
     def test_absolute_path(self):
         # An absolute path is a ValueError.
-        path = pathlib.Path(__spec__.origin).resolve()
+        path = os.path.absolute(__spec__.origin)
         with self.assertRaises(ValueError):
             with resources.open(PACKAGE, path) as file:
                 pass
