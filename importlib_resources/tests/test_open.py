@@ -1,5 +1,6 @@
 import os.path
 import pathlib
+import sys
 import unittest
 
 import importlib_resources as resources
@@ -25,7 +26,7 @@ class CommonTests(unittest.TestCase):
 
     def test_absolute_path(self):
         # An absolute path is a ValueError.
-        path = os.path.absolute(__spec__.origin)
+        path = os.path.abspath(__spec__.origin)
         with self.assertRaises(ValueError):
             with resources.open(PACKAGE, path) as file:
                 pass
