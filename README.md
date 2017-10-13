@@ -1,7 +1,7 @@
 # `importlib.resources`
 This repository is to house the design and implementation of a planned
 `importlib.resources` module for Python's stdlib -- aiming for
-Python 3.7 -- along with a backport to target Python 2.7 - 3.6.
+Python 3.7 -- along with a backport to target Python 3.4 - 3.6.
 
 The key goal of this module is to replace
 [`pkg_resources`](https://setuptools.readthedocs.io/en/latest/pkg_resources.html)
@@ -15,7 +15,7 @@ but have the semantics be stable and consistent.
 - Provide a reasonable replacement for `pkg_resources.resource_filename()`
 - Define an ABC for loaders to implement for reading resources
 - Implement this in the stdlib for Python 3.7
-- Implement a package for PyPI which will work on Python ==2.7,>=3.4
+- Implement a package for PyPI which will work on Python >=3.4
 
 ## Non-goals
 - Replace all of `pkg_resources`
