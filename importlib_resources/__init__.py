@@ -20,7 +20,6 @@ def _get_package(package_name):
 
 
 def _normalize_path(path):
-    path = _fspath(path)
     if os.path.isabs(path):
         raise ValueError("{!r} is absolute".format(path))
     normalized_path = os.path.normpath(path)
