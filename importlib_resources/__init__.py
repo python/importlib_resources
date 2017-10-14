@@ -8,7 +8,7 @@ from typing.io import BinaryIO
 if sys.version_info >= (3, 6):
     Path = Union[str, os.PathLike]
 else:
-    Path = Union[str]
+    Path = str
 
 
 def _get_package(package_name):
