@@ -137,17 +137,19 @@ def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
                 pass
 ```
 
-If *module_name* has not been imported yet then it will be as a
-side-effect of the call. The specified module is expected to be a
-package, otherwise `TypeError` is raised. The module is expected to
-have a loader specified on `__spec__.loader` which
+If *package* is an actual package, it is used directly. Otherwise the
+argument is used in calling `importlib.import_module()`. The found
+package is expected to be an actual package, otherwise `TypeError` is
+raised.
 
-For the *file_name* argument, it is expected to be only a file name with
-no other path parts. If any parts beyond a file name are found, a `ValueError`
-will be raised. The expectation is that all data files will exist within
-a directory that can be imported by Python as a package.
+For the *file_name* argument, it is expected to be only a file name
+with no other path parts. If any parts beyond a file name are found, a
+`ValueError` will be raised. The expectation is that all data files
+will exist within a directory that can be imported by Python as a
+package.
 
-All functions raise `FileNotFoundError` if the resource does not exist.
+All functions raise `FileNotFoundError` if the resource does not exist
+or cannot be found.
 
 
 # Open Issues
