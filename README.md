@@ -64,7 +64,7 @@ from typing.io import BinaryIO
 
 
 Package = Union[str, types.ModuleType]
-Path = Union[str, os.PathLike]
+FileName = Union[str, os.PathLike]
 
 
 def _get_package(package):
@@ -82,35 +82,34 @@ def _get_package(package):
 
 
 def _normalize_path(path):
-    if os.path.isabs(path):
-        raise ValueError(f"{path!r} is absolute")
-    normalized_path = os.path.normpath(path)
-    if normalized_path.startswith(".."):
-        raise ValueError(f"{path!r} attempts to traverse past package")
+    directory, file_name = os.path.split(path)
+    if directory:
+        raise ValueError(f"{path!r} is not just a file name")
     else:
-        return normalized_path
+        return file_name
 
 
-def open(module_name: Package, path: Path) -> BinaryIO:
+def open(module_name: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
-    normalized_path = _normalize_path(path)
+    normalized_path = _normalize_path(file_name)
     module = _get_package(module_name)
     return module.__spec__.loader.open_resource(normalized_path)
 
 
-def read(module_name: Package, path: Path, encoding: str = "utf-8",
+def read(module_name: Package, file_name: FileName, encoding: str = "utf-8",
          errors: str = "strict") -> str:
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    with open(module_name, path) as file:
+    # Note this is **not** builtins.open()!
+    with open(module_name, file_name) as file:
         return file.read().decode(encoding=encoding, errors=errors)
 
 
 @contextlib.contextmanager
-def path(module_name: Package, path: Path) -> Iterator[pathlib.Path]:
+def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -119,7 +118,7 @@ def path(module_name: Package, path: Path) -> Iterator[pathlib.Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    normalized_path = _normalize_path(path)
+    normalized_path = _normalize_path(file_name)
     module = _get_package(module_name)
     try:
         yield pathlib.Path(module.__spec__.resource_path(normalized_path))
@@ -143,12 +142,10 @@ side-effect of the call. The specified module is expected to be a
 package, otherwise `TypeError` is raised. The module is expected to
 have a loader specified on `__spec__.loader` which
 
-For the *path* argument, it is expected to be a relative path. If
-there are implicit references to the parent directory (i.e. `..`), they
-will be resolved. If the normalized, relative path attempts to reference
-beyond the location of the specified module, a `ValueError` will be
-raised. The provided path is expected to be UNIX-style (i.e. to use
-`/` as its path separator). Bytes-based paths are not supported.
+For the *file_name* argument, it is expected to be only a file name with
+no other path parts. If any parts beyond a file name are found, a `ValueError`
+will be raised. The expectation is that all data files will exist within
+a directory that can be imported by Python as a package.
 
 All functions raise `FileNotFoundError` if the resource does not exist.
 
