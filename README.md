@@ -58,19 +58,27 @@ import importlib
 import os
 import pathlib
 import tempfile
+import types
 from typing import ContextManager, Iterator, Union
 from typing.io import BinaryIO
 
 
+Package = Union[str, types.ModuleType]
 Path = Union[str, os.PathLike]
 
 
-def _get_package(module_name):
-    module = importlib.import_module(module_name)
-    if module.__spec__.submodule_search_locations is None:
-        raise TypeError(f"{module_name!r} is not a package")
+def _get_package(package):
+    if hasattr(package, '__spec__'):
+        if package.__spec__.submodule_search_locations is None:
+            raise TypeError(f"{package.__spec__.name!r} is not a package")
+        else:
+            return package
     else:
-        return module
+        module = importlib.import_module(package_name)
+        if module.__spec__.submodule_search_locations is None:
+            raise TypeError(f"{package_name!r} is not a package")
+        else:
+            return module
 
 
 def _normalize_path(path):
@@ -83,14 +91,14 @@ def _normalize_path(path):
         return normalized_path
 
 
-def open(module_name: str, path: Path) -> BinaryIO:
+def open(module_name: Package, path: Path) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     normalized_path = _normalize_path(path)
     module = _get_package(module_name)
     return module.__spec__.loader.open_resource(normalized_path)
 
 
-def read(module_name: str, path: Path, encoding: str = "utf-8",
+def read(module_name: Package, path: Path, encoding: str = "utf-8",
          errors: str = "strict") -> str:
     """Return the decoded string of the resource.
 
@@ -102,7 +110,7 @@ def read(module_name: str, path: Path, encoding: str = "utf-8",
 
 
 @contextlib.contextmanager
-def path(module_name: str, path: Path) -> Iterator[pathlib.Path]:
+def path(module_name: Package, path: Path) -> Iterator[pathlib.Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
