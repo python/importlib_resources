@@ -89,14 +89,14 @@ def _normalize_path(path):
         return file_name
 
 
-def open(module_name: Package, file_name: FileName) -> BinaryIO:
+def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     normalized_path = _normalize_path(file_name)
-    module = _get_package(module_name)
+    module = _get_package(package)
     return module.__spec__.loader.open_resource(normalized_path)
 
 
-def read(module_name: Package, file_name: FileName, encoding: str = "utf-8",
+def read(package: Package, file_name: FileName, encoding: str = "utf-8",
          errors: str = "strict") -> str:
     """Return the decoded string of the resource.
 
@@ -104,12 +104,12 @@ def read(module_name: Package, file_name: FileName, encoding: str = "utf-8",
     bytes.decode().
     """
     # Note this is **not** builtins.open()!
-    with open(module_name, file_name) as file:
+    with open(package, file_name) as file:
         return file.read().decode(encoding=encoding, errors=errors)
 
 
 @contextlib.contextmanager
-def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
+def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -119,11 +119,11 @@ def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     exiting).
     """
     normalized_path = _normalize_path(file_name)
-    module = _get_package(module_name)
+    package = _get_package(package)
     try:
-        yield pathlib.Path(module.__spec__.resource_path(normalized_path))
+        yield pathlib.Path(package.__spec__.resource_path(normalized_path))
     except FileNotFoundError:
-        with module.__spec__.open_resource(normalized_path) as file:
+        with package.__spec__.open_resource(normalized_path) as file:
             data = file.read()
         raw_path = tempfile.mkstemp()
         try:
