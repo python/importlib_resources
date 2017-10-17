@@ -67,19 +67,12 @@ Package = Union[str, types.ModuleType]
 FileName = Union[str, os.PathLike]
 
 
-<<<<<<< HEAD
-def _get_package(package_name):
-    module = importlib.import_module(package_name)
-    if module.__spec__.submodule_search_locations is None:
-        raise TypeError(f"{package_name!r} is not a package")
-=======
 def _get_package(package):
     if hasattr(package, '__spec__'):
         if package.__spec__.submodule_search_locations is None:
             raise TypeError(f"{package.__spec__.name!r} is not a package")
         else:
             return package
->>>>>>> master
     else:
         module = importlib.import_module(package_name)
         if module.__spec__.submodule_search_locations is None:
@@ -96,16 +89,6 @@ def _normalize_path(path):
         return file_name
 
 
-<<<<<<< HEAD
-def open(package_name: str, path: Path) -> BinaryIO:
-    """Return a file-like object opened for binary-reading of the resource."""
-    normalized_path = _normalize_path(path)
-    module = _get_package(package_name)
-    return module.__spec__.loader.open_resource(normalized_path)
-
-
-def read(package_name: str, path: Path, encoding: str = "utf-8",
-=======
 def open(module_name: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     normalized_path = _normalize_path(file_name)
@@ -114,28 +97,19 @@ def open(module_name: Package, file_name: FileName) -> BinaryIO:
 
 
 def read(module_name: Package, file_name: FileName, encoding: str = "utf-8",
->>>>>>> master
          errors: str = "strict") -> str:
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-<<<<<<< HEAD
-    with open(package_name, path) as file:
-=======
     # Note this is **not** builtins.open()!
     with open(module_name, file_name) as file:
->>>>>>> master
         return file.read().decode(encoding=encoding, errors=errors)
 
 
 @contextlib.contextmanager
-<<<<<<< HEAD
-def path(package_name: str, path: Path) -> Iterator[pathlib.Path]:
-=======
 def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
->>>>>>> master
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -144,13 +118,8 @@ def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-<<<<<<< HEAD
-    normalized_path = _normalize_path(path)
-    module = _get_package(package_name)
-=======
     normalized_path = _normalize_path(file_name)
     module = _get_package(module_name)
->>>>>>> master
     try:
         yield pathlib.Path(module.__spec__.resource_path(normalized_path))
     except FileNotFoundError:
@@ -168,17 +137,10 @@ def path(module_name: Package, file_name: FileName) -> Iterator[pathlib.Path]:
                 pass
 ```
 
-<<<<<<< HEAD
-If *package_name* has not been imported yet then it will be as a
-side-effect of the call. The specified module is expected to be a
-package, otherwise `TypeError` is raised. The module is expected to
-have a loader specified on `__spec__.loader` which
-=======
 If *package* is an actual package, it is used directly. Otherwise the
 argument is used in calling `importlib.import_module()`. The found
 package is expected to be an actual package, otherwise `TypeError` is
 raised.
->>>>>>> master
 
 For the *file_name* argument, it is expected to be only a file name
 with no other path parts. If any parts beyond a file name are found, a
