@@ -1,8 +1,10 @@
 import importlib
+import importlib.abc
 import io
 import os.path
 import sys
 import types
+import typing
 from typing import Union
 from typing.io import BinaryIO
 
@@ -14,7 +16,7 @@ else:
     Path = str
 
 
-def _get_package(package):
+def _get_package(package) -> types.ModuleType:
     if hasattr(package, '__spec__'):
         if package.__spec__.submodule_search_locations is None:
             raise TypeError("{!r} is not a package".format(package.__spec__.name))
@@ -28,7 +30,7 @@ def _get_package(package):
             return module
 
 
-def _normalize_path(path):
+def _normalize_path(path) -> str:
     parent, file_name = os.path.split(path)
     if parent:
         raise ValueError("{!r} is not only a file name".format(path))
@@ -46,5 +48,9 @@ def open(package: Package, file_name: Path) -> BinaryIO:
         package_name = package.__spec__.name
         message = "{!r} does not exist"
         raise FileNotFoundError(message.format(full_path))
-    data = package.__spec__.loader.get_data(full_path)
+    # Just assume the loader is a resource loader; all the relevant
+    # importlib.machinery loaders are and an AttributeError for get_data() will
+    # make it clear what is needed from the loader.
+    loader = typing.cast(importlib.abc.ResourceLoader, package.__spec__.loader)
+    data = loader.get_data(full_path)
     return io.BytesIO(data)
