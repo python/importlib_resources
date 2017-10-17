@@ -10,7 +10,7 @@ install:
 
 script:
   - python3 -m unittest discover
-  - mypy --ignore-missing-imports importlib_resources/*.py
+  - mypy --ignore-missing-imports importlib_resources
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
