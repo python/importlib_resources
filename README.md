@@ -104,8 +104,10 @@ def read(package: Package, file_name: FileName, encoding: str = "utf-8",
     bytes.decode().
     """
     # Note this is **not** builtins.open()!
-    with open(package, file_name) as file:
-        return file.read().decode(encoding=encoding, errors=errors)
+    with open(package, file_name) as binary_file:
+        text_file = io.TextIOWrapper(binary_file, encoding=encoding,
+                                     errors=errors)
+        return text_file.read()
 
 
 @contextlib.contextmanager
