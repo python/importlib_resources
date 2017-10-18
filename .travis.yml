@@ -1,0 +1,19 @@
+language: python
+cache: pip
+python:
+  - "3.4"
+  - "3.5-dev"
+  - "3.6-dev"
+
+install:
+  - python3 -m pip install --upgrade mypy
+
+script:
+  - python3 -m unittest discover
+  - mypy --ignore-missing-imports importlib_resources
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  email: false
