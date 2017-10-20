@@ -33,6 +33,8 @@ class CommonTests(unittest.TestCase):
         with resources.open(data, path) as file:
             pass  # No error.
 
+    # Don't fail if run under e.g. pytest.
+    @unittest.skipIf(__spec__ is None, '__spec__ is None')
     def test_absolute_path(self):
         # An absolute path is a ValueError.
         path = pathlib.Path(__spec__.origin)
