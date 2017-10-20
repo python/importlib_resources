@@ -67,13 +67,13 @@ class OpenTests(unittest.TestCase):
     def test_opened_for_reading(self):
         # The file-like object is ready for reading.
         with resources.open(data, 'utf-8.file') as file:
-            self.assertEqual(b"Hello, world!\n", file.read())
+            self.assertEqual(b"Hello, UTF-8 world!\n", file.read())
 
     def test_wrap_for_text(self):
         # The file-like object can be wrapped for text reading.
         with resources.open(data, 'utf-8.file') as file:
             text_file = io.TextIOWrapper(file, encoding='utf-8')
-            self.assertEqual('Hello, world!\n', text_file.read())
+            self.assertEqual('Hello, UTF-8 world!\n', text_file.read())
 
 
 if __name__ == '__main__':
