@@ -53,13 +53,9 @@ class ResourceReader(abc.ABC):
 ## High-level
 For `importlib.resources`:
 ```python
-import contextlib
-import importlib
-import os
 import pathlib
-import tempfile
 import types
-from typing import ContextManager, Iterator, Union
+from typing import ContextManager, Union
 from typing.io import BinaryIO
 
 
@@ -67,33 +63,9 @@ Package = Union[str, types.ModuleType]
 FileName = Union[str, os.PathLike]
 
 
-def _get_package(package):
-    if hasattr(package, '__spec__'):
-        if package.__spec__.submodule_search_locations is None:
-            raise TypeError(f"{package.__spec__.name!r} is not a package")
-        else:
-            return package
-    else:
-        module = importlib.import_module(package_name)
-        if module.__spec__.submodule_search_locations is None:
-            raise TypeError(f"{package_name!r} is not a package")
-        else:
-            return module
-
-
-def _normalize_path(path):
-    directory, file_name = os.path.split(path)
-    if directory:
-        raise ValueError(f"{path!r} is not just a file name")
-    else:
-        return file_name
-
-
 def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
-    normalized_path = _normalize_path(file_name)
-    module = _get_package(package)
-    return module.__spec__.loader.open_resource(normalized_path)
+    ...
 
 
 def read(package: Package, file_name: FileName, encoding: str = "utf-8",
@@ -103,15 +75,11 @@ def read(package: Package, file_name: FileName, encoding: str = "utf-8",
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    # Note this is **not** builtins.open()!
-    with open(package, file_name) as binary_file:
-        text_file = io.TextIOWrapper(binary_file, encoding=encoding,
-                                     errors=errors)
-        return text_file.read()
+    ...
 
 
 @contextlib.contextmanager
-def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
+def path(package: Package, file_name: FileName) -> ContextManager[pathlib.Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -120,23 +88,7 @@ def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    normalized_path = _normalize_path(file_name)
-    package = _get_package(package)
-    try:
-        yield pathlib.Path(package.__spec__.resource_path(normalized_path))
-    except FileNotFoundError:
-        with package.__spec__.open_resource(normalized_path) as file:
-            data = file.read()
-        raw_path = tempfile.mkstemp()
-        try:
-            with open(raw_path, 'wb') as file:
-                file.write(data)
-            yield pathlib.Path(raw_path)
-        finally:
-            try:
-                os.delete(raw_path)
-            except FileNotFoundError:
-                pass
+    ...
 ```
 
 If *package* is an actual package, it is used directly. Otherwise the
