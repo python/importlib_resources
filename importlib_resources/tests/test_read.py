@@ -29,11 +29,9 @@ class CommonTests(unittest.TestCase):
         path = pathlib.PurePath('utf-8.file')
         resources.read(data, path)
 
-    # Don't fail if run under e.g. pytest.
-    @unittest.skipIf(__spec__ is None, '__spec__ is None')
     def test_absolute_path(self):
         # An absolute path is a ValueError.
-        path = pathlib.Path(__spec__.origin)
+        path = pathlib.Path(__file__)
         full_path = path.parent/'utf-8.file'
         with self.assertRaises(ValueError):
             resources.read(data, str(full_path))
