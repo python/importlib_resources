@@ -1,19 +1,23 @@
+import builtins
+import contextlib
 import importlib
 import importlib.abc
 import io
 import os.path
+import pathlib
 import sys
+import tempfile
 import types
 import typing
-from typing import Union
+from typing import Iterator, Union
 from typing.io import BinaryIO
 
 
 Package = Union[types.ModuleType, str]
 if sys.version_info >= (3, 6):
-    Path = Union[str, os.PathLike]
+    FileName = Union[str, os.PathLike]
 else:
-    Path = str
+    FileName = str
 
 
 def _get_package(package) -> types.ModuleType:
@@ -38,7 +42,7 @@ def _normalize_path(path) -> str:
         return file_name
 
 
-def open(package: Package, file_name: Path) -> BinaryIO:
+def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
@@ -56,7 +60,7 @@ def open(package: Package, file_name: Path) -> BinaryIO:
     return io.BytesIO(data)
 
 
-def read(package: Package, file_name: Path, encoding: str = 'utf-8',
+def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
          errors: str = 'strict') -> str:
     """Return the decoded string of the resource.
 
@@ -72,3 +76,37 @@ def read(package: Package, file_name: Path, encoding: str = 'utf-8',
         text_file = io.TextIOWrapper(binary_file, encoding=encoding,
                                      errors=errors)
         return text_file.read()
+
+
+@contextlib.contextmanager
+def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
+    """A context manager providing a file path object to the resource.
+
+    If the resource does not already exist on its own on the file system,
+    a temporary file will be created. If the file was created, the file
+    will be deleted upon exiting the context manager (no exception is
+    raised if the file was deleted prior to the context manager
+    exiting).
+    """
+    normalized_path = _normalize_path(file_name)
+    package = _get_package(package)
+    package_directory = pathlib.Path(package.__spec__.origin).parent
+    file_path = package_directory/normalized_path
+    if file_path.exists():
+        yield file_path
+    else:
+        with open(package, normalized_path) as file:
+            data = file.read()
+        # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
+        # blocks due to the need to close the temporary file to work on
+        # Windows properly.
+        fd, raw_path = tempfile.mkstemp()
+        try:
+            os.write(fd, data)
+            os.close(fd)
+            yield pathlib.Path(raw_path)
+        finally:
+            try:
+                os.remove(raw_path)
+            except FileNotFoundError:
+                pass
