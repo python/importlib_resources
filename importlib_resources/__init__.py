@@ -54,3 +54,21 @@ def open(package: Package, file_name: Path) -> BinaryIO:
     loader = typing.cast(importlib.abc.ResourceLoader, package.__spec__.loader)
     data = loader.get_data(full_path)
     return io.BytesIO(data)
+
+
+def read(package: Package, file_name: Path, encoding: str = 'utf-8',
+         errors: str = 'strict') -> str:
+    """Return the decoded string of the resource.
+
+    The decoding-related arguments have the same semantics as those of
+    bytes.decode().
+    """
+    file_name = _normalize_path(file_name)
+    package = _get_package(package)
+    # Note this is **not** builtins.open()!
+    with open(package, file_name) as binary_file:
+        # Decoding from io.TextIOWrapper() instead of str.decode() in hopes that
+        # the former will be smarter about memory usage.
+        text_file = io.TextIOWrapper(binary_file, encoding=encoding,
+                                     errors=errors)
+        return text_file.read()

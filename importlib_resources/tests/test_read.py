@@ -12,67 +12,57 @@ class CommonTests(unittest.TestCase):
 
     def test_package_name(self):
         # Passing in the package name should succeed.
-        with resources.open(data.__name__, 'utf-8.file') as file:
-            pass  # No error.
+        resources.read(data.__name__, 'utf-8.file')
 
     def test_package_object(self):
         # Passing in the package itself should succeed.
-        with resources.open(data, 'utf-8.file') as file:
-            pass  # No error.
+        resources.read(data, 'utf-8.file')
 
     def test_string_path(self):
         path = 'utf-8.file'
         # Passing in a string for the path should succeed.
-        with resources.open(data, path) as file:
-            pass  # No error.
+        resources.read(data, path)
 
     @unittest.skipIf(sys.version_info < (3, 6), 'requires os.PathLike support')
     def test_pathlib_path(self):
         # Passing in a pathlib.PurePath object for the path should succeed.
         path = pathlib.PurePath('utf-8.file')
-        with resources.open(data, path) as file:
-            pass  # No error.
+        resources.read(data, path)
 
     def test_absolute_path(self):
         # An absolute path is a ValueError.
         path = pathlib.Path(__file__)
         full_path = path.parent/'utf-8.file'
         with self.assertRaises(ValueError):
-            with resources.open(data, str(full_path)) as file:
-                pass
+            resources.read(data, str(full_path))
 
     def test_relative_path(self):
         # A reative path is a ValueError.
         with self.assertRaises(ValueError):
-            with resources.open(data, '../data/utf-8.file') as file:
-                pass
+            resources.read(data, '../data/utf-8.file')
 
     def test_importing_module_as_side_effect(self):
         # The anchor package can already be imported.
         del sys.modules[data.__name__]
-        with resources.open(data.__name__, 'utf-8.file') as file:
-            pass  # No Errors.
+        resources.read(data.__name__, 'utf-8.file')
 
     def test_non_package(self):
         # The anchor package cannot be a module.
         with self.assertRaises(TypeError):
-            with resources.open(__spec__.name, 'utf-8.file') as file:
-                pass
+            resources.read(__spec__.name, 'utf-8.file')
 
 
-class OpenTests(unittest.TestCase):
+class ReadTests(unittest.TestCase):
 
-    def test_opened_for_reading(self):
-        # The file-like object is ready for reading.
-        with resources.open(data, 'utf-8.file') as file:
-            self.assertEqual(b"Hello, UTF-8 world!\n", file.read())
+    def test_default_encoding(self):
+        result = resources.read(data, 'utf-8.file')
+        self.assertEqual("Hello, UTF-8 world!\n", result)
 
-    def test_wrap_for_text(self):
-        # The file-like object can be wrapped for text reading.
-        with resources.open(data, 'utf-8.file') as file:
-            text_file = io.TextIOWrapper(file, encoding='utf-8')
-            self.assertEqual('Hello, UTF-8 world!\n', text_file.read())
+    def test_encoding(self):
+        result = resources.read(data, 'utf-16.file', encoding='utf-16')
+        self.assertEqual("Hello, UTF-16 world!\n", result)
 
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_errors(self):
+        # Raises UnicodeError without the 'errors' argument.
+        result = resources.read(data, 'utf-16.file', encoding='utf-8',
+                                errors='ignore')
