@@ -68,5 +68,7 @@ class PathTests(unittest.TestCase):
         # Test also implicitly verifies the returned object is a pathlib.Path
         # instance.
         with resources.path(data, 'utf-8.file') as path:
-            self.assertEqual('Hello, UTF-8 world!\n',
-                             path.read_text(encoding='utf-8'))
+            # pathlib.Path.read_text() was introduced in Python 3.5.
+            with path.open('r', encoding='utf-8') as file:
+                text = file.read()
+            self.assertEqual('Hello, UTF-8 world!\n', text)
