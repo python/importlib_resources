@@ -59,7 +59,6 @@ class ZipSetup:
 
     @classmethod
     def setUpClass(cls):
-        global ZIP_DATA_PATH, zip_data
         data_path = pathlib.Path(data.__spec__.origin)
         data_dir = data_path.parent
         cls._zip_path = str(data_dir / 'ziptestdata.zip')
