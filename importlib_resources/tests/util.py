@@ -69,9 +69,17 @@ class ZipSetup:
     def tearDownClass(cls):
         try:
             sys.path.remove(cls._zip_path)
+        except ValueError:
+            pass
+
+        try:
             del sys.path_importer_cache[cls._zip_path]
             del sys.modules[cls.data.__spec__.name]
+        except KeyError:
+            pass
+
+        try:
             del cls.data
             del cls._zip_path
-        except (KeyError, ValueError):
+        except AttributeError:
             pass
