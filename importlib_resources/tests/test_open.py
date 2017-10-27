@@ -15,17 +15,18 @@ def setUpModule():
     global ZIP_DATA_PATH, zip_data
     data_path = pathlib.Path(data.__spec__.origin)
     data_dir = data_path.parent
-    ZIP_DATA_PATH = data_dir / 'ziptestdata.zip'
-    sys.path.append(str(ZIP_DATA_PATH))
+    ZIP_DATA_PATH = str(data_dir / 'ziptestdata.zip')
+    sys.path.append(ZIP_DATA_PATH)
     import ziptestdata
     zip_data = ziptestdata
 
 
 def tearDownModule():
     global zip_data
-    del zip_data
     try:
-        sys.path.remove(str(ZIP_DATA_PATH))
+        sys.path.remove(ZIP_DATA_PATH)
+        del sys.path_importer_cache[ZIP_DATA_PATH]
+        del sys.modules[zip_data.__spec__.name]
     except ValueError:
         pass
 
