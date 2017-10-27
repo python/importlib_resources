@@ -35,9 +35,10 @@ def _get_package(package) -> types.ModuleType:
 
 
 def _normalize_path(path) -> str:
-    parent, file_name = os.path.split(path)
+    str_path = str(path)
+    parent, file_name = os.path.split(str_path)
     if parent:
-        raise ValueError("{!r} is not only a file name".format(path))
+        raise ValueError("{!r} must be only a file name".format(path))
     else:
         return file_name
 
