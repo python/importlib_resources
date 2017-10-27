@@ -27,23 +27,25 @@ but have the semantics be stable and consistent.
 ## Low-level
 For [`importlib.abc`](https://docs.python.org/3/library/importlib.html#module-importlib.abc):
 ```python
-from typing import Optional
+import abc
 from typing.io import BinaryIO
 
 
 class ResourceReader(abc.ABC):
 
-    def open_resource(self, path) -> BinaryIO:
+    def open_resource(self, path: str) -> BinaryIO:
         """Return a file-like object opened for binary reading.
 
-        The path is expected to be relative to the location of the
-        package this loader represents.
+        The 'path' argument is expected to represent only a file name.
+        If the resource cannot be found, FileNotFoundError is raised.
         """
         raise FileNotFoundError
 
-    def resource_path(self, path) -> str:
+    def resource_path(self, path: str) -> str:
         """Return the file system path to the specified resource.
 
+
+        The 'path' argument is expected to represent only a file name.
         If the resource does not exist on the file system, raise
         FileNotFoundError.
         """
