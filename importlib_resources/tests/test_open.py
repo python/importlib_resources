@@ -8,6 +8,27 @@ import importlib_resources as resources
 from importlib_resources.tests import data
 
 
+ZIP_DATA_PATH = None  # type: Optional[pathlib.Path]
+zip_data = None  # type: Optional[]
+def setUpModule():
+    global ZIP_DATA_PATH, zip_data
+    data_path = pathlib.Path(data.__spec__.origin)
+    data_dir = data_path.parent
+    ZIP_DATA_PATH = data_dir / 'ziptestdata.zip'
+    sys.path.append(str(ZIP_DATA_PATH))
+    import ziptestdata
+    zip_data = ziptestdata
+
+
+def tearDownModule():
+    global zip_data
+    del zip_data
+    try:
+        sys.path.remove(str(ZIP_DATA_PATH))
+    except ValueError:
+        pass
+
+
 class CommonTests(unittest.TestCase):
 
     def test_package_name(self):
@@ -60,18 +81,37 @@ class CommonTests(unittest.TestCase):
                 pass
 
 
-class OpenTests(unittest.TestCase):
+class OpenTests:
+
+    # Subclasses are expected to set the 'data' attribute.
 
     def test_opened_for_reading(self):
         # The file-like object is ready for reading.
-        with resources.open(data, 'utf-8.file') as file:
+        with resources.open(self.data, 'utf-8.file') as file:
             self.assertEqual(b"Hello, UTF-8 world!\n", file.read())
 
     def test_wrap_for_text(self):
         # The file-like object can be wrapped for text reading.
-        with resources.open(data, 'utf-8.file') as file:
+        with resources.open(self.data, 'utf-8.file') as file:
             text_file = io.TextIOWrapper(file, encoding='utf-8')
             self.assertEqual('Hello, UTF-8 world!\n', text_file.read())
+
+    def test_FileNotFoundError(self):
+        with self.assertRaises(FileNotFoundError):
+            with resources.open(self.data, 'does-not-exist') as file:
+                pass
+
+
+class OpenDiskTests(OpenTests, unittest.TestCase):
+
+    def setUp(self):
+        self.data = data
+
+
+class OpenZipTests(OpenTests, unittest.TestCase):
+
+    def setUp(self):
+        self.data = zip_data
 
 
 if __name__ == '__main__':

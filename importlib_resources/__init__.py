@@ -48,16 +48,18 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     package = _get_package(package)
     package_path = os.path.dirname(os.path.abspath(package.__spec__.origin))
     full_path = os.path.join(package_path, file_name)
-    if not os.path.exists(full_path):
-        package_name = package.__spec__.name
-        message = "{!r} does not exist"
-        raise FileNotFoundError(message.format(full_path))
     # Just assume the loader is a resource loader; all the relevant
     # importlib.machinery loaders are and an AttributeError for get_data() will
     # make it clear what is needed from the loader.
     loader = typing.cast(importlib.abc.ResourceLoader, package.__spec__.loader)
-    data = loader.get_data(full_path)
-    return io.BytesIO(data)
+    try:
+        data = loader.get_data(full_path)
+    except OSError:
+        package_name = package.__spec__.name
+        message = f'{file_name!r} resource not found in {package_name!r}'
+        raise FileNotFoundError(message)
+    else:
+        return io.BytesIO(data)
 
 
 def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
