@@ -46,10 +46,13 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
-    package_path = pathlib.Path(package.__spec__.origin).resolve().parent
-    full_path = package_path / file_name
+    # Using pathlib doesn't work well here due to the lack of 'strict' argument
+    # for pathlib.Path.resolve() prior to Python 3.6.
+    absolute_package_path = os.path.abspath(package.__spec__.origin)
+    package_path = os.path.dirname(absolute_package_path)
+    full_path = os.path.join(package_path, file_name)
     try:
-        return full_path.open('rb')
+        return builtins.open(full_path, 'rb')
     except IOError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for get_data()
@@ -57,7 +60,7 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
         loader = typing.cast(importlib.abc.ResourceLoader,
                              package.__spec__.loader)
         try:
-            data = loader.get_data(str(full_path))
+            data = loader.get_data(full_path)
         except IOError:
             package_name = package.__spec__.name
             message = '{!r} resource not found in {!r}'.format(file_name, package_name)
