@@ -1,4 +1,5 @@
 import abc
+import importlib
 import pathlib
 import sys
 import unittest
@@ -52,3 +53,26 @@ class CommonTests(abc.ABC):
         # The anchor package cannot be a module.
         with self.assertRaises(TypeError):
             self.execute(__spec__.name, 'utf-8.file')
+
+
+class ZipSetup:
+
+    @classmethod
+    def setUpClass(cls):
+        global ZIP_DATA_PATH, zip_data
+        data_path = pathlib.Path(data.__spec__.origin)
+        data_dir = data_path.parent
+        cls._zip_path = str(data_dir / 'ziptestdata.zip')
+        sys.path.append(cls._zip_path)
+        cls.data = importlib.import_module('ziptestdata')
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            sys.path.remove(cls._zip_path)
+            del sys.path_importer_cache[cls._zip_path]
+            del sys.modules[cls.data.__spec__.name]
+            del cls.data
+            del cls._zip_path
+        except (KeyError, ValueError):
+            pass

@@ -9,28 +9,6 @@ from . import data
 from . import util
 
 
-ZIP_DATA_PATH = None  # type: Optional[pathlib.Path]
-zip_data = None  # type: Optional[]
-def setUpModule():
-    global ZIP_DATA_PATH, zip_data
-    data_path = pathlib.Path(data.__spec__.origin)
-    data_dir = data_path.parent
-    ZIP_DATA_PATH = str(data_dir / 'ziptestdata.zip')
-    sys.path.append(ZIP_DATA_PATH)
-    import ziptestdata
-    zip_data = ziptestdata
-
-
-def tearDownModule():
-    global zip_data
-    try:
-        sys.path.remove(ZIP_DATA_PATH)
-        del sys.path_importer_cache[ZIP_DATA_PATH]
-        del sys.modules[zip_data.__spec__.name]
-    except ValueError:
-        pass
-
-
 class CommonTests(util.CommonTests, unittest.TestCase):
 
     def execute(self, package, path):
@@ -65,10 +43,8 @@ class OpenDiskTests(OpenTests, unittest.TestCase):
         self.data = data
 
 
-class OpenZipTests(OpenTests, unittest.TestCase):
-
-    def setUp(self):
-        self.data = zip_data
+class OpenZipTests(OpenTests, util.ZipSetup, unittest.TestCase):
+    pass
 
 
 if __name__ == '__main__':
