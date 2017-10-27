@@ -48,9 +48,9 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     package = _get_package(package)
     package_path = pathlib.Path(package.__spec__.origin).resolve().parent
     full_path = package_path / file_name
-    if full_path.exists():
+    try:
         return full_path.open('rb')
-    else:
+    except IOError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for get_data()
         # will make it clear what is needed from the loader.
