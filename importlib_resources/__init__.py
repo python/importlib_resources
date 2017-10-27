@@ -91,7 +91,7 @@ def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     normalized_path = _normalize_path(file_name)
     package = _get_package(package)
     package_directory = pathlib.Path(package.__spec__.origin).parent
-    file_path = package_directory/normalized_path
+    file_path = package_directory / normalized_path
     if file_path.exists():
         yield file_path
     else:
