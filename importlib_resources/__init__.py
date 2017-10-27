@@ -60,7 +60,7 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
             data = loader.get_data(str(full_path))
         except OSError:
             package_name = package.__spec__.name
-            message = f'{file_name!r} resource not found in {package_name!r}'
+            message = '{!r} resource not found in {!r}'.format(file_name, package_name)
             raise FileNotFoundError(message)
         else:
             return io.BytesIO(data)
