@@ -38,3 +38,7 @@ class ReadDiskTests(ReadTests, unittest.TestCase):
 
 class ReadZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
     pass
+
+
+if __name__ == '__main__':
+    unittest.main()

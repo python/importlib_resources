@@ -36,3 +36,7 @@ class PathDiskTests(PathTests, unittest.TestCase):
 
 class PathZipTests(PathTests, util.ZipSetup, unittest.TestCase):
     pass
+
+
+if __name__ == '__main__':
+    unittest.main()
