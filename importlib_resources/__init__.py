@@ -35,9 +35,10 @@ def _get_package(package) -> types.ModuleType:
 
 
 def _normalize_path(path) -> str:
-    parent, file_name = os.path.split(path)
+    str_path = str(path)
+    parent, file_name = os.path.split(str_path)
     if parent:
-        raise ValueError("{!r} is not only a file name".format(path))
+        raise ValueError("{!r} must be only a file name".format(path))
     else:
         return file_name
 
@@ -46,18 +47,27 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
-    package_path = os.path.dirname(os.path.abspath(package.__spec__.origin))
+    # Using pathlib doesn't work well here due to the lack of 'strict' argument
+    # for pathlib.Path.resolve() prior to Python 3.6.
+    absolute_package_path = os.path.abspath(package.__spec__.origin)
+    package_path = os.path.dirname(absolute_package_path)
     full_path = os.path.join(package_path, file_name)
-    if not os.path.exists(full_path):
-        package_name = package.__spec__.name
-        message = "{!r} does not exist"
-        raise FileNotFoundError(message.format(full_path))
-    # Just assume the loader is a resource loader; all the relevant
-    # importlib.machinery loaders are and an AttributeError for get_data() will
-    # make it clear what is needed from the loader.
-    loader = typing.cast(importlib.abc.ResourceLoader, package.__spec__.loader)
-    data = loader.get_data(full_path)
-    return io.BytesIO(data)
+    try:
+        return builtins.open(full_path, 'rb')
+    except IOError:
+        # Just assume the loader is a resource loader; all the relevant
+        # importlib.machinery loaders are and an AttributeError for get_data()
+        # will make it clear what is needed from the loader.
+        loader = typing.cast(importlib.abc.ResourceLoader,
+                             package.__spec__.loader)
+        try:
+            data = loader.get_data(full_path)
+        except IOError:
+            package_name = package.__spec__.name
+            message = '{!r} resource not found in {!r}'.format(file_name, package_name)
+            raise FileNotFoundError(message)
+        else:
+            return io.BytesIO(data)
 
 
 def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
