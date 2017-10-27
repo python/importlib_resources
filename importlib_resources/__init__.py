@@ -58,7 +58,7 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
                              package.__spec__.loader)
         try:
             data = loader.get_data(str(full_path))
-        except OSError:
+        except IOError:
             package_name = package.__spec__.name
             message = '{!r} resource not found in {!r}'.format(file_name, package_name)
             raise FileNotFoundError(message)
