@@ -108,26 +108,33 @@ def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     """
     file_name = _normalize_path(file_name)
     package = _get_package(package)
-    try:
-        yield pathlib.Path(package.__spec__.loader.resource_path(file_name))
-    except (AttributeError, FileNotFoundError):
-        package_directory = pathlib.Path(package.__spec__.origin).parent
-        file_path = package_directory / file_name
-        if file_path.exists():
-            yield file_path
-        else:
-            with open(package, file_name) as file:
-                data = file.read()
-            # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-            # blocks due to the need to close the temporary file to work on
-            # Windows properly.
-            fd, raw_path = tempfile.mkstemp()
+    if hasattr(package.__spec__.loader, 'resource_path'):
+        reader = typing.cast(resources_abc.ResourceReader,
+                             package.__spec__.loader)
+        try:
+            yield pathlib.Path(reader.resource_path(file_name))
+            return
+        except FileNotFoundError:
+            pass
+    # Fall-through for both the lack of resource_path() *and* if resource_path()
+    # raises FileNotFoundError.
+    package_directory = pathlib.Path(package.__spec__.origin).parent
+    file_path = package_directory / file_name
+    if file_path.exists():
+        yield file_path
+    else:
+        with open(package, file_name) as file:
+            data = file.read()
+        # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
+        # blocks due to the need to close the temporary file to work on
+        # Windows properly.
+        fd, raw_path = tempfile.mkstemp()
+        try:
+            os.write(fd, data)
+            os.close(fd)
+            yield pathlib.Path(raw_path)
+        finally:
             try:
-                os.write(fd, data)
-                os.close(fd)
-                yield pathlib.Path(raw_path)
-            finally:
-                try:
-                    os.remove(raw_path)
-                except FileNotFoundError:
-                    pass
+                os.remove(raw_path)
+            except FileNotFoundError:
+                pass
