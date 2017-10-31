@@ -1,10 +1,10 @@
 import abc
 import importlib
 import importlib.machinery
-import importlib.util
 import io
 import pathlib
 import sys
+import types
 import unittest
 
 from .. import abc as resources_abc
@@ -27,10 +27,15 @@ def create_package(*, file, path):
             else:
                 return path
 
-    spec = importlib.machinery.ModuleSpec('testingpackage', Reader(),
+    name = 'testingpackage'
+    spec = importlib.machinery.ModuleSpec(name, Reader(),
                                           origin='does-not-exist',
                                           is_package=True)
-    return importlib.util.module_from_spec(spec)
+    # Unforunately importlib.util.module_from_spec() was not introduced until
+    # Python 3.5.
+    module = types.ModuleType(name)
+    module.__spec__ = spec
+    return module
 
 
 class CommonTests(abc.ABC):
