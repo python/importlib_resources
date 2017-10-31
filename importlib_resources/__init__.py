@@ -12,6 +12,8 @@ import typing
 from typing import Iterator, Union
 from typing.io import BinaryIO
 
+from . import abc as resources_abc
+
 
 Package = Union[types.ModuleType, str]
 if sys.version_info >= (3, 6):
@@ -48,7 +50,9 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     file_name = _normalize_path(file_name)
     package = _get_package(package)
     if hasattr(package.__spec__.loader, 'open_resource'):
-        return package.__spec__.loader.open_resource(file_name)
+        reader = typing.cast(resources_abc.ResourceReader,
+                             package.__spec__.loader)
+        return reader.open_resource(file_name)
     else:
         # Using pathlib doesn't work well here due to the lack of 'strict'
         # argument for pathlib.Path.resolve() prior to Python 3.6.
