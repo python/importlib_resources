@@ -47,9 +47,9 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
-    try:
+    if hasattr(package.__spec__.loader, 'open_resource'):
         return package.__spec__.loader.open_resource(file_name)
-    except AttributeError:
+    else:
         # Using pathlib doesn't work well here due to the lack of 'strict'
         # argument for pathlib.Path.resolve() prior to Python 3.6.
         absolute_package_path = os.path.abspath(package.__spec__.origin)
