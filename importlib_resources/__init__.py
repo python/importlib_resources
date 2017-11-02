@@ -12,6 +12,8 @@ import typing
 from typing import Iterator, Union
 from typing.io import BinaryIO
 
+from . import abc as resources_abc
+
 
 Package = Union[types.ModuleType, str]
 if sys.version_info >= (3, 6):
@@ -47,27 +49,33 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
     """Return a file-like object opened for binary-reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
-    # Using pathlib doesn't work well here due to the lack of 'strict' argument
-    # for pathlib.Path.resolve() prior to Python 3.6.
-    absolute_package_path = os.path.abspath(package.__spec__.origin)
-    package_path = os.path.dirname(absolute_package_path)
-    full_path = os.path.join(package_path, file_name)
-    try:
-        return builtins.open(full_path, 'rb')
-    except IOError:
-        # Just assume the loader is a resource loader; all the relevant
-        # importlib.machinery loaders are and an AttributeError for get_data()
-        # will make it clear what is needed from the loader.
-        loader = typing.cast(importlib.abc.ResourceLoader,
+    if hasattr(package.__spec__.loader, 'open_resource'):
+        reader = typing.cast(resources_abc.ResourceReader,
                              package.__spec__.loader)
+        return reader.open_resource(file_name)
+    else:
+        # Using pathlib doesn't work well here due to the lack of 'strict'
+        # argument for pathlib.Path.resolve() prior to Python 3.6.
+        absolute_package_path = os.path.abspath(package.__spec__.origin)
+        package_path = os.path.dirname(absolute_package_path)
+        full_path = os.path.join(package_path, file_name)
         try:
-            data = loader.get_data(full_path)
+            return builtins.open(full_path, 'rb')
         except IOError:
-            package_name = package.__spec__.name
-            message = '{!r} resource not found in {!r}'.format(file_name, package_name)
-            raise FileNotFoundError(message)
-        else:
-            return io.BytesIO(data)
+            # Just assume the loader is a resource loader; all the relevant
+            # importlib.machinery loaders are and an AttributeError for
+            # get_data() will make it clear what is needed from the loader.
+            loader = typing.cast(importlib.abc.ResourceLoader,
+                                package.__spec__.loader)
+            try:
+                data = loader.get_data(full_path)
+            except IOError:
+                package_name = package.__spec__.name
+                message = '{!r} resource not found in {!r}'.format(file_name,
+                                                                   package_name)
+                raise FileNotFoundError(message)
+            else:
+                return io.BytesIO(data)
 
 
 def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
@@ -98,14 +106,24 @@ def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    normalized_path = _normalize_path(file_name)
+    file_name = _normalize_path(file_name)
     package = _get_package(package)
+    if hasattr(package.__spec__.loader, 'resource_path'):
+        reader = typing.cast(resources_abc.ResourceReader,
+                             package.__spec__.loader)
+        try:
+            yield pathlib.Path(reader.resource_path(file_name))
+            return
+        except FileNotFoundError:
+            pass
+    # Fall-through for both the lack of resource_path() *and* if resource_path()
+    # raises FileNotFoundError.
     package_directory = pathlib.Path(package.__spec__.origin).parent
-    file_path = package_directory / normalized_path
+    file_path = package_directory / file_name
     if file_path.exists():
         yield file_path
     else:
-        with open(package, normalized_path) as file:
+        with open(package, file_name) as file:
             data = file.read()
         # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
         # blocks due to the need to close the temporary file to work on

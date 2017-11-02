@@ -1,10 +1,41 @@
 import abc
 import importlib
+import importlib.machinery
+import io
 import pathlib
 import sys
+import types
 import unittest
 
+from .. import abc as resources_abc
 from . import data
+
+
+def create_package(*, file, path):
+    class Reader(resources_abc.ResourceReader):
+        def open_resource(self, path):
+            self._path = path
+            if isinstance(file, Exception):
+                raise file
+            else:
+                return file
+
+        def resource_path(self, path_):
+            self._path = path_
+            if isinstance(path, Exception):
+                raise path
+            else:
+                return path
+
+    name = 'testingpackage'
+    spec = importlib.machinery.ModuleSpec(name, Reader(),
+                                          origin='does-not-exist',
+                                          is_package=True)
+    # Unforunately importlib.util.module_from_spec() was not introduced until
+    # Python 3.5.
+    module = types.ModuleType(name)
+    module.__spec__ = spec
+    return module
 
 
 class CommonTests(abc.ABC):
@@ -53,6 +84,25 @@ class CommonTests(abc.ABC):
         # The anchor package cannot be a module.
         with self.assertRaises(TypeError):
             self.execute(__spec__.name, 'utf-8.file')
+
+    def test_resource_opener(self):
+        data = io.BytesIO(b'Hello, world!')
+        package = create_package(file=data, path=FileNotFoundError())
+        self.execute(package, 'utf-8.file')
+        self.assertEqual(package.__spec__.loader._path, 'utf-8.file')
+
+    def test_resource_path(self):
+        data = io.BytesIO(b'Hello, world!')
+        path = __file__
+        package = create_package(file=data, path=path)
+        self.execute(package, 'utf-8.file')
+        self.assertEqual(package.__spec__.loader._path, 'utf-8.file')
+
+    def test_useless_loader(self):
+        package = create_package(file=FileNotFoundError(),
+                                 path=FileNotFoundError())
+        with self.assertRaises(FileNotFoundError):
+            self.execute(package, 'utf-8.file')
 
 
 class ZipSetup:
