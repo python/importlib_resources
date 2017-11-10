@@ -20,15 +20,16 @@ from . import abc as resources_abc
 
 Package = Union[types.ModuleType, str]
 if sys.version_info >= (3, 6):
-    FileName = Union[str, os.PathLike]
+    FileName = Union[str, os.PathLike]              # pragma: ge36
 else:
-    FileName = str
+    FileName = str                                  # pragma: le35
 
 
 def _get_package(package) -> types.ModuleType:
     if hasattr(package, '__spec__'):
         if package.__spec__.submodule_search_locations is None:
-            raise TypeError("{!r} is not a package".format(package.__spec__.name))
+            raise TypeError("{!r} is not a package".format(
+                package.__spec__.name))
         else:
             return package
     else:
@@ -69,13 +70,13 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
             # importlib.machinery loaders are and an AttributeError for
             # get_data() will make it clear what is needed from the loader.
             loader = typing.cast(importlib.abc.ResourceLoader,
-                                package.__spec__.loader)
+                                 package.__spec__.loader)
             try:
                 data = loader.get_data(full_path)
             except IOError:
                 package_name = package.__spec__.name
-                message = '{!r} resource not found in {!r}'.format(file_name,
-                                                                   package_name)
+                message = '{!r} resource not found in {!r}'.format(
+                    file_name, package_name)
                 raise FileNotFoundError(message)
             else:
                 return io.BytesIO(data)
@@ -92,8 +93,8 @@ def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
     package = _get_package(package)
     # Note this is **not** builtins.open()!
     with open(package, file_name) as binary_file:
-        # Decoding from io.TextIOWrapper() instead of str.decode() in hopes that
-        # the former will be smarter about memory usage.
+        # Decoding from io.TextIOWrapper() instead of str.decode() in hopes
+        # that the former will be smarter about memory usage.
         text_file = io.TextIOWrapper(binary_file, encoding=encoding,
                                      errors=errors)
         return text_file.read()
@@ -119,8 +120,8 @@ def path(package: Package, file_name: FileName) -> Iterator[pathlib.Path]:
             return
         except FileNotFoundError:
             pass
-    # Fall-through for both the lack of resource_path() *and* if resource_path()
-    # raises FileNotFoundError.
+    # Fall-through for both the lack of resource_path() *and* if
+    # resource_path() raises FileNotFoundError.
     package_directory = pathlib.Path(package.__spec__.origin).parent
     file_path = package_directory / file_name
     if file_path.exists():

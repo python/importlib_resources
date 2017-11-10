@@ -1,7 +1,3 @@
-import io
-import os.path
-import pathlib
-import sys
 import unittest
 
 import importlib_resources as resources
@@ -27,8 +23,8 @@ class ReadTests:
 
     def test_errors(self):
         # Raises UnicodeError without the 'errors' argument.
-        result = resources.read(self.data, 'utf-16.file', encoding='utf-8',
-                                errors='ignore')
+        resources.read(
+            self.data, 'utf-16.file', encoding='utf-8', errors='ignore')
 
 
 class ReadDiskTests(ReadTests, unittest.TestCase):

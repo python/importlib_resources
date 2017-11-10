@@ -1,7 +1,4 @@
 import io
-import os.path
-import pathlib
-import sys
 import unittest
 
 import importlib_resources as resources
@@ -33,7 +30,7 @@ class OpenTests:
 
     def test_FileNotFoundError(self):
         with self.assertRaises(FileNotFoundError):
-            with resources.open(self.data, 'does-not-exist') as file:
+            with resources.open(self.data, 'does-not-exist'):
                 pass
 
 

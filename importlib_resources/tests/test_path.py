@@ -1,7 +1,3 @@
-import io
-import os.path
-import pathlib
-import sys
 import unittest
 
 import importlib_resources as resources
@@ -35,7 +31,11 @@ class PathDiskTests(PathTests, unittest.TestCase):
 
 
 class PathZipTests(PathTests, util.ZipSetup, unittest.TestCase):
-    pass
+    def test_remove_in_context_manager(self):
+        # It is not an error if the file that was temporarily stashed on the
+        # file system is removed inside the `with` stanza.
+        with resources.path(self.data, 'utf-8.file') as path:
+            path.unlink()
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ from .. import abc as resources_abc
 from . import data
 
 
-def create_package(*, file, path):
+def create_package(*, file, path, is_package=True):
     class Reader(resources_abc.ResourceReader):
         def open_resource(self, path):
             self._path = path
@@ -28,9 +28,10 @@ def create_package(*, file, path):
                 return path
 
     name = 'testingpackage'
-    spec = importlib.machinery.ModuleSpec(name, Reader(),
-                                          origin='does-not-exist',
-                                          is_package=True)
+    spec = importlib.machinery.ModuleSpec(
+        name, Reader(),
+        origin='does-not-exist',
+        is_package=is_package)
     # Unforunately importlib.util.module_from_spec() was not introduced until
     # Python 3.5.
     module = types.ModuleType(name)
@@ -80,10 +81,16 @@ class CommonTests(abc.ABC):
         del sys.modules[data.__name__]
         self.execute(data.__name__, 'utf-8.file')
 
-    def test_non_package(self):
+    def test_non_package_by_name(self):
         # The anchor package cannot be a module.
         with self.assertRaises(TypeError):
             self.execute(__spec__.name, 'utf-8.file')
+
+    def test_non_package_by_package(self):
+        # The anchor package cannot be a module.
+        with self.assertRaises(TypeError):
+            module = sys.modules['importlib_resources.tests.util']
+            self.execute(module, 'utf-8.file')
 
     def test_resource_opener(self):
         data = io.BytesIO(b'Hello, world!')
