@@ -17,7 +17,7 @@ from typing.io import BinaryIO
 
 Package = Union[ModuleType, str]
 if sys.version_info >= (3, 6):
-    FileName = Union[str, os.PathLike]              # pragma: ge36
+    FileName = Union[str, os.PathLike]              # pragma: ge35
 else:
     FileName = str                                  # pragma: le35
 
