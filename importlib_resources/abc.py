@@ -1,13 +1,23 @@
-import abc
+from __future__ import absolute_import
 
-from typing.io import BinaryIO
+from ._compat import ABC, FileNotFoundError
+from abc import abstractmethod
+
+# We use mypy's comment syntax here since this file must be compatible with
+# both Python 2 and 3.
+try:
+    from typing import BinaryIO, Text                             # noqa: F401
+except ImportError:
+    # Python 2
+    pass
 
 
-class ResourceReader(abc.ABC):
+class ResourceReader(ABC):
     """Abstract base class for loaders to provide resource reading support."""
 
-    @abc.abstractmethod
-    def open_resource(self, path: str) -> BinaryIO:
+    @abstractmethod
+    def open_resource(self, path):
+        # type: (Text) -> BinaryIO
         """Return an opened, file-like object for binary reading.
 
         The 'path' argument is expected to represent only a file name.
@@ -16,10 +26,11 @@ class ResourceReader(abc.ABC):
         # This deliberately raises FileNotFoundError instead of
         # NotImplementedError so that if this method is accidentally called,
         # it'll still do the right thing.
-        raise FileNotFoundError                     # pragma: nocover
+        raise FileNotFoundError
 
-    @abc.abstractmethod
-    def resource_path(self, path: str) -> str:
+    @abstractmethod
+    def resource_path(self, path):
+        # type: (Text) -> Text
         """Return the file system path to the specified resource.
 
         The 'path' argument is expected to represent only a file name.
@@ -29,4 +40,4 @@ class ResourceReader(abc.ABC):
         # This deliberately raises FileNotFoundError instead of
         # NotImplementedError so that if this method is accidentally called,
         # it'll still do the right thing.
-        raise FileNotFoundError                     # pragma: nocover
+        raise FileNotFoundError
