@@ -11,11 +11,12 @@ matrix:
     - python: "3.7-dev"
 
 install:
-  - python3 -m pip install --upgrade mypy coverage
+  - python3 -m pip install --upgrade mypy coverage sphinx
 
 script:
   - python3 -m coverage run --rcfile=coverage.ini -m unittest discover
   - mypy --ignore-missing-imports importlib_resources
+  - python3 setup.py build_sphinx
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
