@@ -2,10 +2,10 @@ import os
 import tempfile
 
 from ._compat import FileNotFoundError
-from __builtin__ import open as builtin_open
+from ._util import _wrap_file
 from contextlib import contextmanager
 from importlib import import_module
-from io import BytesIO
+from io import BytesIO, open as io_open
 from pathlib2 import Path
 
 
@@ -32,8 +32,8 @@ def _normalize_path(path):
         return file_name
 
 
-def open(package, file_name):
-    """Return a file-like object opened for binary-reading of the resource."""
+def open(package, file_name, encoding=None, errors=None):
+    """Return a file-like object opened for reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
     # Using pathlib doesn't work well here due to the lack of 'strict' argument
@@ -41,8 +41,12 @@ def open(package, file_name):
     package_path = os.path.dirname(package.__file__)
     relative_path = os.path.join(package_path, file_name)
     full_path = os.path.abspath(relative_path)
+    if encoding is None:
+        args = dict(mode='rb')
+    else:
+        args = dict(mode='r', encoding=encoding, errors=errors)
     try:
-        return builtin_open(full_path, 'rb')
+        return io_open(full_path, **args)
     except IOError:
         # This might be a package in a zip file.  zipimport provides a loader
         # with a functioning get_data() method, however we have to strip the
@@ -60,7 +64,7 @@ def open(package, file_name):
                 file_name, package_name)
             raise FileNotFoundError(message)
         else:
-            return BytesIO(data)
+            return _wrap_file(BytesIO(data), encoding, errors)
 
 
 def read(package, file_name, encoding='utf-8', errors='strict'):

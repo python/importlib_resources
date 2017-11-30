@@ -3,6 +3,7 @@ import sys
 import tempfile
 
 from . import abc as resources_abc
+from ._util import _wrap_file
 from builtins import open as builtins_open
 from contextlib import contextmanager
 from importlib import import_module
@@ -12,7 +13,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Iterator, Union
 from typing import cast
-from typing.io import BinaryIO
+from typing.io import IO
 
 
 Package = Union[ModuleType, str]
@@ -46,21 +47,28 @@ def _normalize_path(path) -> str:
         return file_name
 
 
-def open(package: Package, file_name: FileName) -> BinaryIO:
-    """Return a file-like object opened for binary-reading of the resource."""
+def open(package: Package,
+         file_name: FileName,
+         encoding: str = None,
+         errors: str = None) -> IO:
+    """Return a file-like object opened for reading of the resource."""
     file_name = _normalize_path(file_name)
     package = _get_package(package)
     if hasattr(package.__spec__.loader, 'open_resource'):
         reader = cast(resources_abc.ResourceReader, package.__spec__.loader)
-        return reader.open_resource(file_name)
+        return _wrap_file(reader.open_resource(file_name), encoding, errors)
     else:
         # Using pathlib doesn't work well here due to the lack of 'strict'
         # argument for pathlib.Path.resolve() prior to Python 3.6.
         absolute_package_path = os.path.abspath(package.__spec__.origin)
         package_path = os.path.dirname(absolute_package_path)
         full_path = os.path.join(package_path, file_name)
+        if encoding is None:
+            args = dict(mode='rb')
+        else:
+            args = dict(mode='r', encoding=encoding, errors=errors)
         try:
-            return builtins_open(full_path, 'rb')
+            return builtins_open(full_path, **args)   # type: ignore
         except IOError:
             # Just assume the loader is a resource loader; all the relevant
             # importlib.machinery loaders are and an AttributeError for
@@ -74,7 +82,7 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
                     file_name, package_name)
                 raise FileNotFoundError(message)
             else:
-                return BytesIO(data)
+                return _wrap_file(BytesIO(data), encoding, errors)
 
 
 def read(package: Package,
