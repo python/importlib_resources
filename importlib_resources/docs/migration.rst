@@ -21,8 +21,8 @@ since only file are allowed as resources, file names in the
 ``importlib_resources`` API may *not* include path separators (e.g. slashes).
 
 
-resource_filename()
-===================
+``pkg_resources.resource_filename()``
+=====================================
 
 ``resource_filename()`` is one of the more interesting APIs because it
 guarantees that the return value names a file on the file system.  This means
@@ -72,8 +72,8 @@ Assuming your Python interpreter exits gracefully, the temporary file will be
 cleaned up when Python exits.
 
 
-resource_stream()
-=================
+``pkg_resources.resource_stream()``
+===================================
 
 ``pkg_resources.resource_stream()`` returns a readable file-like object opened
 in binary mode.  When you read from the returned file-like object, you get
@@ -88,8 +88,8 @@ The equivalent code in ``importlib_resources`` is pretty straightforward::
         my_bytes = fp.read()
 
 
-resource_string()
-=================
+``pkg_resources.resource_string()``
+===================================
 
 In Python 2, ``pkg_resources.resource_string()`` returns the contents of a
 resource as a ``str``.  In Python 3, this function is a misnomer; it actually
