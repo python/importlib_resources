@@ -73,7 +73,10 @@ def read(package, file_name, encoding='utf-8', errors='strict'):
     package = _get_package(package)
     # Note this is **not** builtins.open()!
     with open(package, file_name) as binary_file:
-        return binary_file.read().decode(encoding=encoding, errors=errors)
+        contents = binary_file.read()
+        if encoding is None:
+            return contents
+        return contents.decode(encoding=encoding, errors=errors)
 
 
 @contextmanager

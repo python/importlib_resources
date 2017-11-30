@@ -77,8 +77,10 @@ def open(package: Package, file_name: FileName) -> BinaryIO:
                 return BytesIO(data)
 
 
-def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
-         errors: str = 'strict') -> str:
+def read(package: Package,
+         file_name: FileName,
+         encoding: str = 'utf-8',
+         errors: str = 'strict') -> Union[str, bytes]:
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
@@ -88,6 +90,8 @@ def read(package: Package, file_name: FileName, encoding: str = 'utf-8',
     package = _get_package(package)
     # Note this is **not** builtins.open()!
     with open(package, file_name) as binary_file:
+        if encoding is None:
+            return binary_file.read()
         # Decoding from io.TextIOWrapper() instead of str.decode() in hopes
         # that the former will be smarter about memory usage.
         text_file = TextIOWrapper(
