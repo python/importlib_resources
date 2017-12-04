@@ -18,7 +18,7 @@ standard library as ``importlib.resources``.  Its API is currently
 `provisional`_.
 
 This documentation includes a general :ref:`usage <using>` guide and a
-:ref:`migration` guide for projects which want to adopt
+:ref:`migration <migration>` guide for projects that want to adopt
 ``importlib_resources`` instead of ``pkg_resources``.
 
 
@@ -28,6 +28,7 @@ This documentation includes a general :ref:`usage <using>` guide and a
 
    using.rst
    migration.rst
+   api.rst
 
 
 Indices and tables

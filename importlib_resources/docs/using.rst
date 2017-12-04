@@ -18,8 +18,8 @@ Your test could read the data file by doing something like::
         eml = fp.read()
 
 But there's a problem with this!  The use of ``__file__`` doesn't work if your
-package lives inside a zip file, since in that case, this code does not live
-on the file system.
+package lives inside a zip file, since in that case this code does not live on
+the file system.
 
 You could use the `pkg_resources API`_ like so::
 
@@ -27,22 +27,25 @@ You could use the `pkg_resources API`_ like so::
     from pkg_resources import resource_string as resource_bytes
     eml = resource_bytes('email.tests.data', 'message.eml').decode('utf-8')
 
-This requires you to make both ``email/tests`` and ``email/tests/data`` to be
-Python packages, by placing empty ``__init__.py`` files in those directories.
+This requires you to make Python packages of both ``email/tests`` and
+``email/tests/data``, by placing an empty ``__init__.py`` files in each of
+those directories.
+
 **This is a requirement for ``importlib_resources`` too!**
 
-The problem with this is that, depending on the structure of your package,
-``pkg_resources`` can be very inefficient even to just import.
-``pkg_resources`` is a sort of grab-bag of APIs and functionalities, and to
-support all of this, it sometimes has to do a ton of work at import time,
-e.g. to scan every package on your ``sys.path``.  This can have a serious
-negative impact on things like command line startup time for Python implement
-commands.
+The problem with the ``pkg_resources`` approach is that, depending on the
+structure of your package, ``pkg_resources`` can be very inefficient even to
+just import.  ``pkg_resources`` is a sort of grab-bag of APIs and
+functionalities, and to support all of this, it sometimes has to do a ton of
+work at import time, e.g. to scan every package on your ``sys.path``.  This
+can have a serious negative impact on things like command line startup time
+for Python implement commands.
 
 ``importlib_resources`` solves this by being built entirely on the back of the
-stdlib :py:mod:`importlib`.  This makes it very fast, by taking advantage of
-all the efficiencies in Python's import system.  The equivalent code using
-``importlib_resources`` would look like::
+stdlib :py:mod:`importlib`.  By taking advantage of all the efficiencies in
+Python's import system, and the fact that it's built into Python, using
+``importlib_resources`` can be much more performant.  The equivalent code
+using ``importlib_resources`` would look like::
 
     from importlib_resources import read
     # Reads contents with UTF-8 encoding and returns str.
