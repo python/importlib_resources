@@ -99,9 +99,37 @@ Functions
                       not have sub-resources (i.e. it cannot be a directory).
     :type file_name: ``FileName``
     :returns: A context manager for use in a ``with``-statement.  Entering
-              the context manager provides a :py:class:`pathlib.Path`
-              object.
+              the context manager provides a :py:class:`pathlib.Path` object.
     :rtype: context manager providing a :py:class:`pathlib.Path` object
+
+
+.. py:function:: importlib_resources.is_resource(package, file_name)
+
+    Return True if there is a resource named ``file_name`` in the package,
+    otherwise False.  Remember that directories are *not* resources!
+
+    :param package: A package name or module object.  See above for the API
+                    that such module objects must support.
+    :type package: ``Package``
+    :param file_name: The name of the resource to read within ``package``.
+                      ``file_name`` may not contain path separators and it may
+                      not have sub-resources (i.e. it cannot be a directory).
+    :type file_name: ``FileName``
+    :returns: A flag indicating whether the resource exists or not.
+    :rtype: bool
+
+
+.. py:function:: importlib_resources.contents(package)
+
+    Return an iterator over the contents of the package.  The iterator can
+    return resources (e.g. files) and non-resources (e.g. directories).  The
+    iterator does not recurse into subdirectories.
+
+    :param package: A package name or module object.  See above for the API
+                    that such module objects must support.
+    :type package: ``Package``
+    :returns: The contents of the package, both resources and non-resources.
+    :rtype: An iterator over strings.
 
 
 .. _`context manager`: https://docs.python.org/3/library/stdtypes.html#typecontextmanager

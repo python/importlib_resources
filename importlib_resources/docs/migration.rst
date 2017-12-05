@@ -14,6 +14,8 @@ access`_ APIs:
 * ``pkg_resources.resource_filename()``
 * ``pkg_resources.resource_stream()``
 * ``pkg_resources.resource_string()``
+* ``pkg_resources.resource_listdir()``
+* ``pkg_resources.resource_isdir()``
 
 Keep in mind that ``pkg_resources`` defines *resources* to include
 directories.  ``importlib_resources`` does not treat directories as resources;
@@ -107,6 +109,57 @@ This can be easily rewritten like so::
 The ``encoding=None`` argument is needed because by default ``read()`` returns
 a ``unicode`` in Python 2 or a ``str`` in Python 3, read and decoded with the
 ``utf-8`` encoding.
+
+
+``pkg_resources.resource_listdir()``
+====================================
+
+This function lists the entries in the package, both files and directories,
+but it does not recurse into subdirectories, e.g.::
+
+    for entry in pkg_resources.listdir('my.package', 'subpackage'):
+        print(entry)
+
+This is easily rewritten using the following idiom::
+
+    for entry in importlib_resources.contents('my.package.subpackage'):
+        print(entry)
+
+Note:
+
+* ``pkg_resources`` does not require ``subpackage`` to be a Python package,
+  but ``importlib_resources`` does.
+* ``importlib_resources.contents()`` returns an iterator, not a concrete
+  sequence.
+* The order in which the elements are returned is undefined.
+* ``importlib_resources.contents()`` returns *all* the entries in the
+  subpackage, i.e. both resources (files) and non-resources (directories).  As
+  with ``pkg_resources.listdir()`` it does not recurse.
+
+
+pkg_resources.resource_isdir()
+==============================
+
+You can ask ``pkg_resources`` to tell you whether a particular resource inside
+a package is a directory or not::
+
+    if pkg_resources.resource_isdir('my.package', 'resource'):
+        print('A directory')
+
+Because ``importlib_resources`` explicitly does not define directories as
+resources, there's no direct equivalent.  However, you can ask whether a
+particular resource exists inside a package, and since directories are not
+resources you can infer whether the resource is a directory or a file.  Here
+is a way to do that::
+
+    from importlib_resources import contents, is_resource
+    if 'resource' in contents('my.package') and \
+              not is_resource('my.package', 'resource'):
+      print('It must be a directory')
+
+The reason you have to do it this way and not just call
+``not is_resource('my.package', 'resource')`` is because this conditional will
+also return False when ``resource`` is not an entry in ``my.package``.
 
 
 .. _`basic resource access`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access

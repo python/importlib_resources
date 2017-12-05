@@ -7,6 +7,7 @@ import unittest
 
 from .. import abc as resources_abc
 from . import data
+from . import zipdata
 from .._compat import ABC, Path, PurePath, FileNotFoundError
 
 
@@ -16,7 +17,7 @@ except ImportError:
     ModuleSpec = None                               # type: ignore
 
 
-def create_package(file, path, is_package=True):
+def create_package(file, path, is_package=True, contents=()):
     class Reader(resources_abc.ResourceReader):
         def open_resource(self, path):
             self._path = path
@@ -31,6 +32,23 @@ def create_package(file, path, is_package=True):
                 raise path
             else:
                 return path
+
+        def is_resource(self, path_):
+            self._path = path_
+            if isinstance(path, Exception):
+                raise path
+            for entry in contents:
+                parts = entry.split('/')
+                if len(parts) == 1 and parts[0] == path_:
+                    return True
+            return False
+
+        def contents(self):
+            if isinstance(path, Exception):
+                raise path
+            # There's no yield from in baseball, er, Python 2.
+            for entry in contents:
+                yield entry
 
     name = 'testingpackage'
     # Unforunately importlib.util.module_from_spec() was not introduced until
@@ -130,10 +148,9 @@ class CommonTests(ABC):
 
 
 class ZipSetup:
-
     @classmethod
     def setUpClass(cls):
-        data_path = Path(data.__file__)
+        data_path = Path(zipdata.__file__)
         data_dir = data_path.parent
         cls._zip_path = str(data_dir / 'ziptestdata.zip')
         sys.path.append(cls._zip_path)
