@@ -19,22 +19,22 @@ from zipfile import ZipFile
 
 Package = Union[ModuleType, str]
 if sys.version_info >= (3, 6):
-    FileName = Union[str, os.PathLike]              # pragma: ge35
+    Resource = Union[str, os.PathLike]              # pragma: ge35
 else:
-    FileName = str                                  # pragma: le35
+    Resource = str                                  # pragma: le35
 
 
 def _get_package(package) -> ModuleType:
     if hasattr(package, '__spec__'):
         if package.__spec__.submodule_search_locations is None:
-            raise TypeError("{!r} is not a package".format(
+            raise TypeError('{!r} is not a package'.format(
                 package.__spec__.name))
         else:
             return package
     else:
         module = import_module(package)
         if module.__spec__.submodule_search_locations is None:
-            raise TypeError("{!r} is not a package".format(package))
+            raise TypeError('{!r} is not a package'.format(package))
         else:
             return module
 
@@ -43,7 +43,7 @@ def _normalize_path(path) -> str:
     str_path = str(path)
     parent, file_name = os.path.split(str_path)
     if parent:
-        raise ValueError("{!r} must be only a file name".format(path))
+        raise ValueError('{!r} must be only a file name'.format(path))
     else:
         return file_name
 
@@ -61,20 +61,20 @@ def _get_resource_reader(
 
 
 def open(package: Package,
-         file_name: FileName,
+         resource: Resource,
          encoding: str = None,
          errors: str = None) -> IO:
     """Return a file-like object opened for reading of the resource."""
-    file_name = _normalize_path(file_name)
+    resource = _normalize_path(resource)
     package = _get_package(package)
     reader = _get_resource_reader(package)
     if reader is not None:
-        return _wrap_file(reader.open_resource(file_name), encoding, errors)
+        return _wrap_file(reader.open_resource(resource), encoding, errors)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
     absolute_package_path = os.path.abspath(package.__spec__.origin)
     package_path = os.path.dirname(absolute_package_path)
-    full_path = os.path.join(package_path, file_name)
+    full_path = os.path.join(package_path, resource)
     if encoding is None:
         args = dict(mode='rb')
     else:
@@ -91,14 +91,14 @@ def open(package: Package,
         except IOError:
             package_name = package.__spec__.name
             message = '{!r} resource not found in {!r}'.format(
-                file_name, package_name)
+                resource, package_name)
             raise FileNotFoundError(message)
         else:
             return _wrap_file(BytesIO(data), encoding, errors)
 
 
 def read(package: Package,
-         file_name: FileName,
+         resource: Resource,
          encoding: str = 'utf-8',
          errors: str = 'strict') -> Union[str, bytes]:
     """Return the decoded string of the resource.
@@ -106,10 +106,10 @@ def read(package: Package,
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    file_name = _normalize_path(file_name)
+    resource = _normalize_path(resource)
     package = _get_package(package)
     # Note this is **not** builtins.open()!
-    with open(package, file_name) as binary_file:
+    with open(package, resource) as binary_file:
         if encoding is None:
             return binary_file.read()
         # Decoding from io.TextIOWrapper() instead of str.decode() in hopes
@@ -120,7 +120,7 @@ def read(package: Package,
 
 
 @contextmanager
-def path(package: Package, file_name: FileName) -> Iterator[Path]:
+def path(package: Package, resource: Resource) -> Iterator[Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -129,23 +129,23 @@ def path(package: Package, file_name: FileName) -> Iterator[Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    file_name = _normalize_path(file_name)
+    resource = _normalize_path(resource)
     package = _get_package(package)
     reader = _get_resource_reader(package)
     if reader is not None:
         try:
-            yield Path(reader.resource_path(file_name))
+            yield Path(reader.resource_path(resource))
             return
         except FileNotFoundError:
             pass
     # Fall-through for both the lack of resource_path() *and* if
     # resource_path() raises FileNotFoundError.
     package_directory = Path(package.__spec__.origin).parent
-    file_path = package_directory / file_name
+    file_path = package_directory / resource
     if file_path.exists():
         yield file_path
     else:
-        with open(package, file_name) as file:
+        with open(package, resource) as file:
             data = file.read()
         # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
         # blocks due to the need to close the temporary file to work on
@@ -162,26 +162,26 @@ def path(package: Package, file_name: FileName) -> Iterator[Path]:
                 pass
 
 
-def is_resource(package: Package, file_name: str) -> bool:
-    """True if file_name is a resource inside package.
+def is_resource(package: Package, name: str) -> bool:
+    """True if `name` is a resource inside `package`.
 
     Directories are *not* resources.
     """
     package = _get_package(package)
-    _normalize_path(file_name)
+    _normalize_path(name)
     reader = _get_resource_reader(package)
     if reader is not None:
-        return reader.is_resource(file_name)
+        return reader.is_resource(name)
     try:
         package_contents = set(contents(package))
     except (NotADirectoryError, FileNotFoundError):
         return False
-    if file_name not in package_contents:
+    if name not in package_contents:
         return False
     # Just because the given file_name lives as an entry in the package's
     # contents doesn't necessarily mean it's a resource.  Directories are not
     # resources, so let's try to find out if it's a directory or not.
-    path = Path(package.__spec__.origin).parent / file_name
+    path = Path(package.__spec__.origin).parent / name
     if path.is_file():
         return True
     if path.is_dir():
@@ -195,7 +195,7 @@ def is_resource(package: Package, file_name: str) -> bool:
     with ZipFile(archive_path) as zf:
         toc = zf.namelist()
     relpath = package_directory.relative_to(archive_path)
-    candidate_path = relpath / file_name
+    candidate_path = relpath / name
     for entry in toc:                               # pragma: nobranch
         try:
             relative_to_candidate = Path(entry).relative_to(candidate_path)
@@ -217,7 +217,7 @@ def is_resource(package: Package, file_name: str) -> bool:
 
 
 def contents(package: Package) -> Iterator[str]:
-    """Return the list of entries in package.
+    """Return the list of entries in `package`.
 
     Note that not all entries are resources.  Specifically, directories are
     not considered resources.  Use `is_resource()` on each entry returned here
