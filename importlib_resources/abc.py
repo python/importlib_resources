@@ -16,11 +16,11 @@ class ResourceReader(ABC):
     """Abstract base class for loaders to provide resource reading support."""
 
     @abstractmethod
-    def open_resource(self, path):
+    def open_resource(self, resource):
         # type: (Text) -> BinaryIO
         """Return an opened, file-like object for binary reading.
 
-        The 'path' argument is expected to represent only a file name.
+        The 'resource' argument is expected to represent only a file name.
         If the resource cannot be found, FileNotFoundError is raised.
         """
         # This deliberately raises FileNotFoundError instead of
@@ -29,11 +29,11 @@ class ResourceReader(ABC):
         raise FileNotFoundError
 
     @abstractmethod
-    def resource_path(self, path):
+    def resource_path(self, resource):
         # type: (Text) -> Text
         """Return the file system path to the specified resource.
 
-        The 'path' argument is expected to represent only a file name.
+        The 'resource' argument is expected to represent only a file name.
         If the resource does not exist on the file system, raise
         FileNotFoundError.
         """
@@ -45,7 +45,7 @@ class ResourceReader(ABC):
     @abstractmethod
     def is_resource(self, path):
         # type: (Text) -> bool
-        """Return True if the named path is a resource.
+        """Return True if the named 'path' is a resource.
 
         Files are resources, directories are not.
         """
@@ -54,5 +54,5 @@ class ResourceReader(ABC):
     @abstractmethod
     def contents(self):
         # type: () -> Iterator[str]
-        """Return an iterator over the string contents of the resource."""
+        """Return an iterator over the string contents of the package."""
         raise FileNotFoundError
