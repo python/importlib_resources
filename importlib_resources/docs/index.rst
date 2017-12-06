@@ -30,6 +30,16 @@ This documentation includes a general :ref:`usage <using>` guide and a
    migration.rst
    api.rst
    abc.rst
+   changelog.rst
+
+
+Project details
+===============
+
+ * Project home: https://gitlab.com/python-devs/importlib_resources
+ * Report bugs at: https://gitlab.com/python-devs/importlib_resources/issues
+ * Code hosting: https://gitlab.com/python-devs/importlib_resources.git
+ * Documentation: http://importlib_resources.readthedocs.io/
 
 
 Indices and tables

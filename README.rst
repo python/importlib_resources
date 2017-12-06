@@ -11,3 +11,12 @@ The key goal of this module is to replace parts of `pkg_resources
 solution in Python's stdlib that relies on well-defined APIs.  This should not
 only make reading resources included in packages easier, but have the
 semantics be stable and consistent.
+
+
+Project details
+===============
+
+ * Project home: https://gitlab.com/python-devs/importlib_resources
+ * Report bugs at: https://gitlab.com/python-devs/importlib_resources/issues
+ * Code hosting: https://gitlab.com/python-devs/importlib_resources.git
+ * Documentation: http://importlib_resources.readthedocs.io/
