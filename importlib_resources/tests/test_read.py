@@ -5,34 +5,43 @@ from . import data
 from . import util
 
 
-class CommonTests(util.CommonTests, unittest.TestCase):
-
+class CommonBinaryTests(util.CommonTests, unittest.TestCase):
     def execute(self, package, path):
-        resources.read(package, path)
+        resources.read_binary(package, path)
+
+
+class CommonTextTests(util.CommonTests, unittest.TestCase):
+    def execute(self, package, path):
+        resources.read_text(package, path)
 
 
 class ReadTests:
+    def test_read_binary(self):
+        result = resources.read_binary(self.data, 'binary.file')
+        self.assertEqual(result, b'\0\1\2\3')
 
-    def test_default_encoding(self):
-        result = resources.read(self.data, 'utf-8.file')
-        self.assertEqual('Hello, UTF-8 world!\n', result)
+    def test_read_text_default_encoding(self):
+        result = resources.read_text(self.data, 'utf-8.file')
+        self.assertEqual(result, 'Hello, UTF-8 world!\n')
 
-    def test_encoding(self):
-        result = resources.read(self.data, 'utf-16.file', encoding='utf-16')
-        self.assertEqual('Hello, UTF-16 world!\n', result)
+    def test_read_text_given_encoding(self):
+        result = resources.read_text(
+            self.data, 'utf-16.file', encoding='utf-16')
+        self.assertEqual(result, 'Hello, UTF-16 world!\n')
 
-    def test_errors(self):
+    def test_read_text_with_errors(self):
         # Raises UnicodeError without the 'errors' argument.
-        resources.read(
-            self.data, 'utf-16.file', encoding='utf-8', errors='ignore')
-
-    def test_no_encoding(self):
-        result = resources.read(self.data, 'binary.file', encoding=None)
-        self.assertEqual(b'\0\1\2\3', result)
+        self.assertRaises(
+            UnicodeError, resources.read_text, data, 'utf-16.file')
+        result = resources.read_text(self.data, 'utf-16.file', errors='ignore')
+        self.assertEqual(
+            result,
+            'H\x00e\x00l\x00l\x00o\x00,\x00 '
+            '\x00U\x00T\x00F\x00-\x001\x006\x00 '
+            '\x00w\x00o\x00r\x00l\x00d\x00!\x00\n\x00')
 
 
 class ReadDiskTests(ReadTests, unittest.TestCase):
-
     data = data
 
 

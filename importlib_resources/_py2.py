@@ -3,10 +3,9 @@ import errno
 import tempfile
 
 from ._compat import FileNotFoundError
-from ._util import _wrap_file
 from contextlib import contextmanager
 from importlib import import_module
-from io import BytesIO, open as io_open
+from io import BytesIO, TextIOWrapper, open as io_open
 from pathlib2 import Path
 from zipfile import ZipFile
 
@@ -34,8 +33,8 @@ def _normalize_path(path):
         return file_name
 
 
-def open(package, resource, encoding=None, errors=None):
-    """Return a file-like object opened for reading of the resource."""
+def open_binary(package, resource):
+    """Return a file-like object opened for binary reading of the resource."""
     resource = _normalize_path(resource)
     package = _get_package(package)
     # Using pathlib doesn't work well here due to the lack of 'strict' argument
@@ -43,12 +42,8 @@ def open(package, resource, encoding=None, errors=None):
     package_path = os.path.dirname(package.__file__)
     relative_path = os.path.join(package_path, resource)
     full_path = os.path.abspath(relative_path)
-    if encoding is None:
-        args = dict(mode='rb')
-    else:
-        args = dict(mode='r', encoding=encoding, errors=errors)
     try:
-        return io_open(full_path, **args)
+        return io_open(full_path, 'rb')
     except IOError:
         # This might be a package in a zip file.  zipimport provides a loader
         # with a functioning get_data() method, however we have to strip the
@@ -66,10 +61,49 @@ def open(package, resource, encoding=None, errors=None):
                 resource, package_name)
             raise FileNotFoundError(message)
         else:
-            return _wrap_file(BytesIO(data), encoding, errors)
+            return BytesIO(data)
 
 
-def read(package, resource, encoding='utf-8', errors='strict'):
+def open_text(package, resource, encoding='utf-8', errors='strict'):
+    """Return a file-like object opened for text reading of the resource."""
+    resource = _normalize_path(resource)
+    package = _get_package(package)
+    # Using pathlib doesn't work well here due to the lack of 'strict' argument
+    # for pathlib.Path.resolve() prior to Python 3.6.
+    package_path = os.path.dirname(package.__file__)
+    relative_path = os.path.join(package_path, resource)
+    full_path = os.path.abspath(relative_path)
+    try:
+        return io_open(full_path, mode='r', encoding=encoding, errors=errors)
+    except IOError:
+        # This might be a package in a zip file.  zipimport provides a loader
+        # with a functioning get_data() method, however we have to strip the
+        # archive (i.e. the .zip file's name) off the front of the path.  This
+        # is because the zipimport loader in Python 2 doesn't actually follow
+        # PEP 302.  It should allow the full path, but actually requires that
+        # the path be relative to the zip file.
+        try:
+            loader = package.__loader__
+            full_path = relative_path[len(loader.archive)+1:]
+            data = loader.get_data(full_path)
+        except (IOError, AttributeError):
+            package_name = package.__name__
+            message = '{!r} resource not found in {!r}'.format(
+                resource, package_name)
+            raise FileNotFoundError(message)
+        else:
+            return TextIOWrapper(BytesIO(data), encoding, errors)
+
+
+def read_binary(package, resource):
+    """Return the binary contents of the resource."""
+    resource = _normalize_path(resource)
+    package = _get_package(package)
+    with open_binary(package, resource) as fp:
+        return fp.read()
+
+
+def read_text(package, resource, encoding='utf-8', errors='strict'):
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
@@ -77,12 +111,8 @@ def read(package, resource, encoding='utf-8', errors='strict'):
     """
     resource = _normalize_path(resource)
     package = _get_package(package)
-    # Note this is **not** builtins.open()!
-    with open(package, resource) as binary_file:
-        contents = binary_file.read()
-        if encoding is None:
-            return contents
-        return contents.decode(encoding=encoding, errors=errors)
+    with open_text(package, resource, encoding, errors) as fp:
+        return fp.read()
 
 
 @contextmanager
@@ -106,9 +136,8 @@ def path(package, resource):
     if file_path.exists():
         yield file_path
     else:
-        # Note this is **not** builtins.open()!
-        with open(package, resource) as fileobj:
-            data = fileobj.read()
+        with open_binary(package, resource) as fp:
+            data = fp.read()
         # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
         # blocks due to the need to close the temporary file to work on Windows
         # properly.

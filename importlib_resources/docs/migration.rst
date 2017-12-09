@@ -86,7 +86,7 @@ bytes.  E.g.::
 
 The equivalent code in ``importlib_resources`` is pretty straightforward::
 
-    with importlib_resources.open('my.package', 'resource.dat') as fp:
+    with importlib_resources.open_binary('my.package', 'resource.dat') as fp:
         my_bytes = fp.read()
 
 
@@ -103,12 +103,7 @@ following example is often written for clarity as::
 
 This can be easily rewritten like so::
 
-    contents = importlib_resources.read(
-        'my.package', 'resource.dat', encoding=None)
-
-The ``encoding=None`` argument is needed because by default ``read()`` returns
-a ``unicode`` in Python 2 or a ``str`` in Python 3, read and decoded with the
-``utf-8`` encoding.
+    contents = importlib_resources.read_binary('my.package', 'resource.dat')
 
 
 pkg_resources.resource_listdir()

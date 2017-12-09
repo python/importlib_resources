@@ -31,7 +31,7 @@ This requires you to make Python packages of both ``email/tests`` and
 ``email/tests/data``, by placing an empty ``__init__.py`` files in each of
 those directories.
 
-**This is a requirement for ``importlib_resources`` too!**
+**This is a requirement for importlib_resources too!**
 
 The problem with the ``pkg_resources`` approach is that, depending on the
 structure of your package, ``pkg_resources`` can be very inefficient even to
@@ -47,9 +47,9 @@ Python's import system, and the fact that it's built into Python, using
 ``importlib_resources`` can be much more performant.  The equivalent code
 using ``importlib_resources`` would look like::
 
-    from importlib_resources import read
+    from importlib_resources import read_text
     # Reads contents with UTF-8 encoding and returns str.
-    eml = read('email.tests.data', 'message.eml')
+    eml = read_text('email.tests.data', 'message.eml')
 
 
 Packages or package names
@@ -62,7 +62,7 @@ passed in, it must name an importable Python package, and this is first
 imported.  Thus the above example could also be written as::
 
     import email.tests.data
-    eml = read(email.tests.data, 'message.eml')
+    eml = read_text(email.tests.data, 'message.eml')
 
 
 File system or zip file

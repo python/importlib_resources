@@ -29,61 +29,78 @@ Types
 Functions
 =========
 
-.. py:function:: importlib_resources.open(package, resource, encoding=None, errors=None)
+.. py:function:: importlib_resources.open_binary(package, resource)
 
-    Open for reading the resource named **resource** within the **package**
-    package.  By default, the resource is opened for reading in binary mode.
-    With a non-``None`` **encoding** argument, the resource is opened in text
-    mode, with **errors** having the same meaning as for built-in
-    :py:func:`open`.
+    Open for binary reading the *resource* within *package*.
 
     :param package: A package name or module object.  See above for the API
                     that such module objects must support.
     :type package: ``Package``
-    :param resource: The name of the resource to open within **package**.
-                     **resource** may not contain path separators and it may
+    :param resource: The name of the resource to open within *package*.
+                     *resource* may not contain path separators and it may
                      not have sub-resources (i.e. it cannot be a directory).
     :type resource: ``Resource``
-    :param encoding: When ``None``, the resource is opened in binary mode.
-                     When an encoding is given, the resource is opened in text
-                     mode.  **encoding** has the same meaning as with
-                     :py:func:`open`.
+    :returns: a binary I/O stream open for reading.
+    :rtype: ``typing.io.BinaryIO``
+
+
+.. py:function:: importlib_resources.open_text(package, resource, encoding='utf-8', errors='strict')
+
+    Open for text reading the *resource* within *package*.  By default, the
+    resource is opened for reading as UTF-8.
+
+    :param package: A package name or module object.  See above for the API
+                    that such module objects must support.
+    :type package: ``Package``
+    :param resource: The name of the resource to open within *package*.
+                     *resource* may not contain path separators and it may
+                     not have sub-resources (i.e. it cannot be a directory).
+    :type resource: ``Resource``
+    :param encoding: The encoding to open the resource in.  *encoding* has
+                     the same meaning as with :py:func:`open`.
     :type encoding: str
-    :param errors: This parameter is ignored when **encoding** is ``None``.
-                   Otherwise it has the same meaning as with :py:func:`open`.
+    :param errors: This parameter has the same meaning as with :py:func:`open`.
     :type errors: str
     :returns: an I/O stream open for reading.
-    :rtype: ``typing.IO``
+    :rtype: ``typing.TextIO``
 
+.. py:function:: importlib_resources.read_binary(package, resource)
 
-.. py:function:: importlib_resources.read(package, resource, encoding='utf-8', errors='strict')
-
-    Read and return the contents of the resource named **resource** within the
-    **package** package.  By default, the contents are read in UTF-8 and
-    returned as a ``str`` [#fn1]_.  With **encoding** set to ``None``, the
-    resource contents are read in binary mode and returned as ``bytes``.
+    Read and return the contents of the *resource* within *package* as ``bytes``.
 
     :param package: A package name or module object.  See above for the API
                     that such module objects must support.
     :type package: ``Package``
-    :param resource: The name of the resource to read within **package**.
-                     **resource** may not contain path separators and it may
+    :param resource: The name of the resource to read within *package*.
+                     *resource* may not contain path separators and it may
                      not have sub-resources (i.e. it cannot be a directory).
     :type resource: ``Resource``
-    :param encoding: When ``None``, the resource is read in binary mode.
-                     When an encoding is given, the resource is read in text
-                     mode.  **encoding** has the same meaning as with
-                     :py:func:`open`.
+    :returns: the contents of the resource.
+    :rtype: ``bytes``
+
+.. py:function:: importlib_resources.read_text(package, resource, encoding='utf-8', errors='strict')
+
+    Read and return the contents of *resource* within *package* as a ``str [#fn1]_.
+    By default, the contents are read as strict UTF-8.
+
+    :param package: A package name or module object.  See above for the API
+                    that such module objects must support.
+    :type package: ``Package``
+    :param resource: The name of the resource to read within *package*.
+                     *resource* may not contain path separators and it may
+                     not have sub-resources (i.e. it cannot be a directory).
+    :type resource: ``Resource``
+    :param encoding: The encoding to read the contents of the resource in.
+                     *encoding* has the same meaning as with :py:func:`open`.
     :type encoding: str
-    :param errors: This parameter is ignored when **encoding** is ``None``.
-                   Otherwise it has the same meaning as with :py:func:`open`.
+    :param errors: This parameter has the same meaning as with :py:func:`open`.
     :type errors: str
     :returns: the contents of the resource.
-    :rtype: ``bytes`` or ``str``
+    :rtype: ``str``
 
 .. py:function:: importlib_resources.path(package, resource)
 
-    Return the path to the **resource** as an actual file system path.  This
+    Return the path to the *resource* as an actual file system path.  This
     function returns a `context manager`_ for use in a ``with``-statement.
     The context manager provides a :py:class:`pathlib.Path` object.
 
@@ -93,8 +110,8 @@ Functions
     :param package: A package name or module object.  See above for the API
                     that such module objects must support.
     :type package: ``Package``
-    :param resource: The name of the resource to read within **package**.
-                     **resource** may not contain path separators and it may
+    :param resource: The name of the resource to read within *package*.
+                     *resource* may not contain path separators and it may
                      not have sub-resources (i.e. it cannot be a directory).
     :type resource: ``Resource``
     :returns: A context manager for use in a ``with``-statement.  Entering
@@ -104,14 +121,14 @@ Functions
 
 .. py:function:: importlib_resources.is_resource(package, name)
 
-    Return ``True`` if there is a resource named **name** in the package,
+    Return ``True`` if there is a resource named *name* in the package,
     otherwise ``False``.  Remember that directories are *not* resources!
 
     :param package: A package name or module object.  See above for the API
                     that such module objects must support.
     :type package: ``Package``
-    :param name: The name of the resource to read within **package**.
-                 **resource** may not contain path separators and it may
+    :param name: The name of the resource to read within *package*.
+                 *resource* may not contain path separators and it may
                  not have sub-resources (i.e. it cannot be a directory).
     :type name: ``str``
     :returns: A flag indicating whether the resource exists or not.
