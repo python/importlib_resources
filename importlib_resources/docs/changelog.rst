@@ -2,6 +2,12 @@
  importlib_resources NEWS
 ==========================
 
+0.2 (201X-XX-XX)
+================
+* Split the ``open()`` and ``read()`` calls into separate binary and text
+  versions, i.e. ``open_binary()``, ``open_text()``, ``read_binary()``, and
+  ``read_text()``.  Closes #41
+
 0.1 (2017-12-05)
 ================
 * Initial release.
