@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Programming Language :: Python :: 3",
     ]
-requires-python = ">=3.4"
+requires-python = "==2.7,>=3.4"
 requires = [
     "pathlib2; python_version < '3'",
     "typing; python_version < '3.5'",
