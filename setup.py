@@ -19,13 +19,13 @@ extras_require = \
 {":python_version < '3'": ['pathlib2'], ":python_version < '3.5'": ['typing']}
 
 setup(name='importlib_resources',
-      version='0.1.0',
+      version='0.2',
       description='Read resources contained within a package.',
       author='Brett Cannon\nBarry Warsaw',
       author_email='brett@python.org\nbarry@python.org',
-      url='http://importlib-resources.readthedocs.io/en/latest/',
+      url='http://importlib-resources.readthedocs.io/',
       packages=packages,
       package_data=package_data,
       extras_require=extras_require,
-      python_requires='>=3.4',
+      python_requires='==2.7,>=3.4',
      )
