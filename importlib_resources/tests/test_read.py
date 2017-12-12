@@ -1,7 +1,7 @@
 import unittest
 
 import importlib_resources as resources
-from . import data
+from . import data01
 from . import util
 
 
@@ -32,7 +32,7 @@ class ReadTests:
     def test_read_text_with_errors(self):
         # Raises UnicodeError without the 'errors' argument.
         self.assertRaises(
-            UnicodeError, resources.read_text, data, 'utf-16.file')
+            UnicodeError, resources.read_text, self.data, 'utf-16.file')
         result = resources.read_text(self.data, 'utf-16.file', errors='ignore')
         self.assertEqual(
             result,
@@ -42,7 +42,7 @@ class ReadTests:
 
 
 class ReadDiskTests(ReadTests, unittest.TestCase):
-    data = data
+    data = data01
 
 
 class ReadZipTests(ReadTests, util.ZipSetup, unittest.TestCase):

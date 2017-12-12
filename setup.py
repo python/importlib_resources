@@ -8,9 +8,9 @@ from distutils.core import setup
 packages = \
 ['importlib_resources',
  'importlib_resources.tests',
- 'importlib_resources.tests.data',
- 'importlib_resources.tests.data.subdirectory',
- 'importlib_resources.tests.zipdata']
+ 'importlib_resources.tests.data01',
+ 'importlib_resources.tests.data01.subdirectory',
+ 'importlib_resources.tests.zipdata01']
 
 package_data = \
 {'': ['*'], 'importlib_resources': ['docs/*', 'docs/_static/*']}

@@ -4,9 +4,12 @@
 
 0.2 (201X-XX-XX)
 ================
-* Split the ``open()`` and ``read()`` calls into separate binary and text
-  versions, i.e. ``open_binary()``, ``open_text()``, ``read_binary()``, and
-  ``read_text()``.  Closes #41
+* **Backward incompatible change**.  Split the ``open()`` and ``read()`` calls
+  into separate binary and text versions, i.e. ``open_binary()``,
+  ``open_text()``, ``read_binary()``, and ``read_text()``.  Closes #41
+* Fix a bug where unrelated resources could be returned from ``contents()``.
+  Closes #44
+
 
 0.1 (2017-12-05)
 ================

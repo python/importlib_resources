@@ -6,8 +6,8 @@ import types
 import unittest
 
 from .. import abc as resources_abc
-from . import data
-from . import zipdata
+from . import data01
+from . import zipdata01
 from .._compat import ABC, Path, PurePath, FileNotFoundError
 
 
@@ -80,39 +80,39 @@ class CommonTests(ABC):
 
     def test_package_name(self):
         # Passing in the package name should succeed.
-        self.execute(data.__name__, 'utf-8.file')
+        self.execute(data01.__name__, 'utf-8.file')
 
     def test_package_object(self):
         # Passing in the package itself should succeed.
-        self.execute(data, 'utf-8.file')
+        self.execute(data01, 'utf-8.file')
 
     def test_string_path(self):
         # Passing in a string for the path should succeed.
         path = 'utf-8.file'
-        self.execute(data, path)
+        self.execute(data01, path)
 
     @unittest.skipIf(sys.version_info < (3, 6), 'requires os.PathLike support')
     def test_pathlib_path(self):
         # Passing in a pathlib.PurePath object for the path should succeed.
         path = PurePath('utf-8.file')
-        self.execute(data, path)
+        self.execute(data01, path)
 
     def test_absolute_path(self):
         # An absolute path is a ValueError.
         path = Path(__file__)
         full_path = path.parent/'utf-8.file'
         with self.assertRaises(ValueError):
-            self.execute(data, full_path)
+            self.execute(data01, full_path)
 
     def test_relative_path(self):
         # A reative path is a ValueError.
         with self.assertRaises(ValueError):
-            self.execute(data, '../data/utf-8.file')
+            self.execute(data01, '../data01/utf-8.file')
 
     def test_importing_module_as_side_effect(self):
         # The anchor package can already be imported.
-        del sys.modules[data.__name__]
-        self.execute(data.__name__, 'utf-8.file')
+        del sys.modules[data01.__name__]
+        self.execute(data01.__name__, 'utf-8.file')
 
     def test_non_package_by_name(self):
         # The anchor package cannot be a module.
@@ -127,16 +127,16 @@ class CommonTests(ABC):
 
     @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
     def test_resource_opener(self):
-        data = io.BytesIO(b'Hello, world!')
-        package = create_package(file=data, path=FileNotFoundError())
+        bytes_data = io.BytesIO(b'Hello, world!')
+        package = create_package(file=bytes_data, path=FileNotFoundError())
         self.execute(package, 'utf-8.file')
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
     @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
     def test_resource_path(self):
-        data = io.BytesIO(b'Hello, world!')
+        bytes_data = io.BytesIO(b'Hello, world!')
         path = __file__
-        package = create_package(file=data, path=path)
+        package = create_package(file=bytes_data, path=path)
         self.execute(package, 'utf-8.file')
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
@@ -147,10 +147,12 @@ class CommonTests(ABC):
             self.execute(package, 'utf-8.file')
 
 
-class ZipSetup:
+class ZipSetupBase:
+    ZIP_MODULE = None
+
     @classmethod
     def setUpClass(cls):
-        data_path = Path(zipdata.__file__)
+        data_path = Path(cls.ZIP_MODULE.__file__)
         data_dir = data_path.parent
         cls._zip_path = str(data_dir / 'ziptestdata.zip')
         sys.path.append(cls._zip_path)
@@ -174,3 +176,7 @@ class ZipSetup:
             del cls._zip_path
         except AttributeError:
             pass
+
+
+class ZipSetup(ZipSetupBase):
+    ZIP_MODULE = zipdata01                          # type: ignore
