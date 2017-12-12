@@ -255,6 +255,8 @@ def contents(package):
             # However, since directories themselves don't appear in the zip
             # archive as a separate entry, we need to return the first path
             # component for any case that has > 1 subparts -- but only once!
+            if path.parts[:len(relpath.parts)] != relpath.parts:
+                continue
             subparts = path.parts[len(relpath.parts):]
             if len(subparts) == 1:
                 yield subparts[0]

@@ -1,7 +1,7 @@
 import unittest
 
 import importlib_resources as resources
-from . import data
+from . import data01
 from . import util
 from .._compat import FileNotFoundError
 
@@ -62,7 +62,7 @@ class OpenTests:
 
 class OpenDiskTests(OpenTests, unittest.TestCase):
     def setUp(self):
-        self.data = data
+        self.data = data01
 
 
 class OpenZipTests(OpenTests, util.ZipSetup, unittest.TestCase):

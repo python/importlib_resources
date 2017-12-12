@@ -2,7 +2,8 @@ import sys
 import unittest
 
 import importlib_resources as resources
-from . import data
+from . import data01
+from . import zipdata02
 from . import util
 
 
@@ -40,7 +41,7 @@ class ResourceTests:
 
 class ResourceDiskTests(ResourceTests, unittest.TestCase):
     def setUp(self):
-        self.data = data
+        self.data = data01
 
 
 class ResourceZipTests(ResourceTests, util.ZipSetup, unittest.TestCase):
@@ -51,26 +52,26 @@ class ResourceZipTests(ResourceTests, util.ZipSetup, unittest.TestCase):
 class ResourceLoaderTests(unittest.TestCase):
     def test_resource_contents(self):
         package = util.create_package(
-            file=data, path=data.__file__, contents=['A', 'B', 'C'])
+            file=data01, path=data01.__file__, contents=['A', 'B', 'C'])
         self.assertEqual(
             set(resources.contents(package)),
             {'A', 'B', 'C'})
 
     def test_resource_is_resource(self):
         package = util.create_package(
-            file=data, path=data.__file__,
+            file=data01, path=data01.__file__,
             contents=['A', 'B', 'C', 'D/E', 'D/F'])
         self.assertTrue(resources.is_resource(package, 'B'))
 
     def test_resource_directory_is_not_resource(self):
         package = util.create_package(
-            file=data, path=data.__file__,
+            file=data01, path=data01.__file__,
             contents=['A', 'B', 'C', 'D/E', 'D/F'])
         self.assertFalse(resources.is_resource(package, 'D'))
 
     def test_resource_missing_is_not_resource(self):
         package = util.create_package(
-            file=data, path=data.__file__,
+            file=data01, path=data01.__file__,
             contents=['A', 'B', 'C', 'D/E', 'D/F'])
         self.assertFalse(resources.is_resource(package, 'Z'))
 
@@ -82,7 +83,7 @@ class ResourceCornerCaseTests(unittest.TestCase):
         # 2. Are not on the file system
         # 3. Are not in a zip file
         module = util.create_package(
-            file=data, path=data.__file__, contents=['A', 'B', 'C'])
+            file=data01, path=data01.__file__, contents=['A', 'B', 'C'])
         # Give the module a dummy loader.
         module.__loader__ = object()
         # Give the module a dummy origin.
@@ -91,6 +92,23 @@ class ResourceCornerCaseTests(unittest.TestCase):
             module.__spec__.loader = module.__loader__
             module.__spec__.origin = module.__file__
         self.assertFalse(resources.is_resource(module, 'A'))
+
+
+class ResourceFromZipsTest(util.ZipSetupBase, unittest.TestCase):
+    ZIP_MODULE = zipdata02                          # type: ignore
+
+    def test_unrelated_contents(self):
+        # https://gitlab.com/python-devs/importlib_resources/issues/44
+        #
+        # Here we have a zip file with two unrelated subpackages.  The bug
+        # reports that getting the contents of a resource returns unrelated
+        # files.
+        self.assertEqual(
+            set(resources.contents('ziptestdata.one')),
+            {'__init__.py', 'resource1.txt'})
+        self.assertEqual(
+            set(resources.contents('ziptestdata.two')),
+            {'__init__.py', 'resource2.txt'})
 
 
 if __name__ == '__main__':

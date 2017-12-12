@@ -1,7 +1,7 @@
 import unittest
 
 import importlib_resources as resources
-from . import data
+from . import data01
 from . import util
 
 
@@ -26,8 +26,7 @@ class PathTests:
 
 
 class PathDiskTests(PathTests, unittest.TestCase):
-
-    data = data
+    data = data01
 
 
 class PathZipTests(PathTests, util.ZipSetup, unittest.TestCase):
