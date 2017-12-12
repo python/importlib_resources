@@ -19,10 +19,6 @@ resources.
 see if it supports the ``ResourceReader`` interface.  If it does, it will use
 that for all resource access.
 
-
-ResourceReader API
-==================
-
 The ``ResourceReader`` ABC decorates its methods with ``@abstractmethod`` to
 indicate that they must all be overridden by the loader that implements this
 interface.  However, the default implementation of each of these methods is to
@@ -38,7 +34,7 @@ This is so that if the ABC method is accidentally called,
 
    .. py:method:: open_resource(resource)
 
-      Open the named **resource** for binary reading.  The argument must be
+      Open the named *resource* for binary reading.  The argument must be
       filename-like, i.e. it cannot have any path separators in the string.
       If the resource cannot be found, :py:exc:`FileNotFoundError` should be
       raised.
@@ -53,7 +49,7 @@ This is so that if the ABC method is accidentally called,
 
    .. py:method:: resource_path(resource)
 
-      Return the path to the named **resource** as found on the file
+      Return the path to the named *resource* as found on the file
       system.
 
       If the resource is not natively accessible on the file system
@@ -73,13 +69,13 @@ This is so that if the ABC method is accidentally called,
 
    .. py:method:: is_resource(name)
 
-      Return a boolean indicating whether **name** is a resource within the
+      Return a boolean indicating whether *name* is a resource within the
       package.  *Remember that directories are not resources!*
 
       :param name: A filename-like string (i.e. no path separators) to check
                    whether it is a resource within the package.
       :type resource: str
-      :return: Flag indicating whether **name** is a resource or not.
+      :return: Flag indicating whether *name* is a resource or not.
       :rtype: bool
       :raises FileNotFoundError: when the named resource is not found within
                                  the package.

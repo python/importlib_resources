@@ -80,8 +80,8 @@ Functions
 
 .. py:function:: importlib_resources.read_text(package, resource, encoding='utf-8', errors='strict')
 
-    Read and return the contents of *resource* within *package* as a ``str [#fn1]_.
-    By default, the contents are read as strict UTF-8.
+    Read and return the contents of *resource* within *package* as a ``str`` 
+    [#fn1]_.  By default, the contents are read as strict UTF-8.
 
     :param package: A package name or module object.  See above for the API
                     that such module objects must support.
