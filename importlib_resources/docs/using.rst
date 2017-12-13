@@ -4,6 +4,68 @@
  Using importlib_resources
 ===========================
 
+``importlib_resources`` is a library that leverages Python's import system to
+provide access to *resources* within *packages*.  Given that this library is
+built on top of the import system, it is highly efficient and easy to use.
+This library's philosophy is that, if you can import a package, you can access
+resources within that package.  Resources can be opened or read, in either
+binary or text mode.
+
+What exactly do we mean by "a resource"?  It's easiest to think about the
+metaphor of files and directories on the file system, though it's important to
+keep in mind that this is just a metaphor.  Resources and packages **do not**
+have to exist as physical files and directories on the file system.
+
+If you have a file system layout such as::
+
+    data/
+        __init__.py
+        one/
+            __init__.py
+            resource1.txt
+        two/
+            __init__.py
+            resource2.txt
+
+then the directories are ``data``, ``data/one``, and ``data/two``.  Each of
+these are also Python packages by virtue of the fact that they all contain
+``__init__.py`` files [#fn1]_.  That means that in Python, all of these import
+statements work::
+
+    import data
+    import data.one
+    from data import two
+
+Each import statement gives you a Python *module* corresponding to the
+``__init__.py`` file in each of the respective directories.  These modules are
+packages since packages are just special module instances that have an
+additional attribute, namely a ``__path__`` [#fn2]_.
+
+In this analogy then, resources are just files within a package directory, so
+``data/one/resource1.txt`` and ``data/two/resource2.txt`` are both resources,
+as are the ``__init__.py`` files in all the directories.  However the package
+directories themselves are *not* resources; anything that contains other
+things (i.e. directories) are not themselves resources.
+
+Resources are always accessed relative to the package that they live in.  You
+cannot access a resource within a subdirectory inside a package.  This means
+that ``resource1.txt`` is a resource within the ``data.one`` package, but
+neither ``resource2.txt`` nor ``two/resource2.txt`` are resources within the
+``data`` package.  If a directory isn't a package, it can't be imported and
+thus can't contain resources.
+
+Even when this hierarchical structure isn't represented by physical files and
+directories, the model still holds.  So zip files can contain packages and
+resources, as could databases or other storage medium.  In fact, while
+``importlib_resources`` supports physical file systems and zip files by
+default, anything that can be loaded with a Python import system `loader`_ can
+provide resources, as long as the loader implements the :ref:`ResourceReader
+<abc>` abstract base class.
+
+
+Example
+=======
+
 Let's say you are writing an email parsing library and in your test suite you
 have a sample email message in a file called ``message.eml``.  You would like
 to access the contents of this file for your tests, so you put this in your
@@ -57,7 +119,7 @@ Packages or package names
 
 All of the ``importlib_resources`` APIs take a *package* as their first
 parameter, but this can either be a package name (as a ``str``) or an actual
-module object, though the module *must* be a package [#fn1]_.  If a string is
+module object, though the module *must* be a package [#fn3]_.  If a string is
 passed in, it must name an importable Python package, and this is first
 imported.  Thus the above example could also be written as::
 
@@ -91,10 +153,22 @@ manager.
 
 .. rubric:: Footnotes
 
-.. [#fn1] Specifically, this means that in Python 2, the module object must
+.. [#fn1] We're ignoring `PEP 420
+          <https://www.python.org/dev/peps/pep-0420/>`_ style namespace
+          packages, since ``importlib_resources`` does not support resources
+          within namespace packages.  Also, the example assumes that the
+          parent directory containing ``data/`` is on ``sys.path``.
+
+.. [#fn2] As of `PEP 451 <https://www.python.org/dev/peps/pep-0451/>`_ this
+          information is also available on the module's
+          ``__spec__.submodule_search_locations`` attribute, which will not be
+          ``None`` for packages.
+
+.. [#fn3] Specifically, this means that in Python 2, the module object must
           have an ``__path__`` attribute, while in Python 3, the module's
           ``__spec__.submodule_search_locations`` must not be ``None``.
           Otherwise a ``TypeError`` is raised.
 
 
 .. _`pkg_resources API`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
+.. _`loader`: https://docs.python.org/3/reference/import.html#finders-and-loaders
