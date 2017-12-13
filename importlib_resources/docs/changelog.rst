@@ -9,6 +9,7 @@
   ``open_text()``, ``read_binary()``, and ``read_text()``.  Closes #41
 * Fix a bug where unrelated resources could be returned from ``contents()``.
   Closes #44
+* Correctly prevent namespace packages from containing resources.  Closes #20
 
 
 0.1 (2017-12-05)
