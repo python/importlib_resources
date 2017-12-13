@@ -4,7 +4,7 @@ import tempfile
 
 from . import abc as resources_abc
 from builtins import open as builtins_open
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
@@ -78,9 +78,11 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
         # importlib.machinery loaders are and an AttributeError for
         # get_data() will make it clear what is needed from the loader.
         loader = cast(ResourceLoader, package.__spec__.loader)
-        try:
-            data = loader.get_data(full_path)
-        except IOError:
+        data = None
+        if hasattr(package.__spec__.loader, 'get_data'):
+            with suppress(IOError):
+                data = loader.get_data(full_path)
+        if data is None:
             package_name = package.__spec__.name
             message = '{!r} resource not found in {!r}'.format(
                 resource, package_name)
@@ -112,9 +114,11 @@ def open_text(package: Package,
         # importlib.machinery loaders are and an AttributeError for
         # get_data() will make it clear what is needed from the loader.
         loader = cast(ResourceLoader, package.__spec__.loader)
-        try:
-            data = loader.get_data(full_path)
-        except IOError:
+        data = None
+        if hasattr(package.__spec__.loader, 'get_data'):
+            with suppress(IOError):
+                data = loader.get_data(full_path)
+        if data is None:
             package_name = package.__spec__.name
             message = '{!r} resource not found in {!r}'.format(
                 resource, package_name)
@@ -255,6 +259,11 @@ def contents(package: Package) -> Iterator[str]:
     if reader is not None:
         yield from reader.contents()
         return
+    # Is the package a namespace package?  By definition, namespace packages
+    # cannot have resources.
+    if (package.__spec__.origin == 'namespace' and
+            not package.__spec__.has_location):
+        return []
     package_directory = Path(package.__spec__.origin).parent
     try:
         yield from os.listdir(str(package_directory))

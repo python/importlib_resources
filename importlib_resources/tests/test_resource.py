@@ -111,5 +111,35 @@ class ResourceFromZipsTest(util.ZipSetupBase, unittest.TestCase):
             {'__init__.py', 'resource2.txt'})
 
 
+@unittest.skipIf(sys.version_info < (3,), 'No namespace packages in Python 2')
+class NamespaceTest(unittest.TestCase):
+    def test_namespaces_cant_have_resources(self):
+        contents = set(resources.contents(
+            'importlib_resources.tests.data03.namespace'))
+        self.assertEqual(len(contents), 0)
+        # Even though there is a file in the namespace directory, it is not
+        # considered a resource, since namespace packages can't have them.
+        self.assertFalse(resources.is_resource(
+            'importlib_resources.tests.data03.namespace',
+            'resource1.txt'))
+        # We should get an exception if we try to read it or open it.
+        self.assertRaises(
+            FileNotFoundError,
+            resources.open_text,
+            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+        self.assertRaises(
+            FileNotFoundError,
+            resources.open_binary,
+            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+        self.assertRaises(
+            FileNotFoundError,
+            resources.read_text,
+            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+        self.assertRaises(
+            FileNotFoundError,
+            resources.read_binary,
+            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+
+
 if __name__ == '__main__':
     unittest.main()
