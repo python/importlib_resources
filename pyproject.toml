@@ -11,8 +11,8 @@ build-backend = "flit.buildapi"
 
 [tool.flit.metadata]
 module = "importlib_resources"
-author = "Brett Cannon\nBarry Warsaw"
-author-email = "brett@python.org\nbarry@python.org"
+author = "Barry Warsaw"
+author-email = "barry@python.org"
 home-page = "http://importlib-resources.readthedocs.io/"
 description-file = "README.rst"
 classifiers = [
@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Programming Language :: Python :: 3",
     ]
-requires-python = "==2.7,>=3.4"
+requires-python = '>=2.7,!=3.0,!=3.1,!=3.2,!=3.3'
 requires = [
     "pathlib2; python_version < '3'",
     "typing; python_version < '3.5'",

@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-0.2 (201X-XX-XX)
+0.2 (2017-12-13)
 ================
 * **Backward incompatible change**.  Split the ``open()`` and ``read()`` calls
   into separate binary and text versions, i.e. ``open_binary()``,
