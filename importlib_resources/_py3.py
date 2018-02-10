@@ -18,9 +18,9 @@ from zipfile import ZipFile
 
 Package = Union[ModuleType, str]
 if sys.version_info >= (3, 6):
-    Resource = Union[str, os.PathLike]              # pragma: ge35
+    Resource = Union[str, os.PathLike]              # pragma: <=35
 else:
-    Resource = str                                  # pragma: le35
+    Resource = str                                  # pragma: >=36
 
 
 def _get_package(package) -> ModuleType:
@@ -173,7 +173,7 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     # resource_path() raises FileNotFoundError.
     package_directory = Path(package.__spec__.origin).parent
     file_path = package_directory / resource
-    if file_path.exists():
+    if file_path.exists():                          # pragma: FIXME
         yield file_path
     else:
         with open_binary(package, resource) as fp:
@@ -213,10 +213,10 @@ def is_resource(package: Package, name: str) -> bool:
     # contents doesn't necessarily mean it's a resource.  Directories are not
     # resources, so let's try to find out if it's a directory or not.
     path = Path(package.__spec__.origin).parent / name
-    if path.is_file():
+    if path.is_file():                              # pragma: FIXME
         return True
     if path.is_dir():
-        return False
+        return False                                # pragma: FIXME
     # If it's not a file and it's not a directory, what is it?  Well, this
     # means the file doesn't exist on the file system, so it probably lives
     # inside a zip file.  We have to crack open the zip, look at its table of

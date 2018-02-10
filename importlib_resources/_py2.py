@@ -169,7 +169,7 @@ def is_resource(package, name):
             # ENOTDIR, but then we'd have to depend on another external
             # library since Python 2 doesn't have unittest.mock.  It's not
             # worth it.
-            raise                     # pragma: ge3
+            raise                     # pragma: nocover
         return False
     if name not in package_contents:
         return False
@@ -232,7 +232,7 @@ def contents(package):
             # ENOTDIR, but then we'd have to depend on another external
             # library since Python 2 doesn't have unittest.mock.  It's not
             # worth it.
-            raise                     # pragma: ge3
+            raise                     # pragma: nocover
         # The package is probably in a zip file.
         archive_path = getattr(package.__loader__, 'archive', None)
         if archive_path is None:
