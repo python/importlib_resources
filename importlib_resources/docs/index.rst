@@ -12,12 +12,14 @@ importable `Python package`_.  Resources can live on the file system, in a zip
 file, or in any place that has a loader_ supporting the appropriate API for
 reading resources.  Directories are not resources.
 
-``importlib_resources`` is a standalone version of the API available for users
-of Python 2.7, or Python 3.4 through 3.6.  It is available in Python 3.7's
-standard library as ``importlib.resources``.  Its API is currently
-`provisional`_.
+``importlib_resources`` is a backport of Python 3.7's standard library
+`importlib.resources`_ module for Python 2.7, and 3.4 through 3.6.  Users of
+Python 3.7 and beyond are encouraged to use the standard library module, and
+in fact for these versions, ``importlib_resources`` just shadows that module.
+Developers looking for detailed API descriptions should refer to the Python
+3.7 standard library documentation.
 
-This documentation includes a general :ref:`usage <using>` guide and a
+The documentation here includes a general :ref:`usage <using>` guide and a
 :ref:`migration <migration>` guide for projects that want to adopt
 ``importlib_resources`` instead of ``pkg_resources``.
 
@@ -28,8 +30,6 @@ This documentation includes a general :ref:`usage <using>` guide and a
 
    using.rst
    migration.rst
-   api.rst
-   abc.rst
    changelog.rst
 
 
@@ -50,7 +50,7 @@ Indices and tables
 * :ref:`search`
 
 
+.. _`importlib.resources`: https://docs.python.org/3.7/library/importlib.html#module-importlib.resources
 .. _`Basic Resource Access`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
-.. _`provisional`: https://www.python.org/dev/peps/pep-0411/
 .. _`Python package`: https://docs.python.org/3/reference/import.html#packages
 .. _loader: https://docs.python.org/3/reference/import.html#finders-and-loaders

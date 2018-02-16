@@ -2,10 +2,15 @@
 
 import sys
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 
-if sys.version_info >= (3,):
+# Use the Python 3.7 stdlib implementation if available.
+if sys.version_info >= (3, 7):
+    from importlib.resources import (
+        Package, Resource, contents, is_resource, open_binary, open_text, path,
+        read_binary, read_text)
+elif sys.version_info >= (3,):
     from importlib_resources._py3 import (
         Package, Resource, contents, is_resource, open_binary, open_text, path,
         read_binary, read_text)

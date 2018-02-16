@@ -5,10 +5,10 @@ import sys
 import types
 import unittest
 
-from .. import abc as resources_abc
 from . import data01
 from . import zipdata01
 from .._compat import ABC, Path, PurePath, FileNotFoundError
+from ..abc import ResourceReader
 
 
 try:
@@ -18,7 +18,10 @@ except ImportError:
 
 
 def create_package(file, path, is_package=True, contents=()):
-    class Reader(resources_abc.ResourceReader):
+    class Reader(ResourceReader):
+        def get_resource_reader(self, package):
+            return self
+
         def open_resource(self, path):
             self._path = path
             if isinstance(file, Exception):
