@@ -2,6 +2,12 @@
  importlib_resources NEWS
 ==========================
 
+0.3 (2018-XX-XX)
+================
+* The API, implementation, and documenttion is synchronized with the Python
+  3.7 standard library.  Closes #47
+
+
 0.2 (2017-12-13)
 ================
 * **Backward incompatible change**.  Split the ``open()`` and ``read()`` calls

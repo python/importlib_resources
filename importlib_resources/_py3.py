@@ -24,6 +24,11 @@ else:
 
 
 def _get_package(package) -> ModuleType:
+    """Take a package name or module object and return the module.
+
+    If a name, the module is imported.  If the passed or imported module
+    object is not a package, raise an exception.
+    """
     if hasattr(package, '__spec__'):
         if package.__spec__.submodule_search_locations is None:
             raise TypeError('{!r} is not a package'.format(
@@ -39,6 +44,10 @@ def _get_package(package) -> ModuleType:
 
 
 def _normalize_path(path) -> str:
+    """Normalize a path by ensuring it is a string.
+
+    If the resulting string contains path separators, an exception is raised.
+    """
     str_path = str(path)
     parent, file_name = os.path.split(str_path)
     if parent:
@@ -54,9 +63,11 @@ def _get_resource_reader(
     # hook wants to create a weak reference to the object, but
     # zipimport.zipimporter does not support weak references, resulting in a
     # TypeError.  That seems terrible.
-    if hasattr(package.__spec__.loader, 'open_resource'):
-        return cast(resources_abc.ResourceReader, package.__spec__.loader)
-    return None
+    spec = package.__spec__
+    reader = getattr(spec.loader, 'get_resource_reader', None)
+    if reader is None:
+        return None
+    return cast(resources_abc.ResourceReader, reader(spec.name))
 
 
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
@@ -73,14 +84,14 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
     full_path = os.path.join(package_path, resource)
     try:
         return builtins_open(full_path, mode='rb')
-    except IOError:
+    except OSError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for
         # get_data() will make it clear what is needed from the loader.
         loader = cast(ResourceLoader, package.__spec__.loader)
         data = None
         if hasattr(package.__spec__.loader, 'get_data'):
-            with suppress(IOError):
+            with suppress(OSError):
                 data = loader.get_data(full_path)
         if data is None:
             package_name = package.__spec__.name
@@ -109,14 +120,14 @@ def open_text(package: Package,
     try:
         return builtins_open(
             full_path, mode='r', encoding=encoding, errors=errors)
-    except IOError:
+    except OSError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for
         # get_data() will make it clear what is needed from the loader.
         loader = cast(ResourceLoader, package.__spec__.loader)
         data = None
         if hasattr(package.__spec__.loader, 'get_data'):
-            with suppress(IOError):
+            with suppress(OSError):
                 data = loader.get_data(full_path)
         if data is None:
             package_name = package.__spec__.name
@@ -173,7 +184,7 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     # resource_path() raises FileNotFoundError.
     package_directory = Path(package.__spec__.origin).parent
     file_path = package_directory / resource
-    if file_path.exists():                          # pragma: FIXME
+    if file_path.exists():
         yield file_path
     else:
         with open_binary(package, resource) as fp:
@@ -213,10 +224,10 @@ def is_resource(package: Package, name: str) -> bool:
     # contents doesn't necessarily mean it's a resource.  Directories are not
     # resources, so let's try to find out if it's a directory or not.
     path = Path(package.__spec__.origin).parent / name
-    if path.is_file():                              # pragma: FIXME
+    if path.is_file():
         return True
     if path.is_dir():
-        return False                                # pragma: FIXME
+        return False
     # If it's not a file and it's not a directory, what is it?  Well, this
     # means the file doesn't exist on the file system, so it probably lives
     # inside a zip file.  We have to crack open the zip, look at its table of

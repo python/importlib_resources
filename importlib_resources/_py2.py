@@ -11,8 +11,10 @@ from zipfile import ZipFile
 
 
 def _get_package(package):
-    # `package` will be a string or a module.  Always return a module which is
-    # a package, otherwise raise an exception.
+    """Normalize a path by ensuring it is a string.
+
+    If the resulting string contains path separators, an exception is raised.
+    """
     if isinstance(package, basestring):                      # noqa: F821
         module = import_module(package)
     else:
@@ -23,8 +25,10 @@ def _get_package(package):
 
 
 def _normalize_path(path):
-    # Ensure that the incoming `path`, which may be a string or a Path object,
-    # is a bare file name with no hierarchy.
+    """Normalize a path by ensuring it is a string.
+
+    If the resulting string contains path separators, an exception is raised.
+    """
     str_path = str(path)
     parent, file_name = os.path.split(str_path)
     if parent:
