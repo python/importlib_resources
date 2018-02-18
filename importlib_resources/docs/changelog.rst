@@ -2,10 +2,11 @@
  importlib_resources NEWS
 ==========================
 
-0.3 (2018-XX-XX)
+0.3 (2018-02-17)
 ================
 * The API, implementation, and documenttion is synchronized with the Python
   3.7 standard library.  Closes #47
+* When run under Python 3.7 this API shadows the stdlib versions.  Closes #50
 
 
 0.2 (2017-12-13)
