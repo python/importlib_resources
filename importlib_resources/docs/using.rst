@@ -59,8 +59,8 @@ directories, the model still holds.  So zip files can contain packages and
 resources, as could databases or other storage medium.  In fact, while
 ``importlib_resources`` supports physical file systems and zip files by
 default, anything that can be loaded with a Python import system `loader`_ can
-provide resources, as long as the loader implements the :ref:`ResourceReader
-<abc>` abstract base class.
+provide resources, as long as the loader implements the `ResourceReader`_
+abstract base class.
 
 
 Example
@@ -172,3 +172,4 @@ manager.
 
 .. _`pkg_resources API`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
 .. _`loader`: https://docs.python.org/3/reference/import.html#finders-and-loaders
+.. _`ResourceReader`: https://docs.python.org/3.7/library/importlib.html#importlib.abc.ResourceReader
