@@ -28,7 +28,7 @@ extras_require = \
 {":python_version < '3'": ['pathlib2'], ":python_version < '3.5'": ['typing']}
 
 setup(name='importlib_resources',
-      version='0.3',
+      version='0.4',
       description='Read resources contained within a package.',
       author='Barry Warsaw',
       author_email='barry@python.org',
