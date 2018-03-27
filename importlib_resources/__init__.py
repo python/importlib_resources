@@ -2,7 +2,7 @@
 
 import sys
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 # Use the Python 3.7 stdlib implementation if available.
