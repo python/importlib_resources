@@ -6,7 +6,7 @@ from abc import abstractmethod
 # We use mypy's comment syntax here since this file must be compatible with
 # both Python 2 and 3.
 try:
-    from typing import BinaryIO, Iterator, Text                   # noqa: F401
+    from typing import BinaryIO, Iterable, Text                   # noqa: F401
 except ImportError:
     # Python 2
     pass
@@ -53,6 +53,6 @@ class ResourceReader(ABC):
 
     @abstractmethod
     def contents(self):
-        # type: () -> Iterator[str]
+        # type: () -> Iterable[str]
         """Return an iterator over the string contents of the package."""
         raise FileNotFoundError
