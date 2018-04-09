@@ -54,5 +54,5 @@ class ResourceReader(ABC):
     @abstractmethod
     def contents(self):
         # type: () -> Iterable[str]
-        """Return an iterator over the string contents of the package."""
+        """Return an iterable over the string contents of the package."""
         raise FileNotFoundError
