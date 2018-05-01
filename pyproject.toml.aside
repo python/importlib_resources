@@ -6,7 +6,11 @@
 # If you modify this file, you MUST run ./update-setup.py
 
 [build-system]
-requires = ["flit"]
+requires = [
+    "flit",
+    "setuptools",
+    "wheel",
+    ]
 build-backend = "flit.buildapi"
 
 [tool.flit.metadata]

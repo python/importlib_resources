@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-"""Update the setup.py
-
-Run this whenever you change the flit.ini file!
-"""
+"""Update the setup.py"""
 
 import os
 import tarfile

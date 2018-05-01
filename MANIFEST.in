@@ -1,0 +1,4 @@
+include *.py MANIFEST.in
+global-include *.txt *.rst *.ini *.cfg
+exclude .gitignore .tox
+prune build
