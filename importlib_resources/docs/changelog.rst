@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-0.5 (2018-XX-XX)
+0.5 (2018-05-01)
 ================
 * Resynchronize with Python 3.7; changes the return type of ``contents()`` to
   be an ``Iterable``.  Closes #52
