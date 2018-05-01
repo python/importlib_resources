@@ -10,7 +10,7 @@ from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
-from typing import Iterator, Optional, Set, Union   # noqa: F401
+from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
 from zipfile import ZipFile
@@ -258,8 +258,8 @@ def is_resource(package: Package, name: str) -> bool:
     raise AssertionError('Impossible situation')
 
 
-def contents(package: Package) -> Iterator[str]:
-    """Return the list of entries in `package`.
+def contents(package: Package) -> Iterable[str]:
+    """Return an iterable of entries in `package`.
 
     Note that not all entries are resources.  Specifically, directories are
     not considered resources.  Use `is_resource()` on each entry returned here
@@ -268,16 +268,15 @@ def contents(package: Package) -> Iterator[str]:
     package = _get_package(package)
     reader = _get_resource_reader(package)
     if reader is not None:
-        yield from reader.contents()
-        return
+        return reader.contents()
     # Is the package a namespace package?  By definition, namespace packages
     # cannot have resources.
     if (package.__spec__.origin == 'namespace' and
             not package.__spec__.has_location):
-        return []
+        return ()
     package_directory = Path(package.__spec__.origin).parent
     try:
-        yield from os.listdir(str(package_directory))
+        return os.listdir(str(package_directory))
     except (NotADirectoryError, FileNotFoundError):
         # The package is probably in a zip file.
         archive_path = getattr(package.__spec__.loader, 'archive', None)
@@ -287,6 +286,7 @@ def contents(package: Package) -> Iterator[str]:
         with ZipFile(archive_path) as zf:
             toc = zf.namelist()
         subdirs_seen = set()                        # type: Set
+        subdirs_returned = []
         for filename in toc:
             path = Path(filename)
             # Strip off any path component parts that are in common with the
@@ -305,9 +305,10 @@ def contents(package: Package) -> Iterator[str]:
                 continue
             subparts = path.parts[len(relpath.parts):]
             if len(subparts) == 1:
-                yield subparts[0]
+                subdirs_returned.append(subparts[0])
             elif len(subparts) > 1:                 # pragma: nobranch
                 subdir = subparts[0]
                 if subdir not in subdirs_seen:
                     subdirs_seen.add(subdir)
-                    yield subdir
+                    subdirs_returned.append(subdir)
+        return subdirs_returned

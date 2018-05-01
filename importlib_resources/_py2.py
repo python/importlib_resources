@@ -216,7 +216,7 @@ def is_resource(package, name):
 
 
 def contents(package):
-    """Return the list of entries in package.
+    """Return an iterable of entries in `package`.
 
     Note that not all entries are resources.  Specifically, directories are
     not considered resources.  Use `is_resource()` on each entry returned here
@@ -225,10 +225,7 @@ def contents(package):
     package = _get_package(package)
     package_directory = Path(package.__file__).parent
     try:
-        # Python 2 doesn't support `yield from`.  We fall back to using
-        # os.listdir() here to simplify the returning of just the name.
-        for entry in os.listdir(str(package_directory)):
-            yield entry
+        return os.listdir(str(package_directory))
     except OSError as error:
         if error.errno not in (errno.ENOENT, errno.ENOTDIR):
             # We won't hit this in the Python 2 tests, so it'll appear
@@ -245,6 +242,7 @@ def contents(package):
         with ZipFile(archive_path) as zf:
             toc = zf.namelist()
         subdirs_seen = set()                        # type: Set
+        subdirs_returned = []
         for filename in toc:
             path = Path(filename)
             # Strip off any path component parts that are in common with the
@@ -263,9 +261,10 @@ def contents(package):
                 continue
             subparts = path.parts[len(relpath.parts):]
             if len(subparts) == 1:
-                yield subparts[0]
+                subdirs_returned.append(subparts[0])
             elif len(subparts) > 1:                 # pragma: nobranch
                 subdir = subparts[0]
                 if subdir not in subdirs_seen:
                     subdirs_seen.add(subdir)
-                    yield subdir
+                    subdirs_returned.append(subdir)
+        return subdirs_returned

@@ -138,10 +138,10 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
 
 @unittest.skipIf(sys.version_info < (3,), 'No namespace packages in Python 2')
 class NamespaceTest(unittest.TestCase):
-    def test_namespaces_cant_have_resources(self):
-        contents = set(resources.contents(
-            'importlib_resources.tests.data03.namespace'))
-        self.assertEqual(len(contents), 0)
+    def test_namespaces_cannot_have_resources(self):
+        contents = resources.contents(
+            'importlib_resources.tests.data03.namespace')
+        self.assertFalse(list(contents))
         # Even though there is a file in the namespace directory, it is not
         # considered a resource, since namespace packages can't have them.
         self.assertFalse(resources.is_resource(
