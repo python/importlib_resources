@@ -6,4 +6,4 @@
 
 # Yes, it's horrible to let reference counting reclaim the open file object,
 # but oh well, this will exit soon.
-__version__ = open('importlib_resources/version.txt').read()
+__version__ = open('importlib_resources/version.txt').read().strip()
