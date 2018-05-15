@@ -18,4 +18,4 @@ else:
         read_text)
 
 
-__version__ = read_text('importlib_resources', 'version.txt')
+__version__ = read_text('importlib_resources', 'version.txt').strip()

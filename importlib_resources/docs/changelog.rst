@@ -2,6 +2,10 @@
  importlib_resources NEWS
 ==========================
 
+1.0 (2018-XX-XX)
+================
+* Strip ``importlib_resources.__version__``.  Closes #56
+
 0.7 (2018-05-15)
 ================
 * Fix ``setup.cfg`` metadata bug.  Closes #55
