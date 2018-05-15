@@ -2,10 +2,14 @@
  importlib_resources NEWS
 ==========================
 
+0.7 (2018-05-15)
+================
+* Fix ``setup.cfg`` metadata bug.  Closes #55
+
 0.6 (2018-05-15)
 ================
 * Move everything from ``pyproject.toml`` to ``setup.cfg``, with the added
-  benefit of fixing the PyPI metadata.
+  benefit of fixing the PyPI metadata.  Closes #54
 * Turn off mypy's ``strict_optional`` setting for now.
 
 0.5 (2018-05-01)
