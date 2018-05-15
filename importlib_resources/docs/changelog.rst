@@ -2,6 +2,12 @@
  importlib_resources NEWS
 ==========================
 
+0.6 (2018-XX-XX)
+================
+* Move everything from ``pyproject.toml`` to ``setup.cfg``, with the added
+  benefit of fixing the PyPI metadata.
+* Turn off mypy's ``strict_optional`` setting for now.
+
 0.5 (2018-05-01)
 ================
 * Resynchronize with Python 3.7; changes the return type of ``contents()`` to
