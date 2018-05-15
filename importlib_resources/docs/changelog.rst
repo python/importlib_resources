@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-0.6 (2018-XX-XX)
+0.6 (2018-05-15)
 ================
 * Move everything from ``pyproject.toml`` to ``setup.cfg``, with the added
   benefit of fixing the PyPI metadata.
