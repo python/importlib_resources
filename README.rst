@@ -15,6 +15,9 @@ solution in Python's stdlib that relies on well-defined APIs.  This makes
 reading resources included in packages easier, with more stable and consistent
 semantics.
 
+Note that ``pip 10`` is required if you are going to ``pip install
+importlib_resources``.
+
 
 Project details
 ===============
