@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-0.8 (2018-XX-XX)
+0.8 (2018-05-17)
 ================
 * Strip ``importlib_resources.__version__``.  Closes #56
 * Fix a metadata problem with older setuptools.  Closes #57
