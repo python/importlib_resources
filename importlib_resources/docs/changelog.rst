@@ -6,6 +6,7 @@
 ================
 * Strip ``importlib_resources.__version__``.  Closes #56
 * Fix a metadata problem with older setuptools.  Closes #57
+* Add an ``__all__`` to ``importlib_resources``.  Closes #59
 
 0.7 (2018-05-15)
 ================
