@@ -3,7 +3,6 @@ import sys
 import tempfile
 
 from . import abc as resources_abc
-from builtins import open as builtins_open
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -83,7 +82,7 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
     package_path = os.path.dirname(absolute_package_path)
     full_path = os.path.join(package_path, resource)
     try:
-        return builtins_open(full_path, mode='rb')
+        return open(full_path, mode='rb')
     except OSError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for
@@ -118,8 +117,7 @@ def open_text(package: Package,
     package_path = os.path.dirname(absolute_package_path)
     full_path = os.path.join(package_path, resource)
     try:
-        return builtins_open(
-            full_path, mode='r', encoding=encoding, errors=errors)
+        return open(full_path, mode='r', encoding=encoding, errors=errors)
     except OSError:
         # Just assume the loader is a resource loader; all the relevant
         # importlib.machinery loaders are and an AttributeError for
