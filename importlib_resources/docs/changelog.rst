@@ -2,6 +2,10 @@
  importlib_resources NEWS
 ==========================
 
+1.0 (2018-XX-XX)
+================
+* Backport fix for test isolation from Python 3.8/3.7.  Closes #61
+
 0.8 (2018-05-17)
 ================
 * Strip ``importlib_resources.__version__``.  Closes #56
