@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-1.0 (2018-XX-XX)
+1.0 (2018-06-28)
 ================
 * Backport fix for test isolation from Python 3.8/3.7.  Closes #61
 
