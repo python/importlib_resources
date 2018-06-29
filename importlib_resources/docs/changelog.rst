@@ -2,6 +2,10 @@
  importlib_resources NEWS
 ==========================
 
+1.0.1 (2018-06-29)
+==================
+* Update Trove classifiers.  Closes #63
+
 1.0 (2018-06-28)
 ================
 * Backport fix for test isolation from Python 3.8/3.7.  Closes #61
