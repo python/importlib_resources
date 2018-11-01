@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+1.0.2 (2018-11-01)
+==================
+* Fix ``setup_requires`` and ``install_requires`` metadata in ``setup.cfg``.
+  Given by Anthony Sottile.
+
 1.0.1 (2018-06-29)
 ==================
 * Update Trove classifiers.  Closes #63
