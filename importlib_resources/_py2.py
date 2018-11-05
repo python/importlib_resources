@@ -10,15 +10,19 @@ from pathlib2 import Path
 from zipfile import ZipFile
 
 
+def _resolve(name):
+    """If name is a string, resolve to a module."""
+    if not isinstance(name, basestring):                    # noqa: F821
+        return name
+    return import_module(name)
+
+
 def _get_package(package):
     """Normalize a path by ensuring it is a string.
 
     If the resulting string contains path separators, an exception is raised.
     """
-    if isinstance(package, basestring):                      # noqa: F821
-        module = import_module(package)
-    else:
-        module = package
+    module = _resolve(package)
     if not hasattr(module, '__path__'):
         raise TypeError("{!r} is not a package".format(package))
     return module
