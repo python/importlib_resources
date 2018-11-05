@@ -106,34 +106,8 @@ def open_text(package: Package,
               encoding: str = 'utf-8',
               errors: str = 'strict') -> TextIO:
     """Return a file-like object opened for text reading of the resource."""
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    reader = _get_resource_reader(package)
-    if reader is not None:
-        return TextIOWrapper(reader.open_resource(resource), encoding, errors)
-    # Using pathlib doesn't work well here due to the lack of 'strict'
-    # argument for pathlib.Path.resolve() prior to Python 3.6.
-    absolute_package_path = os.path.abspath(package.__spec__.origin)
-    package_path = os.path.dirname(absolute_package_path)
-    full_path = os.path.join(package_path, resource)
-    try:
-        return open(full_path, mode='r', encoding=encoding, errors=errors)
-    except OSError:
-        # Just assume the loader is a resource loader; all the relevant
-        # importlib.machinery loaders are and an AttributeError for
-        # get_data() will make it clear what is needed from the loader.
-        loader = cast(ResourceLoader, package.__spec__.loader)
-        data = None
-        if hasattr(package.__spec__.loader, 'get_data'):
-            with suppress(OSError):
-                data = loader.get_data(full_path)
-        if data is None:
-            package_name = package.__spec__.name
-            message = '{!r} resource not found in {!r}'.format(
-                resource, package_name)
-            raise FileNotFoundError(message)
-        else:
-            return TextIOWrapper(BytesIO(data), encoding, errors)
+    return TextIOWrapper(
+        open_binary(package, resource), encoding=encoding, errors=errors)
 
 
 def read_binary(package: Package, resource: Resource) -> bytes:

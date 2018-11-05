@@ -70,33 +70,8 @@ def open_binary(package, resource):
 
 def open_text(package, resource, encoding='utf-8', errors='strict'):
     """Return a file-like object opened for text reading of the resource."""
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    # Using pathlib doesn't work well here due to the lack of 'strict' argument
-    # for pathlib.Path.resolve() prior to Python 3.6.
-    package_path = os.path.dirname(package.__file__)
-    relative_path = os.path.join(package_path, resource)
-    full_path = os.path.abspath(relative_path)
-    try:
-        return io_open(full_path, mode='r', encoding=encoding, errors=errors)
-    except IOError:
-        # This might be a package in a zip file.  zipimport provides a loader
-        # with a functioning get_data() method, however we have to strip the
-        # archive (i.e. the .zip file's name) off the front of the path.  This
-        # is because the zipimport loader in Python 2 doesn't actually follow
-        # PEP 302.  It should allow the full path, but actually requires that
-        # the path be relative to the zip file.
-        try:
-            loader = package.__loader__
-            full_path = relative_path[len(loader.archive)+1:]
-            data = loader.get_data(full_path)
-        except (IOError, AttributeError):
-            package_name = package.__name__
-            message = '{!r} resource not found in {!r}'.format(
-                resource, package_name)
-            raise FileNotFoundError(message)
-        else:
-            return TextIOWrapper(BytesIO(data), encoding, errors)
+    return TextIOWrapper(
+        open_binary(package, resource), encoding=encoding, errors=errors)
 
 
 def read_binary(package, resource):
