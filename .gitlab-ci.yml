@@ -3,6 +3,7 @@ image: quay.io/python-devs/ci-image
 stages:
   - test
   - codecov
+  - deploy
 
 qa:
   script:
@@ -34,3 +35,10 @@ codecov:
   script:
     - codecov -t $CODECOV_TOKEN
   when: on_success
+
+release:
+  stage: deploy
+  only:
+    - /^\d+\.\d+(\.\d+)?([abc]\d*)?$/
+  script:
+    - tox -e release
