@@ -3,6 +3,7 @@ import sys
 import tempfile
 
 from . import abc as resources_abc
+from . import trees
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -245,41 +246,4 @@ def contents(package: Package) -> Iterable[str]:
     if (package.__spec__.origin == 'namespace' and
             not package.__spec__.has_location):
         return ()
-    package_directory = Path(package.__spec__.origin).parent
-    try:
-        return os.listdir(str(package_directory))
-    except (NotADirectoryError, FileNotFoundError):
-        # The package is probably in a zip file.
-        archive_path = getattr(package.__spec__.loader, 'archive', None)
-        if archive_path is None:
-            raise
-        relpath = package_directory.relative_to(archive_path)
-        with ZipFile(archive_path) as zf:
-            toc = zf.namelist()
-        subdirs_seen = set()                        # type: Set
-        subdirs_returned = []
-        for filename in toc:
-            path = Path(filename)
-            # Strip off any path component parts that are in common with the
-            # package directory, relative to the zip archive's file system
-            # path.  This gives us all the parts that live under the named
-            # package inside the zip file.  If the length of these subparts is
-            # exactly 1, then it is situated inside the package.  The resulting
-            # length will be 0 if it's above the package, and it will be
-            # greater than 1 if it lives in a subdirectory of the package
-            # directory.
-            #
-            # However, since directories themselves don't appear in the zip
-            # archive as a separate entry, we need to return the first path
-            # component for any case that has > 1 subparts -- but only once!
-            if path.parts[:len(relpath.parts)] != relpath.parts:
-                continue
-            subparts = path.parts[len(relpath.parts):]
-            if len(subparts) == 1:
-                subdirs_returned.append(subparts[0])
-            elif len(subparts) > 1:                 # pragma: nobranch
-                subdir = subparts[0]
-                if subdir not in subdirs_seen:
-                    subdirs_seen.add(subdir)
-                    subdirs_returned.append(subdir)
-        return subdirs_returned
+    return list(item.name for item in trees.from_package(package).iterdir())
