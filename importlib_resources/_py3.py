@@ -192,42 +192,7 @@ def is_resource(package: Package, name: str) -> bool:
         return False
     if name not in package_contents:
         return False
-    # Just because the given file_name lives as an entry in the package's
-    # contents doesn't necessarily mean it's a resource.  Directories are not
-    # resources, so let's try to find out if it's a directory or not.
-    path = Path(package.__spec__.origin).parent / name
-    if path.is_file():
-        return True
-    if path.is_dir():
-        return False
-    # If it's not a file and it's not a directory, what is it?  Well, this
-    # means the file doesn't exist on the file system, so it probably lives
-    # inside a zip file.  We have to crack open the zip, look at its table of
-    # contents, and make sure that this entry doesn't have sub-entries.
-    archive_path = package.__spec__.loader.archive   # type: ignore
-    package_directory = Path(package.__spec__.origin).parent
-    with ZipFile(archive_path) as zf:
-        toc = zf.namelist()
-    relpath = package_directory.relative_to(archive_path)
-    candidate_path = relpath / name
-    for entry in toc:                               # pragma: nobranch
-        try:
-            relative_to_candidate = Path(entry).relative_to(candidate_path)
-        except ValueError:
-            # The two paths aren't relative to each other so we can ignore it.
-            continue
-        # Since directories aren't explicitly listed in the zip file, we must
-        # infer their 'directory-ness' by looking at the number of path
-        # components in the path relative to the package resource we're
-        # looking up.  If there are zero additional parts, it's a file, i.e. a
-        # resource.  If there are more than zero it's a directory, i.e. not a
-        # resource.  It has to be one of these two cases.
-        return len(relative_to_candidate.parts) == 0
-    # I think it's impossible to get here.  It would mean that we are looking
-    # for a resource in a zip file, there's an entry matching it in the return
-    # value of contents(), but we never actually found it in the zip's table of
-    # contents.
-    raise AssertionError('Impossible situation')
+    return (trees.from_package(package) / name).is_file()
 
 
 def contents(package: Package) -> Iterable[str]:
