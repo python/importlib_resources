@@ -13,7 +13,6 @@ from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
-from zipfile import ZipFile
 
 
 Package = Union[ModuleType, str]
