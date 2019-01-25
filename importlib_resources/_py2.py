@@ -37,8 +37,7 @@ def _normalize_path(path):
     parent, file_name = os.path.split(str_path)
     if parent:
         raise ValueError("{!r} must be only a file name".format(path))
-    else:
-        return file_name
+    return file_name
 
 
 def open_binary(package, resource):
@@ -68,8 +67,7 @@ def open_binary(package, resource):
             message = '{!r} resource not found in {!r}'.format(
                 resource, package_name)
             raise FileNotFoundError(message)
-        else:
-            return BytesIO(data)
+        return BytesIO(data)
 
 
 def open_text(package, resource, encoding='utf-8', errors='strict'):
@@ -113,27 +111,28 @@ def path(package, resource):
     package_directory = Path(package.__file__).parent
     file_path = package_directory / resource
     # If the file actually exists on the file system, just return it.
+    if file_path.exists():
+        yield file_path
+        return
+
     # Otherwise, it's probably in a zip file, so we need to create a temporary
     # file and copy the contents into that file, hence the contextmanager to
     # clean up the temp file resource.
-    if file_path.exists():
-        yield file_path
-    else:
-        with open_binary(package, resource) as fp:
-            data = fp.read()
-        # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-        # blocks due to the need to close the temporary file to work on Windows
-        # properly.
-        fd, raw_path = tempfile.mkstemp()
+    with open_binary(package, resource) as fp:
+        data = fp.read()
+    # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
+    # blocks due to the need to close the temporary file to work on Windows
+    # properly.
+    fd, raw_path = tempfile.mkstemp()
+    try:
+        os.write(fd, data)
+        os.close(fd)
+        yield Path(raw_path)
+    finally:
         try:
-            os.write(fd, data)
-            os.close(fd)
-            yield Path(raw_path)
-        finally:
-            try:
-                os.remove(raw_path)
-            except FileNotFoundError:
-                pass
+            os.remove(raw_path)
+        except FileNotFoundError:
+            pass
 
 
 def is_resource(package, name):
