@@ -219,7 +219,7 @@ def contents(package):
         relpath = package_directory.relative_to(archive_path)
         with ZipFile(archive_path) as zf:
             toc = zf.namelist()
-        subdirs_seen = set()                        # type: Set
+        subdirs_seen = set()
         subdirs_returned = []
         for filename in toc:
             path = Path(filename)
