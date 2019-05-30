@@ -50,8 +50,7 @@ def _normalize_path(path) -> str:
     parent, file_name = os.path.split(str_path)
     if parent:
         raise ValueError('{!r} must be only a file name'.format(path))
-    else:
-        return file_name
+    return file_name
 
 
 def _get_resource_reader(
@@ -96,8 +95,7 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
             message = '{!r} resource not found in {!r}'.format(
                 resource, package_name)
             raise FileNotFoundError(message)
-        else:
-            return BytesIO(data)
+        return BytesIO(data)
 
 
 def open_text(package: Package,
@@ -146,33 +144,34 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     package = _get_package(package)
     reader = _get_resource_reader(package)
     if reader is not None:
-        try:
+        with suppress(FileNotFoundError):
             yield Path(reader.resource_path(resource))
             return
-        except FileNotFoundError:
-            pass
     # Fall-through for both the lack of resource_path() *and* if
     # resource_path() raises FileNotFoundError.
     package_directory = Path(package.__spec__.origin).parent
     file_path = package_directory / resource
+    # If the file actually exists on the file system, just return it.
     if file_path.exists():
         yield file_path
-    else:
-        with open_binary(package, resource) as fp:
-            data = fp.read()
-        # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-        # blocks due to the need to close the temporary file to work on
-        # Windows properly.
-        fd, raw_path = tempfile.mkstemp()
-        try:
-            os.write(fd, data)
-            os.close(fd)
-            yield Path(raw_path)
-        finally:
-            try:
-                os.remove(raw_path)
-            except FileNotFoundError:
-                pass
+        return
+
+    # Otherwise, it's probably in a zip file, so we need to create a temporary
+    # file and copy the contents into that file, hence the contextmanager to
+    # clean up the temp file resource.
+    with open_binary(package, resource) as fp:
+        data = fp.read()
+    # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
+    # blocks due to the need to close the temporary file to work on
+    # Windows properly.
+    fd, raw_path = tempfile.mkstemp()
+    try:
+        os.write(fd, data)
+        os.close(fd)
+        yield Path(raw_path)
+    finally:
+        with suppress(FileNotFoundError):
+            os.remove(raw_path)
 
 
 def is_resource(package: Package, name: str) -> bool:
