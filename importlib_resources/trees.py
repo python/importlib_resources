@@ -1,20 +1,12 @@
 from __future__ import absolute_import
 
 import abc
-import six
 import zipp
 
-try:
-    import pathlib
-except ImportError:
-    import pathlib2 as pathlib
+from ._compat import ABC, Path
 
 
-__metaclass__ = type
-
-
-@six.add_metaclass(abc.ABCMeta)
-class Traversable:
+class Traversable(ABC):
     @abc.abstractmethod
     def iterdir(self):
         """
@@ -48,7 +40,7 @@ class Traversable:
 
 def from_package(package):
     """Return a Traversable object for the given package"""
-    package_directory = pathlib.Path(package.__spec__.origin).parent
+    package_directory = Path(package.__spec__.origin).parent
     try:
         archive_path = package.__spec__.loader.archive
         rel_path = package_directory.relative_to(archive_path)
