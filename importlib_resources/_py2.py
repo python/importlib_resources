@@ -2,12 +2,12 @@ import os
 import errno
 import tempfile
 
+from . import trees
 from ._compat import FileNotFoundError
 from contextlib import contextmanager
 from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
 from pathlib2 import Path
-from zipfile import ZipFile
 
 
 def _resolve(name):
@@ -155,42 +155,7 @@ def is_resource(package, name):
         return False
     if name not in package_contents:
         return False
-    # Just because the given file_name lives as an entry in the package's
-    # contents doesn't necessarily mean it's a resource.  Directories are not
-    # resources, so let's try to find out if it's a directory or not.
-    path = Path(package.__file__).parent / name
-    if path.is_file():
-        return True
-    if path.is_dir():
-        return False
-    # If it's not a file and it's not a directory, what is it?  Well, this
-    # means the file doesn't exist on the file system, so it probably lives
-    # inside a zip file.  We have to crack open the zip, look at its table of
-    # contents, and make sure that this entry doesn't have sub-entries.
-    archive_path = package.__loader__.archive   # type: ignore
-    package_directory = Path(package.__file__).parent
-    with ZipFile(archive_path) as zf:
-        toc = zf.namelist()
-    relpath = package_directory.relative_to(archive_path)
-    candidate_path = relpath / name
-    for entry in toc:                               # pragma: nobranch
-        try:
-            relative_to_candidate = Path(entry).relative_to(candidate_path)
-        except ValueError:
-            # The two paths aren't relative to each other so we can ignore it.
-            continue
-        # Since directories aren't explicitly listed in the zip file, we must
-        # infer their 'directory-ness' by looking at the number of path
-        # components in the path relative to the package resource we're
-        # looking up.  If there are zero additional parts, it's a file, i.e. a
-        # resource.  If there are more than zero it's a directory, i.e. not a
-        # resource.  It has to be one of these two cases.
-        return len(relative_to_candidate.parts) == 0
-    # I think it's impossible to get here.  It would mean that we are looking
-    # for a resource in a zip file, there's an entry matching it in the return
-    # value of contents(), but we never actually found it in the zip's table of
-    # contents.
-    raise AssertionError('Impossible situation')
+    return (trees.from_package(package) / name).is_file()
 
 
 def contents(package):
@@ -201,48 +166,4 @@ def contents(package):
     to check if it is a resource or not.
     """
     package = _get_package(package)
-    package_directory = Path(package.__file__).parent
-    try:
-        return os.listdir(str(package_directory))
-    except OSError as error:
-        if error.errno not in (errno.ENOENT, errno.ENOTDIR):
-            # We won't hit this in the Python 2 tests, so it'll appear
-            # uncovered.  We could mock os.listdir() to return a non-ENOENT or
-            # ENOTDIR, but then we'd have to depend on another external
-            # library since Python 2 doesn't have unittest.mock.  It's not
-            # worth it.
-            raise                     # pragma: nocover
-        # The package is probably in a zip file.
-        archive_path = getattr(package.__loader__, 'archive', None)
-        if archive_path is None:
-            raise
-        relpath = package_directory.relative_to(archive_path)
-        with ZipFile(archive_path) as zf:
-            toc = zf.namelist()
-        subdirs_seen = set()
-        subdirs_returned = []
-        for filename in toc:
-            path = Path(filename)
-            # Strip off any path component parts that are in common with the
-            # package directory, relative to the zip archive's file system
-            # path.  This gives us all the parts that live under the named
-            # package inside the zip file.  If the length of these subparts is
-            # exactly 1, then it is situated inside the package.  The resulting
-            # length will be 0 if it's above the package, and it will be
-            # greater than 1 if it lives in a subdirectory of the package
-            # directory.
-            #
-            # However, since directories themselves don't appear in the zip
-            # archive as a separate entry, we need to return the first path
-            # component for any case that has > 1 subparts -- but only once!
-            if path.parts[:len(relpath.parts)] != relpath.parts:
-                continue
-            subparts = path.parts[len(relpath.parts):]
-            if len(subparts) == 1:
-                subdirs_returned.append(subparts[0])
-            elif len(subparts) > 1:                 # pragma: nobranch
-                subdir = subparts[0]
-                if subdir not in subdirs_seen:
-                    subdirs_seen.add(subdir)
-                    subdirs_returned.append(subdir)
-        return subdirs_returned
+    return list(item.name for item in trees.from_package(package).iterdir())
