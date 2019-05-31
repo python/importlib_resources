@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import abc
 import zipp
 
-from ._compat import ABC, Path
+from ._compat import ABC, Path, package_spec
 
 
 class Traversable(ABC):
@@ -40,9 +40,10 @@ class Traversable(ABC):
 
 def from_package(package):
     """Return a Traversable object for the given package"""
-    package_directory = Path(package.__spec__.origin).parent
+    spec = package_spec(package)
+    package_directory = Path(spec.origin).parent
     try:
-        archive_path = package.__spec__.loader.archive
+        archive_path = spec.loader.archive
         rel_path = package_directory.relative_to(archive_path)
         return zipp.Path(archive_path, str(rel_path) + '/')
     except Exception:
