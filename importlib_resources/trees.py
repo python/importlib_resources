@@ -55,13 +55,13 @@ def from_package(package):
 
 
 @contextlib.contextmanager
-def _zip_path_as_file(path):
+def _tempfile(reader):
     # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
     # blocks due to the need to close the temporary file to work on Windows
     # properly.
     fd, raw_path = tempfile.mkstemp()
     try:
-        os.write(fd, path.read_bytes())
+        os.write(fd, reader())
         os.close(fd)
         yield Path(raw_path)
     finally:
@@ -69,6 +69,10 @@ def _zip_path_as_file(path):
             os.remove(raw_path)
         except FileNotFoundError:
             pass
+
+
+def _zip_path_as_file(path):
+    return _tempfile(path.read_bytes)
 
 
 @contextlib.contextmanager
