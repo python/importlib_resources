@@ -89,8 +89,6 @@ def as_file(path):
     Given a path-like object, return that object as a
     path on the local file system in a context manager.
     """
-    if not path.is_file():
-        raise FileNotFoundError(path)
     # todo: consider using functools.singledispatch
     wrapper = (
         _zip_path_as_file

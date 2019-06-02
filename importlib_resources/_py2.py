@@ -108,7 +108,10 @@ def path(package, resource):
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    return trees.as_file(get(package, resource))
+    path = get(package, resource)
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    return trees.as_file(path)
 
 
 def is_resource(package, name):
