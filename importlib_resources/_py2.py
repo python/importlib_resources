@@ -1,13 +1,10 @@
 import os
 import errno
-import tempfile
 
 from . import trees
 from ._compat import FileNotFoundError
-from contextlib import contextmanager
 from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
-from pathlib2 import Path
 
 
 def _resolve(name):
@@ -96,7 +93,12 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
         return fp.read()
 
 
-@contextmanager
+def get(package, resource):
+    resource = _normalize_path(resource)
+    package = _get_package(package)
+    return trees.from_package(package) / resource
+
+
 def path(package, resource):
     """A context manager providing a file path object to the resource.
 
@@ -106,33 +108,7 @@ def path(package, resource):
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    package_directory = Path(package.__file__).parent
-    file_path = package_directory / resource
-    # If the file actually exists on the file system, just return it.
-    if file_path.exists():
-        yield file_path
-        return
-
-    # Otherwise, it's probably in a zip file, so we need to create a temporary
-    # file and copy the contents into that file, hence the contextmanager to
-    # clean up the temp file resource.
-    with open_binary(package, resource) as fp:
-        data = fp.read()
-    # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-    # blocks due to the need to close the temporary file to work on Windows
-    # properly.
-    fd, raw_path = tempfile.mkstemp()
-    try:
-        os.write(fd, data)
-        os.close(fd)
-        yield Path(raw_path)
-    finally:
-        try:
-            os.remove(raw_path)
-        except FileNotFoundError:
-            pass
+    return trees.as_file(get(package, resource))
 
 
 def is_resource(package, name):

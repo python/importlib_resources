@@ -1,6 +1,5 @@
 import os
 import sys
-import tempfile
 
 from . import abc as resources_abc
 from . import trees
@@ -130,6 +129,15 @@ def read_text(package: Package,
         return fp.read()
 
 
+def get(package: Package, resource: Resource) -> trees.Traversable:
+    """
+    Get a Traversable resource from a package
+    """
+    resource = _normalize_path(resource)
+    package = _get_package(package)
+    return trees.from_package(package) / resource
+
+
 @contextmanager
 def path(package: Package, resource: Resource) -> Iterator[Path]:
     """A context manager providing a file path object to the resource.
@@ -140,38 +148,14 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    reader = _get_resource_reader(package)
+    norm_resource = _normalize_path(resource)
+    reader = _get_resource_reader(_get_package(package))
     if reader is not None:
         with suppress(FileNotFoundError):
-            yield Path(reader.resource_path(resource))
+            yield Path(reader.resource_path(norm_resource))
             return
-    # Fall-through for both the lack of resource_path() *and* if
-    # resource_path() raises FileNotFoundError.
-    package_directory = Path(package.__spec__.origin).parent
-    file_path = package_directory / resource
-    # If the file actually exists on the file system, just return it.
-    if file_path.exists():
-        yield file_path
-        return
-
-    # Otherwise, it's probably in a zip file, so we need to create a temporary
-    # file and copy the contents into that file, hence the contextmanager to
-    # clean up the temp file resource.
-    with open_binary(package, resource) as fp:
-        data = fp.read()
-    # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-    # blocks due to the need to close the temporary file to work on
-    # Windows properly.
-    fd, raw_path = tempfile.mkstemp()
-    try:
-        os.write(fd, data)
-        os.close(fd)
-        yield Path(raw_path)
-    finally:
-        with suppress(FileNotFoundError):
-            os.remove(raw_path)
+    with trees.as_file(get(package, resource)) as res:
+        yield res
 
 
 def is_resource(package: Package, name: str) -> bool:
