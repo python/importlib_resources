@@ -154,6 +154,10 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
         with suppress(FileNotFoundError):
             yield Path(reader.resource_path(norm_resource))
             return
+        opener_reader = reader.open_resource(norm_resource)
+        with trees._tempfile(opener_reader.read) as res:
+            yield res
+            return
     with trees.as_file(get(package, resource)) as res:
         yield res
 
