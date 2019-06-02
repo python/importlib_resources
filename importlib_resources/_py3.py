@@ -138,7 +138,6 @@ def get(package: Package, resource: Resource) -> trees.Traversable:
     return trees.from_package(package) / resource
 
 
-@contextmanager
 def path(package: Package, resource: Resource) -> Iterator[Path]:
     """A context manager providing a file path object to the resource.
 
@@ -148,17 +147,22 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    norm_resource = _normalize_path(resource)
     reader = _get_resource_reader(_get_package(package))
-    if reader is not None:
-        with suppress(FileNotFoundError):
-            yield Path(reader.resource_path(norm_resource))
-            return
-        opener_reader = reader.open_resource(norm_resource)
-        with trees._tempfile(opener_reader.read) as res:
-            yield res
-            return
-    with trees.as_file(get(package, resource)) as res:
+    return (
+        _path_from_reader(reader, resource)
+        if reader else
+        trees.as_file(get(package, resource))
+        )
+
+
+@contextmanager
+def _path_from_reader(reader, resource):
+    norm_resource = _normalize_path(resource)
+    with suppress(FileNotFoundError):
+        yield Path(reader.resource_path(norm_resource))
+        return
+    opener_reader = reader.open_resource(norm_resource)
+    with trees._tempfile(opener_reader.read) as res:
         yield res
 
 
