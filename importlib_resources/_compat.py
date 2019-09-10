@@ -20,4 +20,4 @@ except ImportError:
 try:
     FileNotFoundError = FileNotFoundError                       # type: ignore
 except NameError:
-    FileNotFoundError = OSError
+    FileNotFoundError = OSError                                 # type: ignore
