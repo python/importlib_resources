@@ -22,4 +22,4 @@ Project details
  * Project home: https://gitlab.com/python-devs/importlib_resources
  * Report bugs at: https://gitlab.com/python-devs/importlib_resources/issues
  * Code hosting: https://gitlab.com/python-devs/importlib_resources.git
- * Documentation: http://importlib_resources.readthedocs.io/
+ * Documentation: https://importlib-resources.readthedocs.io/
