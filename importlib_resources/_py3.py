@@ -10,6 +10,7 @@ from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
+from typing import ContextManager
 from typing import cast
 from typing.io import BinaryIO, TextIO
 
@@ -138,7 +139,9 @@ def get(package: Package, resource: Resource) -> trees.Traversable:
     return trees.from_package(package) / resource
 
 
-def path(package: Package, resource: Resource) -> Iterator[Path]:
+def path(
+        package: Package, resource: Resource,
+        ) -> ContextManager[Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
