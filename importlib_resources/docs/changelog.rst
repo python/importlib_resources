@@ -2,6 +2,13 @@
  importlib_resources NEWS
 ==========================
 
+1.1.0 (2020-01-19)
+==================
+* Add support for retrieving resources from subdirectories of packages
+  through the new ``get()`` function, which returns a ``Traversable``
+  object with ``joinpath`` and ``read_*`` interfaces matching those
+  of ``pathlib.Path`` objects.
+
 1.0.2 (2018-11-01)
 ==================
 * Fix ``setup_requires`` and ``install_requires`` metadata in ``setup.cfg``.
