@@ -2,11 +2,10 @@ from __future__ import absolute_import
 
 import os
 import abc
-import zipp
 import tempfile
 import contextlib
 
-from ._compat import ABC, Path, package_spec, FileNotFoundError
+from ._compat import ABC, Path, package_spec, FileNotFoundError, ZipPath
 
 
 class Traversable(ABC):
@@ -48,7 +47,7 @@ def from_package(package):
     try:
         archive_path = spec.loader.archive
         rel_path = package_directory.relative_to(archive_path)
-        return zipp.Path(archive_path, str(rel_path) + '/')
+        return ZipPath(archive_path, str(rel_path) + '/')
     except Exception:
         pass
     return package_directory
@@ -92,7 +91,7 @@ def as_file(path):
     # todo: consider using functools.singledispatch
     wrapper = (
         _zip_path_as_file
-        if isinstance(path, zipp.Path)
+        if isinstance(path, ZipPath)
         else _local_path_as_file
         )
     with wrapper(path) as local:

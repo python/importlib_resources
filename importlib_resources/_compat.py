@@ -23,6 +23,12 @@ except NameError:
     FileNotFoundError = OSError                                 # type: ignore
 
 
+try:
+    from zipfile import Path as ZipPath  # type: ignore
+except ImportError:
+    from zipp import Path as ZipPath
+
+
 class PackageSpec(object):
 	def __init__(self, **kwargs):
 		vars(self).update(kwargs)
