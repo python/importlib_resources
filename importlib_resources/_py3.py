@@ -185,10 +185,7 @@ def is_resource(package: Package, name: str) -> bool:
     reader = _get_resource_reader(package)
     if reader is not None:
         return reader.is_resource(name)
-    try:
-        package_contents = set(contents(package))
-    except (NotADirectoryError, FileNotFoundError):
-        return False
+    package_contents = set(contents(package))
     if name not in package_contents:
         return False
     # Just because the given file_name lives as an entry in the package's
@@ -254,8 +251,6 @@ def contents(package: Package) -> Iterable[str]:
     except (NotADirectoryError, FileNotFoundError):
         # The package is probably in a zip file.
         archive_path = getattr(package.__spec__.loader, 'archive', None)
-        if archive_path is None:
-            raise
         relpath = package_directory.relative_to(archive_path)
         with ZipFile(archive_path) as zf:
             toc = zf.namelist()
