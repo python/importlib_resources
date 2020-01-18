@@ -76,7 +76,8 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
         return reader.open_resource(resource)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
-    absolute_package_path = os.path.abspath(package.__spec__.origin)
+    absolute_package_path = os.path.abspath(
+        package.__spec__.origin or 'non-existent file')
     package_path = os.path.dirname(absolute_package_path)
     full_path = os.path.join(package_path, resource)
     try:
@@ -241,8 +242,11 @@ def contents(package: Package) -> Iterable[str]:
         return reader.contents()
     # Is the package a namespace package?  By definition, namespace packages
     # cannot have resources.
-    if (package.__spec__.origin == 'namespace' and
-            not package.__spec__.has_location):
+    namespace = (
+        package.__spec__.origin is None or
+        package.__spec__.origin == 'namespace'
+        )
+    if namespace or not package.__spec__.has_location:
         return ()
     package_directory = Path(package.__spec__.origin).parent
     try:
