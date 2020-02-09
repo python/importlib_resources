@@ -93,10 +93,8 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
         return fp.read()
 
 
-def get(package, resource):
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    return trees.from_package(package) / resource
+def files(package):
+    return trees.from_package(_get_package(package))
 
 
 def path(package, resource):
@@ -108,7 +106,7 @@ def path(package, resource):
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    path = get(package, resource)
+    path = files(package).joinpath(_normalize_path(resource))
     if not path.is_file():
         raise FileNotFoundError(path)
     return trees.as_file(path)

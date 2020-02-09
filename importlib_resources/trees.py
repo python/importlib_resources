@@ -9,6 +9,11 @@ from ._compat import ABC, Path, package_spec, FileNotFoundError, ZipPath
 
 
 class Traversable(ABC):
+    """
+    An object with a subset of pathlib.Path methods suitable for
+    traversing directories and opening files.
+    """
+
     @abc.abstractmethod
     def iterdir(self):
         """
@@ -37,6 +42,18 @@ class Traversable(ABC):
     def is_file(self):
         """
         Return True if self is a file
+        """
+
+    @abc.abstractmethod
+    def joinpath(self, child):
+        """
+        Return Traversable child in self
+        """
+
+    @abc.abstractmethod
+    def __truediv__(self, child):
+        """
+        Return Traversable child in self
         """
 
 

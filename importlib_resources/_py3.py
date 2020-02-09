@@ -131,13 +131,11 @@ def read_text(package: Package,
         return fp.read()
 
 
-def get(package: Package, resource: Resource) -> trees.Traversable:
+def files(package: Package) -> trees.Traversable:
     """
     Get a Traversable resource from a package
     """
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    return trees.from_package(package) / resource
+    return trees.from_package(_get_package(package))
 
 
 def path(
@@ -155,7 +153,7 @@ def path(
     return (
         _path_from_reader(reader, resource)
         if reader else
-        trees.as_file(get(package, resource))
+        trees.as_file(files(package).joinpath(_normalize_path(resource)))
         )
 
 
