@@ -8,6 +8,7 @@ __all__ = [
     'Resource',
     'ResourceReader',
     'contents',
+    'files',
     'is_resource',
     'open_binary',
     'open_text',
@@ -22,6 +23,7 @@ if sys.version_info >= (3,):
         Package,
         Resource,
         contents,
+        files,
         is_resource,
         open_binary,
         open_text,
@@ -33,6 +35,7 @@ if sys.version_info >= (3,):
 else:
     from importlib_resources._py2 import (
         contents,
+        files,
         is_resource,
         open_binary,
         open_text,
