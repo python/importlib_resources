@@ -17,11 +17,6 @@ access`_ APIs:
 * ``pkg_resources.resource_listdir()``
 * ``pkg_resources.resource_isdir()``
 
-Keep in mind that ``pkg_resources`` defines *resources* to include
-directories.  ``importlib_resources`` does not treat directories as resources;
-since only files are allowed as resources, file names in the
-``importlib_resources`` API may *not* include path separators (e.g. slashes).
-
 
 pkg_resources.resource_filename()
 =================================
@@ -34,9 +29,11 @@ that ``pkg_resources()`` also *implicitly* cleans up this temporary file,
 without control over its lifetime by the programmer.
 
 ``importlib_resources`` takes a different approach.  Its equivalent API is the
-``path()`` function, which returns a context manager providing a
-:py:class:`pathlib.Path` object.  This means users have both the flexibility
-and responsibility to manage the lifetime of the temporary file.  Note though
+``files()`` function, which returns a Traversable object implementing a
+subset of the
+:py:class:`pathlib.Path` interface suitable for reading the contents and
+provides a wrapper for creating a temporary file on the system in a
+context whose lifetime is managed by the user.  Note though
 that if the resource is *already* on the file system, ``importlib_resources``
 still returns a context manager, but nothing needs to get cleaned up.
 
@@ -46,7 +43,8 @@ Here's an example from ``pkg_resources()``::
 
 The best way to convert this is with the following idiom::
 
-    with importlib_resources.path('my.package', 'resource.dat') as path:
+    ref = importlib_resources.files('my.package') / 'resource.dat'
+    with importlib_resources.trees.as_file(ref) as path:
         # Do something with path.  After the with-statement exits, any
         # temporary file created will be immediately cleaned up.
 
@@ -56,8 +54,9 @@ to stick around for a while?  One way of doing this is to use an
 
     from contextlib import ExitStack
     file_manager = ExitStack()
+    ref = importlib_resources.files('my.package') / 'resource.dat'
     path = file_manager.enter_context(
-        importlib_resources.path('my.package', 'resource.dat'))
+        importlib_resources.trees.as_file(ref))
 
 Now ``path`` will continue to exist until you explicitly call
 ``file_manager.close()``.  What if you want the file to exist until the
@@ -67,8 +66,9 @@ process exits, or you can't pass ``file_manager`` around in your code?  Use an
     import atexit
     file_manager = ExitStack()
     atexit.register(file_manager.close)
+    ref = importlib_resources.files('my.package') / 'resource.dat'
     path = file_manager.enter_context(
-        importlib_resources.path('my.package', 'resource.dat'))
+        importlib_resources.trees.as_file(ref))
 
 Assuming your Python interpreter exits gracefully, the temporary file will be
 cleaned up when Python exits.
@@ -86,7 +86,8 @@ bytes.  E.g.::
 
 The equivalent code in ``importlib_resources`` is pretty straightforward::
 
-    with importlib_resources.open_binary('my.package', 'resource.dat') as fp:
+    ref = importlib_resources.files('my.package').joinpath('resource.dat')
+    with ref.open() as fp:
         my_bytes = fp.read()
 
 
@@ -103,7 +104,8 @@ following example is often written for clarity as::
 
 This can be easily rewritten like so::
 
-    contents = importlib_resources.read_binary('my.package', 'resource.dat')
+    ref = importlib_resources.files('my.package').joinpath('resource.dat')
+    contents = f.read_bytes()
 
 
 pkg_resources.resource_listdir()
@@ -117,19 +119,18 @@ but it does not recurse into subdirectories, e.g.::
 
 This is easily rewritten using the following idiom::
 
-    for entry in importlib_resources.contents('my.package.subpackage'):
-        print(entry)
+    for entry in importlib_resources.files('my.package.subpackage').iterdir():
+        print(entry.name)
 
 Note:
 
-* ``pkg_resources`` does not require ``subpackage`` to be a Python package,
-  but ``importlib_resources`` does.
-* ``importlib_resources.contents()`` returns an iterator, not a concrete
-  sequence.
+* ``Traversable.iterdir()`` returns *all* the entries in the
+  subpackage, i.e. both resources (files) and non-resources (directories).
+* ``Traversable.iterdir()`` returns additional traversable objects, which if
+  directories can also be iterated over (recursively).
+* ``Traversable.iterdir()``, like ``pathlib.Path`` returns an iterator, not a
+  concrete sequence.
 * The order in which the elements are returned is undefined.
-* ``importlib_resources.contents()`` returns *all* the entries in the
-  subpackage, i.e. both resources (files) and non-resources (directories).  As
-  with ``pkg_resources.listdir()`` it does not recurse.
 
 
 pkg_resources.resource_isdir()
@@ -141,20 +142,10 @@ a package is a directory or not::
     if pkg_resources.resource_isdir('my.package', 'resource'):
         print('A directory')
 
-Because ``importlib_resources`` explicitly does not define directories as
-resources, there's no direct equivalent.  However, you can ask whether a
-particular resource exists inside a package, and since directories are not
-resources you can infer whether the resource is a directory or a file.  Here
-is a way to do that::
+The ``importlib_resources`` equivalent is straightforward::
 
-    from importlib_resources import contents, is_resource
-    if 'resource' in contents('my.package') and \
-              not is_resource('my.package', 'resource'):
-      print('It must be a directory')
-
-The reason you have to do it this way and not just call
-``not is_resource('my.package', 'resource')`` is because this conditional will
-also return False when ``resource`` is not an entry in ``my.package``.
+    if importlib_resources.files('my.package').joinpath('resource').isdir():
+        print('A directory')
 
 
 .. _`basic resource access`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
