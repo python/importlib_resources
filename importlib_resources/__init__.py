@@ -4,46 +4,14 @@ import sys
 
 
 __all__ = [
-    'Package',
-    'Resource',
-    'ResourceReader',
-    'contents',
     'files',
-    'is_resource',
-    'open_binary',
-    'open_text',
-    'path',
-    'read_binary',
-    'read_text',
     ]
 
 
 if sys.version_info >= (3,):
-    from importlib_resources._py3 import (
-        Package,
-        Resource,
-        contents,
-        files,
-        is_resource,
-        open_binary,
-        open_text,
-        path,
-        read_binary,
-        read_text,
-        )
-    from importlib_resources.abc import ResourceReader
+    from importlib_resources._py3 import files
 else:
-    from importlib_resources._py2 import (
-        contents,
-        files,
-        is_resource,
-        open_binary,
-        open_text,
-        path,
-        read_binary,
-        read_text,
-        )
-    del __all__[:3]
+    from importlib_resources._py2 import files
 
 
 __version__ = \

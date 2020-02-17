@@ -1,14 +1,11 @@
 import abc
 import importlib
-import io
 import sys
-import types
 import unittest
 
 from . import data01
 from . import zipdata01
-from .._compat import ABC, Path, PurePath, FileNotFoundError
-from ..abc import ResourceReader
+from .._compat import ABC, Path, PurePath
 
 try:
     from test.support import modules_setup, modules_cleanup
@@ -41,64 +38,6 @@ except ImportError:
     ModuleSpec = None                               # type: ignore
 
 
-def create_package(file, path, is_package=True, contents=()):
-    class Reader(ResourceReader):
-        def get_resource_reader(self, package):
-            return self
-
-        def open_resource(self, path):
-            self._path = path
-            if isinstance(file, Exception):
-                raise file
-            else:
-                return file
-
-        def resource_path(self, path_):
-            self._path = path_
-            if isinstance(path, Exception):
-                raise path
-            else:
-                return path
-
-        def is_resource(self, path_):
-            self._path = path_
-            if isinstance(path, Exception):
-                raise path
-            for entry in contents:
-                parts = entry.split('/')
-                if len(parts) == 1 and parts[0] == path_:
-                    return True
-            return False
-
-        def contents(self):
-            if isinstance(path, Exception):
-                raise path
-            # There's no yield from in baseball, er, Python 2.
-            for entry in contents:
-                yield entry
-
-    name = 'testingpackage'
-    # Unforunately importlib.util.module_from_spec() was not introduced until
-    # Python 3.5.
-    module = types.ModuleType(name)
-    if ModuleSpec is None:
-        # Python 2.
-        module.__name__ = name
-        module.__file__ = 'does-not-exist'
-        if is_package:
-            module.__path__ = []
-    else:
-        # Python 3.
-        loader = Reader()
-        spec = ModuleSpec(
-            name, loader,
-            origin='does-not-exist',
-            is_package=is_package)
-        module.__spec__ = spec
-        module.__loader__ = loader
-    return module
-
-
 class CommonTests(ABC):
 
     @abc.abstractmethod
@@ -125,16 +64,13 @@ class CommonTests(ABC):
         self.execute(data01, path)
 
     def test_absolute_path(self):
-        # An absolute path is a ValueError.
         path = Path(__file__)
         full_path = path.parent/'utf-8.file'
-        with self.assertRaises(ValueError):
+        with self.assertRaises(FileNotFoundError):
             self.execute(data01, full_path)
 
     def test_relative_path(self):
-        # A reative path is a ValueError.
-        with self.assertRaises(ValueError):
-            self.execute(data01, '../data01/utf-8.file')
+        self.execute(data01, '../data01/utf-8.file')
 
     def test_importing_module_as_side_effect(self):
         # The anchor package can already be imported.
@@ -151,27 +87,6 @@ class CommonTests(ABC):
         with self.assertRaises(TypeError):
             module = sys.modules['importlib_resources.tests.util']
             self.execute(module, 'utf-8.file')
-
-    @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
-    def test_resource_opener(self):
-        bytes_data = io.BytesIO(b'Hello, world!')
-        package = create_package(file=bytes_data, path=FileNotFoundError())
-        self.execute(package, 'utf-8.file')
-        self.assertEqual(package.__loader__._path, 'utf-8.file')
-
-    @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
-    def test_resource_path(self):
-        bytes_data = io.BytesIO(b'Hello, world!')
-        path = __file__
-        package = create_package(file=bytes_data, path=path)
-        self.execute(package, 'utf-8.file')
-        self.assertEqual(package.__loader__._path, 'utf-8.file')
-
-    def test_useless_loader(self):
-        package = create_package(file=FileNotFoundError(),
-                                 path=FileNotFoundError())
-        with self.assertRaises(FileNotFoundError):
-            self.execute(package, 'utf-8.file')
 
 
 class ZipSetupBase:
