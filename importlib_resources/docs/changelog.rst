@@ -11,6 +11,16 @@
   previous functionality as it provides a more general-purpose access
   to a package's resources.
 
+  With this function, subdirectories are supported (Closes #58).
+
+  The
+  documentation has been updated to reflect that this function is now
+  the preferred interface for loading package resources. It does not,
+  however, support resources from arbitrary loaders. It currently only
+  supports resources from file system path and zipfile packages (a
+  consequence of the ResourceReader interface only operating on
+  Python packages).
+
 1.0.2 (2018-11-01)
 ==================
 * Fix ``setup_requires`` and ``install_requires`` metadata in ``setup.cfg``.
