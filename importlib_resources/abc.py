@@ -73,4 +73,4 @@ class TraversableResources(ResourceReader):
         return self.files().joinpath(path).isfile()
 
     def contents(self):
-        return map(str, self.files().iterdir())
+        return (item.name for item in self.files().iterdir())
