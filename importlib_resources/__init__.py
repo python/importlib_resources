@@ -46,4 +46,5 @@ else:
     del __all__[:3]
 
 
-__version__ = read_text('importlib_resources', 'version.txt').strip()
+__version__ = \
+    files('importlib_resources').joinpath('version.txt').read_text().strip()
