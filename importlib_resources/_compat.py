@@ -9,6 +9,12 @@ except ImportError:
 
 
 try:
+    from functools import singledispatch
+except ImportError:
+    from singledispatch import singledispatch                   # type: ignore
+
+
+try:
     from abc import ABC                                         # type: ignore
 except ImportError:
     from abc import ABCMeta
