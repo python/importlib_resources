@@ -7,17 +7,16 @@ in Python packages.  It provides functionality similar to ``pkg_resources``
 `Basic Resource Access`_ API, but without all of the overhead and performance
 problems of ``pkg_resources``.
 
-In our terminology, a *resource* is a file that is located within an
-importable `Python package`_.  Resources can live on the file system, in a zip
-file, or in any place that has a loader_ supporting the appropriate API for
-reading resources.  Directories are not resources.
+In our terminology, a *resource* is a file tree that is located within an
+importable `Python package`_.  Resources can live on the file system or in a
+zip file, with limited support for loader_ supporting the appropriate API for
+reading resources.
 
-``importlib_resources`` is a backport of Python 3.7's standard library
-`importlib.resources`_ module for Python 2.7, and 3.4 through 3.6.  Users of
-Python 3.7 and beyond are encouraged to use the standard library module, and
-in fact for these versions, ``importlib_resources`` just shadows that module.
+``importlib_resources`` is a backport of Python 3.9's standard library
+`importlib.resources`_ module for Python 2.7, and 3.5 through 3.8.  Users of
+Python 3.9 and beyond are encouraged to use the standard library module.
 Developers looking for detailed API descriptions should refer to the Python
-3.7 standard library documentation.
+3.9 standard library documentation.
 
 The documentation here includes a general :ref:`usage <using>` guide and a
 :ref:`migration <migration>` guide for projects that want to adopt

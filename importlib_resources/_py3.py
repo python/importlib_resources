@@ -1,8 +1,8 @@
 import os
 import sys
-import tempfile
 
 from . import abc as resources_abc
+from . import trees
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -10,9 +10,9 @@ from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
+from typing import ContextManager
 from typing import cast
 from typing.io import BinaryIO, TextIO
-from zipfile import ZipFile
 
 
 Package = Union[ModuleType, str]
@@ -131,8 +131,16 @@ def read_text(package: Package,
         return fp.read()
 
 
-@contextmanager
-def path(package: Package, resource: Resource) -> Iterator[Path]:
+def files(package: Package) -> trees.Traversable:
+    """
+    Get a Traversable resource from a package
+    """
+    return trees.from_package(_get_package(package))
+
+
+def path(
+        package: Package, resource: Resource,
+        ) -> ContextManager[Path]:
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -141,38 +149,23 @@ def path(package: Package, resource: Resource) -> Iterator[Path]:
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    resource = _normalize_path(resource)
-    package = _get_package(package)
-    reader = _get_resource_reader(package)
-    if reader is not None:
-        with suppress(FileNotFoundError):
-            yield Path(reader.resource_path(resource))
-            return
-    # Fall-through for both the lack of resource_path() *and* if
-    # resource_path() raises FileNotFoundError.
-    package_directory = Path(package.__spec__.origin).parent
-    file_path = package_directory / resource
-    # If the file actually exists on the file system, just return it.
-    if file_path.exists():
-        yield file_path
-        return
+    reader = _get_resource_reader(_get_package(package))
+    return (
+        _path_from_reader(reader, resource)
+        if reader else
+        trees.as_file(files(package).joinpath(_normalize_path(resource)))
+        )
 
-    # Otherwise, it's probably in a zip file, so we need to create a temporary
-    # file and copy the contents into that file, hence the contextmanager to
-    # clean up the temp file resource.
-    with open_binary(package, resource) as fp:
-        data = fp.read()
-    # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
-    # blocks due to the need to close the temporary file to work on
-    # Windows properly.
-    fd, raw_path = tempfile.mkstemp()
-    try:
-        os.write(fd, data)
-        os.close(fd)
-        yield Path(raw_path)
-    finally:
-        with suppress(FileNotFoundError):
-            os.remove(raw_path)
+
+@contextmanager
+def _path_from_reader(reader, resource):
+    norm_resource = _normalize_path(resource)
+    with suppress(FileNotFoundError):
+        yield Path(reader.resource_path(norm_resource))
+        return
+    opener_reader = reader.open_resource(norm_resource)
+    with trees._tempfile(opener_reader.read) as res:
+        yield res
 
 
 def is_resource(package: Package, name: str) -> bool:
@@ -188,42 +181,7 @@ def is_resource(package: Package, name: str) -> bool:
     package_contents = set(contents(package))
     if name not in package_contents:
         return False
-    # Just because the given file_name lives as an entry in the package's
-    # contents doesn't necessarily mean it's a resource.  Directories are not
-    # resources, so let's try to find out if it's a directory or not.
-    path = Path(package.__spec__.origin).parent / name
-    if path.is_file():
-        return True
-    if path.is_dir():
-        return False
-    # If it's not a file and it's not a directory, what is it?  Well, this
-    # means the file doesn't exist on the file system, so it probably lives
-    # inside a zip file.  We have to crack open the zip, look at its table of
-    # contents, and make sure that this entry doesn't have sub-entries.
-    archive_path = package.__spec__.loader.archive   # type: ignore
-    package_directory = Path(package.__spec__.origin).parent
-    with ZipFile(archive_path) as zf:
-        toc = zf.namelist()
-    relpath = package_directory.relative_to(archive_path)
-    candidate_path = relpath / name
-    for entry in toc:                               # pragma: nobranch
-        try:
-            relative_to_candidate = Path(entry).relative_to(candidate_path)
-        except ValueError:
-            # The two paths aren't relative to each other so we can ignore it.
-            continue
-        # Since directories aren't explicitly listed in the zip file, we must
-        # infer their 'directory-ness' by looking at the number of path
-        # components in the path relative to the package resource we're
-        # looking up.  If there are zero additional parts, it's a file, i.e. a
-        # resource.  If there are more than zero it's a directory, i.e. not a
-        # resource.  It has to be one of these two cases.
-        return len(relative_to_candidate.parts) == 0
-    # I think it's impossible to get here.  It would mean that we are looking
-    # for a resource in a zip file, there's an entry matching it in the return
-    # value of contents(), but we never actually found it in the zip's table of
-    # contents.
-    raise AssertionError('Impossible situation')
+    return (trees.from_package(package) / name).is_file()
 
 
 def contents(package: Package) -> Iterable[str]:
@@ -245,39 +203,4 @@ def contents(package: Package) -> Iterable[str]:
         )
     if namespace or not package.__spec__.has_location:
         return ()
-    package_directory = Path(package.__spec__.origin).parent
-    try:
-        return os.listdir(str(package_directory))
-    except (NotADirectoryError, FileNotFoundError):
-        # The package is probably in a zip file.
-        archive_path = getattr(package.__spec__.loader, 'archive', None)
-        relpath = package_directory.relative_to(archive_path)
-        with ZipFile(archive_path) as zf:
-            toc = zf.namelist()
-        subdirs_seen = set()                        # type: Set
-        subdirs_returned = []
-        for filename in toc:
-            path = Path(filename)
-            # Strip off any path component parts that are in common with the
-            # package directory, relative to the zip archive's file system
-            # path.  This gives us all the parts that live under the named
-            # package inside the zip file.  If the length of these subparts is
-            # exactly 1, then it is situated inside the package.  The resulting
-            # length will be 0 if it's above the package, and it will be
-            # greater than 1 if it lives in a subdirectory of the package
-            # directory.
-            #
-            # However, since directories themselves don't appear in the zip
-            # archive as a separate entry, we need to return the first path
-            # component for any case that has > 1 subparts -- but only once!
-            if path.parts[:len(relpath.parts)] != relpath.parts:
-                continue
-            subparts = path.parts[len(relpath.parts):]
-            if len(subparts) == 1:
-                subdirs_returned.append(subparts[0])
-            elif len(subparts) > 1:                 # pragma: nobranch
-                subdir = subparts[0]
-                if subdir not in subdirs_seen:
-                    subdirs_seen.add(subdir)
-                    subdirs_returned.append(subdir)
-        return subdirs_returned
+    return list(item.name for item in trees.from_package(package).iterdir())

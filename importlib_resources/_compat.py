@@ -21,3 +21,22 @@ try:
     FileNotFoundError = FileNotFoundError                       # type: ignore
 except NameError:
     FileNotFoundError = OSError                                 # type: ignore
+
+
+try:
+    from zipfile import Path as ZipPath  # type: ignore
+except ImportError:
+    from zipp import Path as ZipPath
+
+
+class PackageSpec(object):
+	def __init__(self, **kwargs):
+		vars(self).update(kwargs)
+
+
+def package_spec(package):
+	return getattr(package, '__spec__', None) or \
+		PackageSpec(
+			origin=package.__file__,
+			loader=getattr(package, '__loader__', None),
+		)

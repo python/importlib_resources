@@ -23,6 +23,8 @@ If you have a file system layout such as::
         one/
             __init__.py
             resource1.txt
+            resources1/
+                resource1.1.txt
         two/
             __init__.py
             resource2.txt
@@ -41,27 +43,40 @@ Each import statement gives you a Python *module* corresponding to the
 packages since packages are just special module instances that have an
 additional attribute, namely a ``__path__`` [#fn2]_.
 
-In this analogy then, resources are just files within a package directory, so
+In this analogy then, resources are just files or directories contained in a
+package directory, so
 ``data/one/resource1.txt`` and ``data/two/resource2.txt`` are both resources,
-as are the ``__init__.py`` files in all the directories.  However the package
-directories themselves are *not* resources; anything that contains other
-things (i.e. directories) are not themselves resources.
+as are the ``__init__.py`` files in all the directories.
 
-Resources are always accessed relative to the package that they live in.  You
-cannot access a resource within a subdirectory inside a package.  This means
-that ``resource1.txt`` is a resource within the ``data.one`` package, but
-neither ``resource2.txt`` nor ``two/resource2.txt`` are resources within the
-``data`` package.  If a directory isn't a package, it can't be imported and
-thus can't contain resources.
+Resources are always accessed relative to the package that they live in.
+``resource1.txt`` and ``resources1/resource1.1.txt`` are resources within
+the ``data.one`` package, and
+``two/resource2.txt`` is a resource within the
+``data`` package.
 
-Even when this hierarchical structure isn't represented by physical files and
-directories, the model still holds.  So zip files can contain packages and
-resources, as could databases or other storage medium.  In fact, while
-``importlib_resources`` supports physical file systems and zip files by
-default, anything that can be loaded with a Python import system `loader`_ can
-provide resources, as long as the loader implements the `ResourceReader`_
-abstract base class.
 
+Caveats
+=======
+
+Subdirectory Access
+-------------------
+
+Prior to importlib_resources 1.1 and the ``files()`` API, resources that were
+not direct descendents of a package's folder were inaccessible through the
+API, so in the example above ``resources1/resource1.1`` is not a resource of
+the ``data.one`` package and ``two/resource2.txt`` is not a resource of the
+``data`` package. Therefore, if subdirectory access is required, use the
+``files()`` API.
+
+Resource Reader Support
+-----------------------
+
+Due to the limitations on resource readers to access files beyond direct
+descendents of a package, the ``files()`` API does not rely
+on the importlib ResourceReader interface and thus only supports resources
+exposed by the built-in path and zipfile loaders. If support for arbitrary
+resource readers is required, the other API functions still support loading
+those resources.
 
 Example
 =======
@@ -93,25 +108,22 @@ This requires you to make Python packages of both ``email/tests`` and
 ``email/tests/data``, by placing an empty ``__init__.py`` files in each of
 those directories.
 
-**This is a requirement for importlib_resources too!**
-
 The problem with the ``pkg_resources`` approach is that, depending on the
-structure of your package, ``pkg_resources`` can be very inefficient even to
-just import.  ``pkg_resources`` is a sort of grab-bag of APIs and
-functionalities, and to support all of this, it sometimes has to do a ton of
-work at import time, e.g. to scan every package on your ``sys.path``.  This
+packages in your environment, ``pkg_resources`` can be expensive
+just to import.  This behavior
 can have a serious negative impact on things like command line startup time
 for Python implement commands.
 
-``importlib_resources`` solves this by being built entirely on the back of the
+``importlib_resources`` solves this performance challenge by being built
+entirely on the back of the
 stdlib :py:mod:`importlib`.  By taking advantage of all the efficiencies in
 Python's import system, and the fact that it's built into Python, using
 ``importlib_resources`` can be much more performant.  The equivalent code
 using ``importlib_resources`` would look like::
 
-    from importlib_resources import read_text
+    from importlib_resources import files
     # Reads contents with UTF-8 encoding and returns str.
-    eml = read_text('email.tests.data', 'message.eml')
+    eml = files('email.tests.data').joinpath('message.eml').read_text()
 
 
 Packages or package names
@@ -124,7 +136,7 @@ passed in, it must name an importable Python package, and this is first
 imported.  Thus the above example could also be written as::
 
     import email.tests.data
-    eml = read_text(email.tests.data, 'message.eml')
+    eml = files(email.tests.data).joinpath('message.eml').read_text()
 
 
 File system or zip file
@@ -143,8 +155,11 @@ to this temporary file as a :py:class:`pathlib.Path` object.  In order to
 properly clean up this temporary file, what's actually returned is a context
 manager that you can use in a ``with``-statement::
 
-    from importlib_resources import path
-    with path(email.tests.data, 'message.eml') as eml:
+    from importlib_resources import files
+    from importlib_resources.trees import as_file
+
+    source = files(email.tests.data).joinpath('message.eml')
+    with as_file(source) as eml:
         third_party_api_requiring_file_system_path(eml)
 
 You can use all the standard :py:mod:`contextlib` APIs to manage this context
@@ -162,12 +177,12 @@ manager.
    **No**::
 
        sys.path.append('relative/path/to/foo.whl')
-       resource_bytes('foo/data.dat')  # This will fail!
+       files('foo')  # This will fail!
 
    **Yes**::
 
        sys.path.append(os.path.abspath('relative/path/to/foo.whl'))
-       resource_bytes('foo/data.dat')
+       files('foo')
 
 Both relative and absolute paths work for Python 3.7 and newer.
 
