@@ -56,3 +56,21 @@ class ResourceReader(ABC):
         # type: () -> Iterable[str]
         """Return an iterable of entries in `package`."""
         raise FileNotFoundError
+
+
+class TraversableResources(ResourceReader):
+    @abstractmethod
+    def files(self):
+        """Return a Traversable object for the loaded package."""
+
+    def open_resource(self, resource):
+        return self.files().joinpath(resource).open('rb')
+
+    def resource_path(self, resource):
+        raise FileNotFoundError(resource)
+
+    def is_resource(self, path):
+        return self.files().joinpath(path).isfile()
+
+    def contents(self):
+        return map(str, self.files().iterdir())
