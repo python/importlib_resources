@@ -5,7 +5,10 @@ import abc
 import tempfile
 import contextlib
 
-from ._compat import ABC, Path, package_spec, FileNotFoundError, ZipPath
+from ._compat import (
+    ABC, Path, package_spec, FileNotFoundError, ZipPath,
+    singledispatch,
+    )
 
 
 class Traversable(ABC):
@@ -87,29 +90,21 @@ def _tempfile(reader):
             pass
 
 
-def _zip_path_as_file(path):
-    return _tempfile(path.read_bytes)
-
-
-@contextlib.contextmanager
-def _local_path_as_file(path):
-    """
-    Degenerate wrapper for pathlib.Path objects
-    """
-    yield path
-
-
+@singledispatch
 @contextlib.contextmanager
 def as_file(path):
     """
     Given a path-like object, return that object as a
     path on the local file system in a context manager.
     """
-    # todo: consider using functools.singledispatch
-    wrapper = (
-        _zip_path_as_file
-        if isinstance(path, ZipPath)
-        else _local_path_as_file
-        )
-    with wrapper(path) as local:
+    with _tempfile(path.read_bytes) as local:
         yield local
+
+
+@as_file.register(Path)
+@contextlib.contextmanager
+def _(path):
+    """
+    Degenerate behavior for pathlib.Path objects
+    """
+    yield path
