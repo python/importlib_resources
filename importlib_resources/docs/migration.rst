@@ -114,7 +114,7 @@ pkg_resources.resource_listdir()
 This function lists the entries in the package, both files and directories,
 but it does not recurse into subdirectories, e.g.::
 
-    for entry in pkg_resources.listdir('my.package', 'subpackage'):
+    for entry in pkg_resources.resource_listdir('my.package', 'subpackage'):
         print(entry)
 
 This is easily rewritten using the following idiom::
