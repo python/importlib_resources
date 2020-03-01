@@ -33,7 +33,9 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
+extensions = [
+    'rst.linker',
+    'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
@@ -177,4 +179,17 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
+    }
+
+
+# For rst.linker, inject release dates into changelog.rst
+link_files = {
+    'changelog.rst': dict(
+        replace=[
+            dict(
+                pattern=r'^(?m)((?P<scm_version>v?\d+(\.\d+){1,2}))\n[-=]+\n',
+                with_scm='{text}\n{rev[timestamp]:%Y-%m-%d}\n\n',
+                ),
+            ],
+        ),
     }

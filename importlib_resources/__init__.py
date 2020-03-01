@@ -2,6 +2,8 @@
 
 import sys
 
+from ._compat import metadata
+
 
 __all__ = [
     'Package',
@@ -46,5 +48,4 @@ else:
     del __all__[:3]
 
 
-__version__ = \
-    files('importlib_resources').joinpath('version.txt').read_text().strip()
+__version__ = metadata.version('importlib_resources')
