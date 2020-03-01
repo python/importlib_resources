@@ -2,6 +2,16 @@
  importlib_resources NEWS
 ==========================
 
+v1.2.0
+======
+* Add extensibility support for non-standard loaders to supply
+  ``Traversable`` resources. Introduces a new abstract base
+  class ``abc.TraversableResources`` that supersedes (but
+  implements for compatibility) ``abc.ResourceReader``. Any
+  loader that implements (implicitly or explicitly) the
+  ``TraversableResources.files`` method will be capable of
+  supplying resources with subdirectory support. Closes #77.
+
 v1.1.0
 ======
 * Add support for retrieving resources from subdirectories of packages
