@@ -9,8 +9,8 @@ problems of ``pkg_resources``.
 
 In our terminology, a *resource* is a file tree that is located within an
 importable `Python package`_.  Resources can live on the file system or in a
-zip file, with limited support for loader_ supporting the appropriate API for
-reading resources.
+zip file, with support for other loader_ classes that implement the appropriate
+API for reading resources.
 
 ``importlib_resources`` is a backport of Python 3.9's standard library
 `importlib.resources`_ module for Python 2.7, and 3.5 through 3.8.  Users of

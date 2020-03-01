@@ -61,8 +61,24 @@ class Traversable(ABC):
 
 
 def from_package(package):
-    """Return a Traversable object for the given package"""
+    """
+    Return a Traversable object for the given package.
+
+    """
     spec = package_spec(package)
+    return from_traversable_resources(spec) or fallback_resources(spec)
+
+
+def from_traversable_resources(spec):
+    """
+    If the spec.loader implements TraversableResources,
+    directly or implicitly, it will have a ``files()`` method.
+    """
+    with contextlib.suppress(AttributeError):
+        return spec.loader.files()
+
+
+def fallback_resources(spec):
     package_directory = Path(spec.origin).parent
     try:
         archive_path = spec.loader.archive
@@ -94,7 +110,7 @@ def _tempfile(reader):
 @contextlib.contextmanager
 def as_file(path):
     """
-    Given a path-like object, return that object as a
+    Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
     with _tempfile(path.read_bytes) as local:
@@ -105,6 +121,6 @@ def as_file(path):
 @contextlib.contextmanager
 def _(path):
     """
-    Degenerate behavior for pathlib.Path objects
+    Degenerate behavior for pathlib.Path objects.
     """
     yield path
