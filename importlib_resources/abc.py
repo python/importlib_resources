@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
 import abc
+import itertools
 
-from ._compat import ABC, FileNotFoundError
+from ._compat import ABC, FileNotFoundError, suppress
 
 # Use mypy's comment syntax for Python 2 compatibility
 try:
@@ -114,6 +115,52 @@ class Traversable(ABC):
         When opening as text, accepts encoding parameters such as those
         accepted by io.TextIOWrapper.
         """
+
+
+class Multiplexed(Traversable):
+    """
+    Given a series of Traversable objects, implement a merged
+    version of the interface across all objects. Useful for
+    namespace packages which may be multihomed at a single
+    name.
+    """
+
+    def __init__(self, *paths):
+        self._paths = paths
+
+    def iterdir(self):
+        return itertools.chain.from_iterable(
+            path.iterdir() for path in self._paths)
+
+    def read_bytes(self):
+        for path in self._paths[:-1]:
+            with suppress(Exception):
+                return path.read_bytes()
+        return self._paths[-1].read_bytes()
+
+    def read_text(self, *args, **kwargs):
+        for path in self._paths[:-1]:
+            with suppress(Exception):
+                return path.read_text(*args, **kwargs)
+        return self._paths[-1].read_text()
+
+    def is_dir(self):
+        return True
+
+    def is_file(self):
+        return False
+
+    def joinpath(self, child):
+        # todo: how to handle subpackages that are themselves multiplexed?
+        subpackages = ()
+        children = (path.joinpath(child) for path in self._paths)
+        return next(
+            child
+            for child in itertools.chain(subpackages, children)
+            if child.is_dir() or child.is_file()
+            )
+
+    __truediv__ = joinpath
 
 
 class TraversableResources(ResourceReader):
