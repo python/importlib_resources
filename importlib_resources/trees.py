@@ -59,6 +59,16 @@ class Traversable(ABC):
         Return Traversable child in self
         """
 
+    @abc.abstractmethod
+    def open(self, mode='r', *args, **kwargs):
+        """
+        mode may be 'r' or 'rb' to open as text or binary. Return a handle
+        suitable for reading (same as pathlib.Path.open).
+
+        When opening as text, accepts encoding parameters such as those
+        accepted by io.TextIOWrapper.
+        """
+
 
 def from_package(package):
     """Return a Traversable object for the given package"""
