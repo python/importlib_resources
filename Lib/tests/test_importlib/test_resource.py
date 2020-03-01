@@ -1,11 +1,10 @@
 import sys
 import unittest
-import importlib_resources as resources
 
 from . import data01
 from . import zipdata01, zipdata02
 from . import util
-from importlib import import_module
+from importlib import resources, import_module
 
 
 class ResourceTests:
@@ -49,7 +48,6 @@ class ResourceZipTests(ResourceTests, util.ZipSetup, unittest.TestCase):
     pass
 
 
-@unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
 class ResourceLoaderTests(unittest.TestCase):
     def test_resource_contents(self):
         package = util.create_package(
@@ -95,7 +93,24 @@ class ResourceCornerCaseTests(unittest.TestCase):
         self.assertFalse(resources.is_resource(module, 'A'))
 
 
-class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
+class ResourceFromZipsTest(util.ZipSetupBase, unittest.TestCase):
+    ZIP_MODULE = zipdata02                          # type: ignore
+
+    def test_unrelated_contents(self):
+        # https://gitlab.com/python-devs/importlib_resources/issues/44
+        #
+        # Here we have a zip file with two unrelated subpackages.  The bug
+        # reports that getting the contents of a resource returns unrelated
+        # files.
+        self.assertEqual(
+            set(resources.contents('ziptestdata.one')),
+            {'__init__.py', 'resource1.txt'})
+        self.assertEqual(
+            set(resources.contents('ziptestdata.two')),
+            {'__init__.py', 'resource2.txt'})
+
+
+class SubdirectoryResourceFromZipsTest(util.ZipSetupBase, unittest.TestCase):
     ZIP_MODULE = zipdata01                          # type: ignore
 
     def test_is_submodule_resource(self):
@@ -119,51 +134,32 @@ class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
             {'__init__.py', 'binary.file'})
 
 
-class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
-    ZIP_MODULE = zipdata02                          # type: ignore
-
-    def test_unrelated_contents(self):
-        # https://gitlab.com/python-devs/importlib_resources/issues/44
-        #
-        # Here we have a zip file with two unrelated subpackages.  The bug
-        # reports that getting the contents of a resource returns unrelated
-        # files.
-        self.assertEqual(
-            set(resources.contents('ziptestdata.one')),
-            {'__init__.py', 'resource1.txt'})
-        self.assertEqual(
-            set(resources.contents('ziptestdata.two')),
-            {'__init__.py', 'resource2.txt'})
-
-
-@unittest.skipIf(sys.version_info < (3,), 'No namespace packages in Python 2')
 class NamespaceTest(unittest.TestCase):
     def test_namespaces_cannot_have_resources(self):
-        contents = resources.contents(
-            'importlib_resources.tests.data03.namespace')
+        contents = resources.contents('test.test_importlib.data03.namespace')
         self.assertFalse(list(contents))
         # Even though there is a file in the namespace directory, it is not
         # considered a resource, since namespace packages can't have them.
         self.assertFalse(resources.is_resource(
-            'importlib_resources.tests.data03.namespace',
+            'test.test_importlib.data03.namespace',
             'resource1.txt'))
         # We should get an exception if we try to read it or open it.
         self.assertRaises(
             FileNotFoundError,
             resources.open_text,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+            'test.test_importlib.data03.namespace', 'resource1.txt')
         self.assertRaises(
             FileNotFoundError,
             resources.open_binary,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+            'test.test_importlib.data03.namespace', 'resource1.txt')
         self.assertRaises(
             FileNotFoundError,
             resources.read_text,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+            'test.test_importlib.data03.namespace', 'resource1.txt')
         self.assertRaises(
             FileNotFoundError,
             resources.read_binary,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
+            'test.test_importlib.data03.namespace', 'resource1.txt')
 
 
 if __name__ == '__main__':

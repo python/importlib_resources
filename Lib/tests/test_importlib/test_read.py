@@ -1,17 +1,16 @@
 import unittest
-import importlib_resources as resources
 
+from importlib import import_module, resources
 from . import data01
 from . import util
-from importlib import import_module
 
 
-class CommonBinaryTests(util.CommonTests, unittest.TestCase):
+class CommonBinaryTests(util.CommonResourceTests, unittest.TestCase):
     def execute(self, package, path):
         resources.read_binary(package, path)
 
 
-class CommonTextTests(util.CommonTests, unittest.TestCase):
+class CommonTextTests(util.CommonResourceTests, unittest.TestCase):
     def execute(self, package, path):
         resources.read_text(package, path)
 

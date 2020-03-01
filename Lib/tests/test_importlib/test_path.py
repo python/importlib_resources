@@ -1,19 +1,17 @@
 import unittest
 
-import importlib_resources as resources
+from importlib import resources
 from . import data01
 from . import util
 
 
-class CommonTests(util.CommonTests, unittest.TestCase):
-
+class CommonTests(util.CommonResourceTests, unittest.TestCase):
     def execute(self, package, path):
         with resources.path(package, path):
             pass
 
 
 class PathTests:
-
     def test_reading(self):
         # Path should be readable.
         # Test also implicitly verifies the returned object is a pathlib.Path
