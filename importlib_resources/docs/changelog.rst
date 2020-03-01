@@ -2,8 +2,8 @@
  importlib_resources NEWS
 ==========================
 
-1.1.0
-=====
+v1.1.0
+======
 * Add support for retrieving resources from subdirectories of packages
   through the new ``files()`` function, which returns a ``Traversable``
   object with ``joinpath`` and ``read_*`` interfaces matching those
