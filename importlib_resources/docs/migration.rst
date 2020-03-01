@@ -17,6 +17,10 @@ access`_ APIs:
 * ``pkg_resources.resource_listdir()``
 * ``pkg_resources.resource_isdir()``
 
+Note that although the steps below provide a drop-in replacement for the
+above methods, for many use-cases, a better approach is to use the
+``Traversable`` path from ``files()`` directly.
+
 
 pkg_resources.resource_filename()
 =================================
