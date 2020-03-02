@@ -1,5 +1,6 @@
 import os
 import sys
+import typing
 
 from . import abc as resources_abc
 from . import trees
@@ -10,7 +11,6 @@ from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
-from typing import ContextManager
 from typing import cast
 from typing.io import BinaryIO, TextIO
 
@@ -140,7 +140,7 @@ def files(package: Package) -> trees.Traversable:
 
 def path(
         package: Package, resource: Resource,
-        ) -> ContextManager[Path]:
+        ) -> 'typing.ContextManager[Path]':
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
