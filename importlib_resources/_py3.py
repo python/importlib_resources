@@ -140,7 +140,7 @@ def files(package: Package) -> trees.Traversable:
 
 def path(
         package: Package, resource: Resource,
-        ) -> typing.ContextManager[Path]:
+        ) -> 'typing.ContextManager[Path]':
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
