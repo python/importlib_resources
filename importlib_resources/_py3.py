@@ -10,10 +10,11 @@ from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
-from typing import ContextManager
 from typing import cast
 from typing.io import BinaryIO, TextIO
 
+if False:  # TYPE_CHECKING
+    from typing import ContextManager
 
 Package = Union[ModuleType, str]
 if sys.version_info >= (3, 6):
@@ -140,7 +141,7 @@ def files(package: Package) -> trees.Traversable:
 
 def path(
         package: Package, resource: Resource,
-        ) -> ContextManager[Path]:
+        ) -> 'ContextManager[Path]':
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
