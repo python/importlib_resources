@@ -2,6 +2,13 @@
  importlib_resources NEWS
 ==========================
 
+v1.2.0
+======
+* Traversable now requires an ``open`` method. Closes #81.
+* Fixed error on ``Python 3.5.{0,3}``. Closes #83.
+* Updated packaging to resolve version from package metadata.
+  Closes #82.
+
 v1.1.0
 ======
 * Add support for retrieving resources from subdirectories of packages
