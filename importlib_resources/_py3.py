@@ -3,7 +3,6 @@ import sys
 
 from . import abc as resources_abc
 from . import trees
-from . import _compat
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -140,7 +139,6 @@ def files(package: Package) -> trees.Traversable:
     return trees.from_package(_get_package(package))
 
 
-@_compat.allow_dirs
 def path(
         package: Package, resource: Resource,
         ) -> 'ContextManager[Path]':
