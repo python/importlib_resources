@@ -2,10 +2,10 @@
  ``importlib_resources``
 =========================
 
-``importlib_resources`` is a backport of Python 3.7's standard library
+``importlib_resources`` is a backport of Python standard library
 `importlib.resources
-<https://docs.python.org/3.7/library/importlib.html#module-importlib.resources>`_
-module for Python 2.7, and 3.4 through 3.6.  Users of Python 3.7 and beyond
+<https://docs.python.org/3.9/library/importlib.html#module-importlib.resources>`_
+module for Python 2.7, and 3.4 through 3.8.  Users of Python 3.9 and beyond
 should use the standard library module, since for these versions,
 ``importlib_resources`` just delegates to that module.
 
