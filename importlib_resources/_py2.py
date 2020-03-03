@@ -2,6 +2,7 @@ import os
 import errno
 
 from . import trees
+from . import _compat
 from ._compat import FileNotFoundError
 from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
@@ -97,6 +98,7 @@ def files(package):
     return trees.from_package(_get_package(package))
 
 
+@_compat.allow_dirs
 def path(package, resource):
     """A context manager providing a file path object to the resource.
 

@@ -167,6 +167,7 @@ class CommonTests(ABC):
         self.execute(package, 'utf-8.file')
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
+    @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
     def test_useless_loader(self):
         package = create_package(file=FileNotFoundError(),
                                  path=FileNotFoundError())

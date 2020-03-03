@@ -4,6 +4,8 @@ import importlib_resources as resources
 from . import data01
 from . import util
 
+from .._compat import IsADirectoryError
+
 
 class CommonTests(util.CommonTests, unittest.TestCase):
 
@@ -24,9 +26,19 @@ class PathTests:
                 text = file.read()
             self.assertEqual('Hello, UTF-8 world!\n', text)
 
+    def test_dirs_not_allowed(self):
+        return  # expected to fail; ref #85
+        with self.assertRaises(IsADirectoryError):
+            resources.path(self.data, 'subdirectory')
+
 
 class PathDiskTests(PathTests, unittest.TestCase):
     data = data01
+
+    def test_dirs_allowed(self):
+        "temporarily allow dirs to be retrieved; ref #85"
+        with resources.path(self.data, 'subdirectory') as path:
+            assert path.is_dir()
 
 
 class PathZipTests(PathTests, util.ZipSetup, unittest.TestCase):
