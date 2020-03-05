@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
+import abc
+
 from ._compat import ABC, FileNotFoundError
-from abc import abstractmethod
 
 # We use mypy's comment syntax here since this file must be compatible with
 # both Python 2 and 3.
@@ -15,7 +16,7 @@ except ImportError:
 class ResourceReader(ABC):
     """Abstract base class for loaders to provide resource reading support."""
 
-    @abstractmethod
+    @abc.abstractmethod
     def open_resource(self, resource):
         # type: (Text) -> BinaryIO
         """Return an opened, file-like object for binary reading.
@@ -28,7 +29,7 @@ class ResourceReader(ABC):
         # it'll still do the right thing.
         raise FileNotFoundError
 
-    @abstractmethod
+    @abc.abstractmethod
     def resource_path(self, resource):
         # type: (Text) -> Text
         """Return the file system path to the specified resource.
@@ -42,7 +43,7 @@ class ResourceReader(ABC):
         # it'll still do the right thing.
         raise FileNotFoundError
 
-    @abstractmethod
+    @abc.abstractmethod
     def is_resource(self, path):
         # type: (Text) -> bool
         """Return True if the named 'path' is a resource.
@@ -51,15 +52,74 @@ class ResourceReader(ABC):
         """
         raise FileNotFoundError
 
-    @abstractmethod
+    @abc.abstractmethod
     def contents(self):
         # type: () -> Iterable[str]
         """Return an iterable of entries in `package`."""
         raise FileNotFoundError
 
 
+class Traversable(ABC):
+    """
+    An object with a subset of pathlib.Path methods suitable for
+    traversing directories and opening files.
+    """
+
+    @abc.abstractmethod
+    def iterdir(self):
+        """
+        Yield Traversable objects in self
+        """
+
+    @abc.abstractmethod
+    def read_bytes(self):
+        """
+        Read contents of self as bytes
+        """
+
+    @abc.abstractmethod
+    def read_text(self, encoding=None):
+        """
+        Read contents of self as bytes
+        """
+
+    @abc.abstractmethod
+    def is_dir(self):
+        """
+        Return True if self is a dir
+        """
+
+    @abc.abstractmethod
+    def is_file(self):
+        """
+        Return True if self is a file
+        """
+
+    @abc.abstractmethod
+    def joinpath(self, child):
+        """
+        Return Traversable child in self
+        """
+
+    @abc.abstractmethod
+    def __truediv__(self, child):
+        """
+        Return Traversable child in self
+        """
+
+    @abc.abstractmethod
+    def open(self, mode='r', *args, **kwargs):
+        """
+        mode may be 'r' or 'rb' to open as text or binary. Return a handle
+        suitable for reading (same as pathlib.Path.open).
+
+        When opening as text, accepts encoding parameters such as those
+        accepted by io.TextIOWrapper.
+        """
+
+
 class TraversableResources(ResourceReader):
-    @abstractmethod
+    @abc.abstractmethod
     def files(self):
         """Return a Traversable object for the loaded package."""
 

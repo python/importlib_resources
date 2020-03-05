@@ -3,12 +3,14 @@
 import sys
 
 from ._compat import metadata
+from .trees import as_file
 
 
 __all__ = [
     'Package',
     'Resource',
     'ResourceReader',
+    'as_file',
     'contents',
     'files',
     'is_resource',

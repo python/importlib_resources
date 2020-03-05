@@ -2,7 +2,7 @@
  importlib_resources NEWS
 ==========================
 
-v1.2.0
+v1.3.0
 ======
 * Add extensibility support for non-standard loaders to supply
   ``Traversable`` resources. Introduces a new abstract base
@@ -11,6 +11,13 @@ v1.2.0
   loader that implements (implicitly or explicitly) the
   ``TraversableResources.files`` method will be capable of
   supplying resources with subdirectory support. Closes #77.
+
+v1.2.0
+======
+* Traversable now requires an ``open`` method. Closes #81.
+* Fixed error on ``Python 3.5.{0,3}``. Closes #83.
+* Updated packaging to resolve version from package metadata.
+  Closes #82.
 
 v1.1.0
 ======
