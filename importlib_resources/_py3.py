@@ -132,7 +132,7 @@ def read_text(package: Package,
         return fp.read()
 
 
-def files(package: Package) -> trees.Traversable:
+def files(package: Package) -> resources_abc.Traversable:
     """
     Get a Traversable resource from a package
     """
