@@ -155,8 +155,7 @@ to this temporary file as a :py:class:`pathlib.Path` object.  In order to
 properly clean up this temporary file, what's actually returned is a context
 manager that you can use in a ``with``-statement::
 
-    from importlib_resources import files
-    from importlib_resources.trees import as_file
+    from importlib_resources import files, as_file
 
     source = files(email.tests.data).joinpath('message.eml')
     with as_file(source) as eml:
