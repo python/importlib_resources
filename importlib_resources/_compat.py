@@ -9,6 +9,12 @@ except ImportError:
 
 
 try:
+    from contextlib import suppress
+except ImportError:
+    from contextlib2 import suppress                         # type: ignore
+
+
+try:
     from functools import singledispatch
 except ImportError:
     from singledispatch import singledispatch                   # type: ignore

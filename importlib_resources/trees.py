@@ -6,7 +6,7 @@ import contextlib
 
 from ._compat import (
     Path, package_spec, FileNotFoundError, ZipPath,
-    singledispatch,
+    singledispatch, suppress,
     )
 
 
@@ -24,7 +24,7 @@ def from_traversable_resources(spec):
     If the spec.loader implements TraversableResources,
     directly or implicitly, it will have a ``files()`` method.
     """
-    with contextlib.suppress(AttributeError):
+    with suppress(AttributeError):
         return spec.loader.files()
 
 
