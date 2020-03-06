@@ -166,7 +166,7 @@ Both relative and absolute paths work for Python 3.7 and newer.
 Extending
 =========
 
-Starting with Python 3.9 and ``importlib_resources`` 1.2, this package
+Starting with Python 3.9 and ``importlib_resources`` 1.3, this package
 provides an interface for non-standard loaders, such as those used by
 executable bundlers, to supply resources. These loaders should subclass
 from the ``TraversableResources`` abstract class and implement the
