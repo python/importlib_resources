@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v1.3.1
+======
+* For improved compatibility, ``importlib_resources.trees`` is
+  now imported implicitly. Closes #88.
+
 v1.3.0
 ======
 * Add extensibility support for non-standard loaders to supply

@@ -5,6 +5,9 @@ import sys
 from ._compat import metadata
 from ._common import as_file
 
+# for compatibility. Ref #88
+__import__('importlib_resources.trees')
+
 
 __all__ = [
     'Package',
