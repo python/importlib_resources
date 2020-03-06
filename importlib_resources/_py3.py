@@ -2,7 +2,7 @@ import os
 import sys
 
 from . import abc as resources_abc
-from . import trees
+from . import _common
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -136,7 +136,7 @@ def files(package: Package) -> resources_abc.Traversable:
     """
     Get a Traversable resource from a package
     """
-    return trees.from_package(_get_package(package))
+    return _common.from_package(_get_package(package))
 
 
 def path(
@@ -154,7 +154,7 @@ def path(
     return (
         _path_from_reader(reader, resource)
         if reader else
-        trees.as_file(files(package).joinpath(_normalize_path(resource)))
+        _common.as_file(files(package).joinpath(_normalize_path(resource)))
         )
 
 
@@ -165,7 +165,7 @@ def _path_from_reader(reader, resource):
         yield Path(reader.resource_path(norm_resource))
         return
     opener_reader = reader.open_resource(norm_resource)
-    with trees._tempfile(opener_reader.read) as res:
+    with _common._tempfile(opener_reader.read) as res:
         yield res
 
 
@@ -182,7 +182,7 @@ def is_resource(package: Package, name: str) -> bool:
     package_contents = set(contents(package))
     if name not in package_contents:
         return False
-    return (trees.from_package(package) / name).is_file()
+    return (_common.from_package(package) / name).is_file()
 
 
 def contents(package: Package) -> Iterable[str]:
@@ -204,4 +204,4 @@ def contents(package: Package) -> Iterable[str]:
         )
     if namespace or not package.__spec__.has_location:
         return ()
-    return list(item.name for item in trees.from_package(package).iterdir())
+    return list(item.name for item in _common.from_package(package).iterdir())

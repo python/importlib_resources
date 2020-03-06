@@ -1,7 +1,7 @@
 import os
 import errno
 
-from . import trees
+from . import _common
 from ._compat import FileNotFoundError
 from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
@@ -94,7 +94,7 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
 
 
 def files(package):
-    return trees.from_package(_get_package(package))
+    return _common.from_package(_get_package(package))
 
 
 def path(package, resource):
@@ -109,7 +109,7 @@ def path(package, resource):
     path = files(package).joinpath(_normalize_path(resource))
     if not path.is_file():
         raise FileNotFoundError(path)
-    return trees.as_file(path)
+    return _common.as_file(path)
 
 
 def is_resource(package, name):
@@ -132,7 +132,7 @@ def is_resource(package, name):
         return False
     if name not in package_contents:
         return False
-    return (trees.from_package(package) / name).is_file()
+    return (_common.from_package(package) / name).is_file()
 
 
 def contents(package):
@@ -143,4 +143,4 @@ def contents(package):
     to check if it is a resource or not.
     """
     package = _get_package(package)
-    return list(item.name for item in trees.from_package(package).iterdir())
+    return list(item.name for item in _common.from_package(package).iterdir())

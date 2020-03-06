@@ -3,7 +3,7 @@
 import sys
 
 from ._compat import metadata
-from .trees import as_file
+from ._common import as_file
 
 
 __all__ = [
