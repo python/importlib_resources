@@ -55,29 +55,6 @@ the ``data.one`` package, and
 ``data`` package.
 
 
-Caveats
-=======
-
-Subdirectory Access
--------------------
-
-Prior to importlib_resources 1.1 and the ``files()`` API, resources that were
-not direct descendents of a package's folder were inaccessible through the
-API, so in the example above ``resources1/resource1.1`` is not a resource of
-the ``data.one`` package and ``two/resource2.txt`` is not a resource of the
-``data`` package. Therefore, if subdirectory access is required, use the
-``files()`` API.
-
-Resource Reader Support
------------------------
-
-Due to the limitations on resource readers to access files beyond direct
-descendents of a package, the ``files()`` API does not rely
-on the importlib ResourceReader interface and thus only supports resources
-exposed by the built-in path and zipfile loaders. If support for arbitrary
-resource readers is required, the other API functions still support loading
-those resources.
-
 Example
 =======
 
@@ -184,6 +161,16 @@ manager.
        files('foo')
 
 Both relative and absolute paths work for Python 3.7 and newer.
+
+
+Extending
+=========
+
+Starting with Python 3.9 and ``importlib_resources`` 1.3, this package
+provides an interface for non-standard loaders, such as those used by
+executable bundlers, to supply resources. These loaders should subclass
+from the ``TraversableResources`` abstract class and implement the
+``files()`` method to return a ``Traversable`` object.
 
 
 .. rubric:: Footnotes

@@ -116,3 +116,21 @@ class Traversable(ABC):
         When opening as text, accepts encoding parameters such as those
         accepted by io.TextIOWrapper.
         """
+
+
+class TraversableResources(ResourceReader):
+    @abc.abstractmethod
+    def files(self):
+        """Return a Traversable object for the loaded package."""
+
+    def open_resource(self, resource):
+        return self.files().joinpath(resource).open('rb')
+
+    def resource_path(self, resource):
+        raise FileNotFoundError(resource)
+
+    def is_resource(self, path):
+        return self.files().joinpath(path).isfile()
+
+    def contents(self):
+        return (item.name for item in self.files().iterdir())

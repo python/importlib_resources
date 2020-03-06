@@ -4,6 +4,13 @@
 
 v1.3.0
 ======
+* Add extensibility support for non-standard loaders to supply
+  ``Traversable`` resources. Introduces a new abstract base
+  class ``abc.TraversableResources`` that supersedes (but
+  implements for compatibility) ``abc.ResourceReader``. Any
+  loader that implements (implicitly or explicitly) the
+  ``TraversableResources.files`` method will be capable of
+  supplying resources with subdirectory support. Closes #77.
 * Preferred way to access ``as_file`` is now from top-level module.
   ``importlib_resources.trees.as_file`` is deprecated and discouraged.
   Closes #86.
