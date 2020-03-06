@@ -4,12 +4,10 @@ import abc
 
 from ._compat import ABC, FileNotFoundError
 
-# We use mypy's comment syntax here since this file must be compatible with
-# both Python 2 and 3.
+# Use mypy's comment syntax for Python 2 compatibility
 try:
-    from typing import BinaryIO, Iterable, Text                   # noqa: F401
+    from typing import BinaryIO, Iterable, Text
 except ImportError:
-    # Python 2
     pass
 
 
