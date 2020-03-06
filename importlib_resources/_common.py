@@ -9,6 +9,11 @@ from ._compat import (
     singledispatch, suppress,
     )
 
+try:
+    from typing import Any
+except Exception:
+    pass
+
 
 def from_package(package):
     """
@@ -74,3 +79,16 @@ def _(path):
     Degenerate behavior for pathlib.Path objects.
     """
     yield path
+
+
+def _normalize_path(path):
+    # type: (Any) -> str
+    """Normalize a path by ensuring it is a string.
+
+    If the resulting string contains path separators, an exception is raised.
+    """
+    str_path = str(path)
+    parent, file_name = os.path.split(str_path)
+    if parent:
+        raise ValueError("{!r} must be only a file name".format(path))
+    return file_name

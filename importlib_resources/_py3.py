@@ -3,6 +3,7 @@ import sys
 
 from . import abc as resources_abc
 from . import _common
+from ._common import _normalize_path
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
@@ -40,18 +41,6 @@ def _get_package(package) -> ModuleType:
     if module.__spec__.submodule_search_locations is None:
         raise TypeError('{!r} is not a package'.format(package))
     return module
-
-
-def _normalize_path(path) -> str:
-    """Normalize a path by ensuring it is a string.
-
-    If the resulting string contains path separators, an exception is raised.
-    """
-    str_path = str(path)
-    parent, file_name = os.path.split(str_path)
-    if parent:
-        raise ValueError('{!r} must be only a file name'.format(path))
-    return file_name
 
 
 def _get_resource_reader(

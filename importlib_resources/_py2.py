@@ -2,6 +2,7 @@ import os
 import errno
 
 from . import _common
+from ._common import _normalize_path
 from ._compat import FileNotFoundError
 from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
@@ -23,18 +24,6 @@ def _get_package(package):
     if not hasattr(module, '__path__'):
         raise TypeError("{!r} is not a package".format(package))
     return module
-
-
-def _normalize_path(path):
-    """Normalize a path by ensuring it is a string.
-
-    If the resulting string contains path separators, an exception is raised.
-    """
-    str_path = str(path)
-    parent, file_name = os.path.split(str_path)
-    if parent:
-        raise ValueError("{!r} must be only a file name".format(path))
-    return file_name
 
 
 def open_binary(package, resource):
