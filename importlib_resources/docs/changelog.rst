@@ -2,6 +2,13 @@
  importlib_resources NEWS
 ==========================
 
+v1.3.0
+======
+* Preferred way to access ``as_file`` is now from top-level module.
+  ``importlib_resources.trees.as_file`` is deprecated and discouraged.
+  Closes #86.
+* Moved ``Traversable`` abc to ``abc`` module. Closes #87.
+
 v1.2.0
 ======
 * Traversable now requires an ``open`` method. Closes #81.
