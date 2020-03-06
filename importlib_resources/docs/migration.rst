@@ -48,7 +48,7 @@ Here's an example from ``pkg_resources()``::
 The best way to convert this is with the following idiom::
 
     ref = importlib_resources.files('my.package') / 'resource.dat'
-    with importlib_resources.trees.as_file(ref) as path:
+    with importlib_resources.as_file(ref) as path:
         # Do something with path.  After the with-statement exits, any
         # temporary file created will be immediately cleaned up.
 
@@ -60,7 +60,7 @@ to stick around for a while?  One way of doing this is to use an
     file_manager = ExitStack()
     ref = importlib_resources.files('my.package') / 'resource.dat'
     path = file_manager.enter_context(
-        importlib_resources.trees.as_file(ref))
+        importlib_resources.as_file(ref))
 
 Now ``path`` will continue to exist until you explicitly call
 ``file_manager.close()``.  What if you want the file to exist until the
@@ -72,7 +72,7 @@ process exits, or you can't pass ``file_manager`` around in your code?  Use an
     atexit.register(file_manager.close)
     ref = importlib_resources.files('my.package') / 'resource.dat'
     path = file_manager.enter_context(
-        importlib_resources.trees.as_file(ref))
+        importlib_resources.as_file(ref))
 
 Assuming your Python interpreter exits gracefully, the temporary file will be
 cleaned up when Python exits.
