@@ -2,23 +2,24 @@ import os
 
 from . import abc as resources_abc
 from . import _common
+from ._common import as_file
 from contextlib import contextmanager, suppress
 from importlib import import_module
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
-from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
+from typing import ContextManager, Iterable, Optional, Union
 from typing import cast
 from typing.io import BinaryIO, TextIO
 
-if False:  # TYPE_CHECKING
-    from typing import ContextManager
 
 __all__ = [
     'Package',
     'Resource',
+    'as_file',
     'contents',
+    'files',
     'is_resource',
     'open_binary',
     'open_text',

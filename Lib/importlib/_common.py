@@ -1,13 +1,9 @@
-from __future__ import absolute_import
-
 import os
+import pathlib
+import zipfile
 import tempfile
+import functools
 import contextlib
-
-from ._compat import (
-    Path, package_spec, FileNotFoundError, ZipPath,
-    singledispatch, suppress,
-    )
 
 
 def from_package(package):
@@ -15,7 +11,7 @@ def from_package(package):
     Return a Traversable object for the given package.
 
     """
-    spec = package_spec(package)
+    spec = package.__spec__
     return from_traversable_resources(spec) or fallback_resources(spec)
 
 
@@ -24,16 +20,16 @@ def from_traversable_resources(spec):
     If the spec.loader implements TraversableResources,
     directly or implicitly, it will have a ``files()`` method.
     """
-    with suppress(AttributeError):
+    with contextlib.suppress(AttributeError):
         return spec.loader.files()
 
 
 def fallback_resources(spec):
-    package_directory = Path(spec.origin).parent
+    package_directory = pathlib.Path(spec.origin).parent
     try:
         archive_path = spec.loader.archive
         rel_path = package_directory.relative_to(archive_path)
-        return ZipPath(archive_path, str(rel_path) + '/')
+        return zipfile.Path(archive_path, str(rel_path) + '/')
     except Exception:
         pass
     return package_directory
@@ -48,7 +44,7 @@ def _tempfile(reader):
     try:
         os.write(fd, reader())
         os.close(fd)
-        yield Path(raw_path)
+        yield pathlib.Path(raw_path)
     finally:
         try:
             os.remove(raw_path)
@@ -56,7 +52,7 @@ def _tempfile(reader):
             pass
 
 
-@singledispatch
+@functools.singledispatch
 @contextlib.contextmanager
 def as_file(path):
     """
@@ -67,7 +63,7 @@ def as_file(path):
         yield local
 
 
-@as_file.register(Path)
+@as_file.register(pathlib.Path)
 @contextlib.contextmanager
 def _(path):
     """
