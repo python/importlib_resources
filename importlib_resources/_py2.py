@@ -2,20 +2,9 @@ import os
 import errno
 
 from . import _common
-from ._common import _normalize_path, _resolve
+from ._common import _normalize_path, _get_package
 from ._compat import FileNotFoundError
 from io import BytesIO, TextIOWrapper, open as io_open
-
-
-def _get_package(package):
-    """Normalize a path by ensuring it is a string.
-
-    If the resulting string contains path separators, an exception is raised.
-    """
-    module = _resolve(package)
-    if not hasattr(module, '__path__'):
-        raise TypeError("{!r} is not a package".format(package))
-    return module
 
 
 def open_binary(package, resource):

@@ -7,7 +7,7 @@ import contextlib
 
 from ._compat import (
     Path, package_spec, FileNotFoundError, ZipPath,
-    singledispatch, suppress, string_types,
+    singledispatch, suppress, string_types, is_package,
     )
 
 try:
@@ -103,3 +103,16 @@ def _resolve(name):
         if isinstance(name, string_types) else
         name
         )
+
+
+def _get_package(package):
+    # type(Any) -> ModuleType
+    """Take a package name or module object and return the module.
+
+    If a name, the module is imported.  If the resolved module
+    object is not a package, raise an exception.
+    """
+    module = _resolve(package)
+    if not is_package(module):
+        raise TypeError("{!r} is not a package".format(package))
+    return module

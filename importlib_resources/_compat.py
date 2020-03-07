@@ -67,3 +67,11 @@ PY2 = sys.version_info[0] == 2
 
 
 string_types = (unicode, bytes) if PY2 else (str,)
+
+
+def is_package(module):
+    return (
+        hasattr(module, '__path__')
+        if PY2 else
+        module.__spec__.submodule_search_locations is not None
+    )

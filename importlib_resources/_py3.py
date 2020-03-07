@@ -3,7 +3,7 @@ import sys
 
 from . import abc as resources_abc
 from . import _common
-from ._common import _normalize_path, _resolve
+from ._common import _normalize_path, _get_package
 from contextlib import contextmanager, suppress
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
@@ -21,18 +21,6 @@ if sys.version_info >= (3, 6):
     Resource = Union[str, os.PathLike]              # pragma: <=35
 else:
     Resource = str                                  # pragma: >=36
-
-
-def _get_package(package) -> ModuleType:
-    """Take a package name or module object and return the module.
-
-    If a name, the module is imported.  If the resolved module
-    object is not a package, raise an exception.
-    """
-    module = _resolve(package)
-    if module.__spec__.submodule_search_locations is None:
-        raise TypeError('{!r} is not a package'.format(package))
-    return module
 
 
 def _get_resource_reader(
