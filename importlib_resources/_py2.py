@@ -2,7 +2,7 @@ import os
 import errno
 
 from . import _common
-from ._common import _normalize_path, _get_package
+from ._common import _normalize_path, _get_package, files
 from ._compat import FileNotFoundError
 from io import BytesIO, TextIOWrapper, open as io_open
 
@@ -57,10 +57,6 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
     """
     with open_text(package, resource, encoding, errors) as fp:
         return fp.read()
-
-
-def files(package):
-    return _common.from_package(_get_package(package))
 
 
 def path(package, resource):

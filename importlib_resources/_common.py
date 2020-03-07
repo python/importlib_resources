@@ -10,11 +10,15 @@ from ._compat import (
     Path, package_spec, FileNotFoundError, ZipPath,
     singledispatch, suppress, string_types, is_package,
     )
+from .abc import Traversable
 
 try:
-    from typing import Any
+    from typing import Any, Union
 except Exception:  # pragma: nocover
     pass
+
+
+Package = Union[types.ModuleType, str]
 
 
 def from_package(package):
@@ -117,3 +121,11 @@ def _get_package(package):
     if not is_package(module):
         raise TypeError("{!r} is not a package".format(package))
     return module
+
+
+def files(package):
+    # type: (Package) -> Traversable
+    """
+    Get a Traversable resource from a package
+    """
+    return from_package(_get_package(package))

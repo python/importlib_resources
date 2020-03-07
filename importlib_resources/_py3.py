@@ -3,7 +3,7 @@ import sys
 
 from . import abc as resources_abc
 from . import _common
-from ._common import _normalize_path, _get_package
+from ._common import _normalize_path, _get_package, files, Package
 from contextlib import contextmanager, suppress
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
@@ -16,7 +16,6 @@ from typing.io import BinaryIO, TextIO
 if False:  # TYPE_CHECKING
     from typing import ContextManager
 
-Package = Union[ModuleType, str]
 if sys.version_info >= (3, 6):
     Resource = Union[str, os.PathLike]              # pragma: <=35
 else:
@@ -95,13 +94,6 @@ def read_text(package: Package,
     """
     with open_text(package, resource, encoding, errors) as fp:
         return fp.read()
-
-
-def files(package: Package) -> resources_abc.Traversable:
-    """
-    Get a Traversable resource from a package
-    """
-    return _common.from_package(_get_package(package))
 
 
 def path(
