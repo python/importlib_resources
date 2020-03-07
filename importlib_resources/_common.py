@@ -13,7 +13,7 @@ from ._compat import (
 
 try:
     from typing import Any
-except Exception:
+except Exception:  # pragma: nocover
     pass
 
 
