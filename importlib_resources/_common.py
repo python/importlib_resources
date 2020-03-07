@@ -125,11 +125,14 @@ def _get_package(package):
 
 def _get_resource_reader(package):
     # type: (types.ModuleType) -> Optional[ResourceReader]
-    # Return the package's loader if it's a ResourceReader.  We can't use
-    # a issubclass() check here because apparently abc.'s __subclasscheck__()
-    # hook wants to create a weak reference to the object, but
-    # zipimport.zipimporter does not support weak references, resulting in a
-    # TypeError.  That seems terrible.
+    """
+    Return the package's loader if it's a ResourceReader.
+    Cannot use issubclass() because apparently abc's
+    __subclasscheck__() hook wants to create a weak
+    reference to the object, but zipimport.zipimporter
+    does not support weak references, resulting in a
+    TypeError.
+    """
     spec = package.__spec__
     reader = getattr(spec.loader, 'get_resource_reader', None)
     if reader is None:
