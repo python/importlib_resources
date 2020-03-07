@@ -75,8 +75,6 @@ def open_text(package, resource, encoding='utf-8', errors='strict'):
 
 def read_binary(package, resource):
     """Return the binary contents of the resource."""
-    resource = _normalize_path(resource)
-    package = _get_package(package)
     with open_binary(package, resource) as fp:
         return fp.read()
 
@@ -87,8 +85,6 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    resource = _normalize_path(resource)
-    package = _get_package(package)
     with open_text(package, resource, encoding, errors) as fp:
         return fp.read()
 
