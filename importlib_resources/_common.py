@@ -2,11 +2,12 @@ from __future__ import absolute_import
 
 import os
 import tempfile
+import importlib
 import contextlib
 
 from ._compat import (
     Path, package_spec, FileNotFoundError, ZipPath,
-    singledispatch, suppress,
+    singledispatch, suppress, string_types,
     )
 
 try:
@@ -92,3 +93,13 @@ def _normalize_path(path):
     if parent:
         raise ValueError("{!r} must be only a file name".format(path))
     return file_name
+
+
+def _resolve(name):
+    # (Any) -> ModuleType
+    """If name is a string, resolve to a module."""
+    return (
+        importlib.import_module(name)
+        if isinstance(name, string_types) else
+        name
+        )

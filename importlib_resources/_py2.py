@@ -2,17 +2,9 @@ import os
 import errno
 
 from . import _common
-from ._common import _normalize_path
+from ._common import _normalize_path, _resolve
 from ._compat import FileNotFoundError
-from importlib import import_module
 from io import BytesIO, TextIOWrapper, open as io_open
-
-
-def _resolve(name):
-    """If name is a string, resolve to a module."""
-    if not isinstance(name, basestring):                    # noqa: F821
-        return name
-    return import_module(name)
 
 
 def _get_package(package):

@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 
+import sys
+
 # flake8: noqa
+
 
 try:
     from pathlib import Path, PurePath
@@ -58,3 +61,9 @@ def package_spec(package):
 			origin=package.__file__,
 			loader=getattr(package, '__loader__', None),
 		)
+
+
+PY2 = sys.version_info[0] == 2
+
+
+string_types = (unicode, bytes) if PY2 else (str,)

@@ -3,9 +3,8 @@ import sys
 
 from . import abc as resources_abc
 from . import _common
-from ._common import _normalize_path
+from ._common import _normalize_path, _resolve
 from contextlib import contextmanager, suppress
-from importlib import import_module
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
@@ -22,13 +21,6 @@ if sys.version_info >= (3, 6):
     Resource = Union[str, os.PathLike]              # pragma: <=35
 else:
     Resource = str                                  # pragma: >=36
-
-
-def _resolve(name) -> ModuleType:
-    """If name is a string, resolve to a module."""
-    if hasattr(name, '__spec__'):
-        return name
-    return import_module(name)
 
 
 def _get_package(package) -> ModuleType:
