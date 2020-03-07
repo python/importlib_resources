@@ -1,9 +1,9 @@
 import os
-import sys
 
 from . import _common
 from ._common import (
     _normalize_path, _get_package, files, Package, _get_resource_reader,
+    Resource,
     )
 from contextlib import contextmanager, suppress
 from importlib.abc import ResourceLoader
@@ -15,11 +15,6 @@ from typing.io import BinaryIO, TextIO
 
 if False:  # TYPE_CHECKING
     from typing import ContextManager
-
-if sys.version_info >= (3, 6):
-    Resource = Union[str, os.PathLike]              # pragma: <=35
-else:
-    Resource = str                                  # pragma: >=36
 
 
 def open_binary(package: Package, resource: Resource) -> BinaryIO:

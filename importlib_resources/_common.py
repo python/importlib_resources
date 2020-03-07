@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import sys
 import types
 import tempfile
 import importlib
@@ -16,6 +17,11 @@ try:
     from typing import Any, Union, cast, Optional
 except Exception:  # pragma: nocover
     pass
+
+if sys.version_info > (3, 6):
+    Resource = Union[str, os.PathLike]              # pragma: <=35
+else:
+    Resource = str                                  # pragma: >=36
 
 
 Package = Union[types.ModuleType, str]
