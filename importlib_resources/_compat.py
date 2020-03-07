@@ -50,6 +50,12 @@ except ImportError:
     from zipp import Path as ZipPath
 
 
+try:
+    import builtins  # type: ignore
+except ImportError:
+    import __builtin__ as builtins  # type: ignore
+
+
 class PackageSpec(object):
 	def __init__(self, **kwargs):
 		vars(self).update(kwargs)
@@ -66,7 +72,7 @@ def package_spec(package):
 PY2 = sys.version_info[0] == 2
 
 
-string_types = (unicode, bytes) if PY2 else (str,)
+string_types = (builtins.unicode, bytes) if PY2 else (str,)  # type: ignore
 
 
 def is_package(module):

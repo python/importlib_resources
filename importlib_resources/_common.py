@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import types
 import tempfile
 import importlib
 import contextlib
@@ -106,7 +107,7 @@ def _resolve(name):
 
 
 def _get_package(package):
-    # type(Any) -> ModuleType
+    # type: (Any) -> types.ModuleType
     """Take a package name or module object and return the module.
 
     If a name, the module is imported.  If the resolved module
