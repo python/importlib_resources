@@ -10,10 +10,10 @@ from ._compat import (
     Path, package_spec, FileNotFoundError, ZipPath,
     singledispatch, suppress, string_types, is_package,
     )
-from .abc import Traversable
+from .abc import Traversable, ResourceReader
 
 try:
-    from typing import Any, Union
+    from typing import Any, Union, cast, Optional
 except Exception:  # pragma: nocover
     pass
 
@@ -121,6 +121,20 @@ def _get_package(package):
     if not is_package(module):
         raise TypeError("{!r} is not a package".format(package))
     return module
+
+
+def _get_resource_reader(package):
+    # type: (types.ModuleType) -> Optional[ResourceReader]
+    # Return the package's loader if it's a ResourceReader.  We can't use
+    # a issubclass() check here because apparently abc.'s __subclasscheck__()
+    # hook wants to create a weak reference to the object, but
+    # zipimport.zipimporter does not support weak references, resulting in a
+    # TypeError.  That seems terrible.
+    spec = package.__spec__
+    reader = getattr(spec.loader, 'get_resource_reader', None)
+    if reader is None:
+        return None
+    return cast(ResourceReader, reader(spec.name))
 
 
 def files(package):

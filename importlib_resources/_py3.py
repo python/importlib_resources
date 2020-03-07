@@ -1,14 +1,14 @@
 import os
 import sys
 
-from . import abc as resources_abc
 from . import _common
-from ._common import _normalize_path, _get_package, files, Package
+from ._common import (
+    _normalize_path, _get_package, files, Package, _get_resource_reader,
+    )
 from contextlib import contextmanager, suppress
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
-from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
@@ -20,20 +20,6 @@ if sys.version_info >= (3, 6):
     Resource = Union[str, os.PathLike]              # pragma: <=35
 else:
     Resource = str                                  # pragma: >=36
-
-
-def _get_resource_reader(
-        package: ModuleType) -> Optional[resources_abc.ResourceReader]:
-    # Return the package's loader if it's a ResourceReader.  We can't use
-    # a issubclass() check here because apparently abc.'s __subclasscheck__()
-    # hook wants to create a weak reference to the object, but
-    # zipimport.zipimporter does not support weak references, resulting in a
-    # TypeError.  That seems terrible.
-    spec = package.__spec__
-    reader = getattr(spec.loader, 'get_resource_reader', None)
-    if reader is None:
-        return None
-    return cast(resources_abc.ResourceReader, reader(spec.name))
 
 
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
