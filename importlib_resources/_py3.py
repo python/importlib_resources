@@ -161,7 +161,7 @@ def _path_from_reader(reader, resource):
         yield Path(reader.resource_path(norm_resource))
         return
     opener_reader = reader.open_resource(norm_resource)
-    with _common._tempfile(opener_reader.read) as res:
+    with _common._tempfile(opener_reader.read, suffix=norm_resource) as res:
         yield res
 
 

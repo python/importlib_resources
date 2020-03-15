@@ -40,11 +40,11 @@ def fallback_resources(spec):
 
 
 @contextlib.contextmanager
-def _tempfile(reader):
+def _tempfile(reader, suffix=''):
     # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
     # blocks due to the need to close the temporary file to work on Windows
     # properly.
-    fd, raw_path = tempfile.mkstemp()
+    fd, raw_path = tempfile.mkstemp(suffix=suffix)
     try:
         os.write(fd, reader())
         os.close(fd)
@@ -63,7 +63,7 @@ def as_file(path):
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
-    with _tempfile(path.read_bytes) as local:
+    with _tempfile(path.read_bytes, suffix=path.name) as local:
         yield local
 
 
