@@ -44,7 +44,7 @@ except ImportError:
 try:
     from zipfile import Path as ZipPath  # type: ignore
 except ImportError:
-    from zipp import Path as ZipPath
+    from zipp import Path as ZipPath  # type: ignore
 
 
 class PackageSpec(object):
