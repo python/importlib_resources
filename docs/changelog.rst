@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v1.4.0
+======
+* #79: Temporary files created will now reflect the filename of
+  their origin.
+
 v1.3.1
 ======
 * For improved compatibility, ``importlib_resources.trees`` is
