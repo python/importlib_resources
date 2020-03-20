@@ -133,16 +133,10 @@ class Multiplexed(Traversable):
             path.iterdir() for path in self._paths)
 
     def read_bytes(self):
-        for path in self._paths[:-1]:
-            with suppress(Exception):
-                return path.read_bytes()
-        return self._paths[-1].read_bytes()
+        return self.open(mode='rb').read()
 
     def read_text(self, *args, **kwargs):
-        for path in self._paths[:-1]:
-            with suppress(Exception):
-                return path.read_text(*args, **kwargs)
-        return self._paths[-1].read_text()
+        return self.open(mode='r', *args, **kwargs).read()
 
     def is_dir(self):
         return True
