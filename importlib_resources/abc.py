@@ -162,6 +162,12 @@ class Multiplexed(Traversable):
 
     __truediv__ = joinpath
 
+    def open(self, *args, **kwargs):
+        for path in self._paths[:-1]:
+            with suppress(Exception):
+                return path.open(*args, **kwargs)
+        return self._paths[-1].open(*args, **kwargs)
+
 
 class TraversableResources(ResourceReader):
     @abc.abstractmethod
