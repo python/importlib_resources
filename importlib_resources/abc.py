@@ -167,6 +167,10 @@ class TraversableResources(ResourceReader):
 
 
 class ResourceHandle(Traversable):
+    """
+    Handle to a named resource in a ResourceReader.
+    """
+
     def __init__(self, reader, name):
         self.reader = reader
         self.name = name
@@ -183,8 +187,15 @@ class ResourceHandle(Traversable):
             stream = io.TextIOWrapper(*args, **kwargs)
         return stream
 
+    def joinpath(self, name):
+        raise RuntimeError("Cannot traverse into a resource")
+
 
 class ResourceContainer(Traversable):
+    """
+    Traversable container for a package's resources via its reader.
+    """
+
     def __init__(self, reader: SimpleReader):
         self.reader = reader
 
