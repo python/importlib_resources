@@ -139,20 +139,22 @@ class Multiplexed(Traversable):
         return self.open(mode='r', *args, **kwargs).read()
 
     def is_dir(self):
-        return True
+        return any(path.is_dir() for path in self._paths)
 
     def is_file(self):
-        return False
+        return any(path.is_file() for path in self._paths)
 
     def joinpath(self, child):
-        # todo: how to handle subpackages that are themselves multiplexed?
-        subpackages = ()
-        children = (path.joinpath(child) for path in self._paths)
-        return next(
+        children = (
+            path.joinpath(child)
+            for path in self._paths
+            )
+        existing = (
             child
-            for child in itertools.chain(subpackages, children)
+            for child in children
             if child.is_dir() or child.is_file()
             )
+        return Multiplexed(*existing)
 
     __truediv__ = joinpath
 
