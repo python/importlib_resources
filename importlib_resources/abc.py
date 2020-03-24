@@ -112,31 +112,31 @@ class Traversable(Protocol):
         """
 
 
-class SimpleReader:
-    # Holds the string name of the virtual Python package this is a resource loader for.
-    # For filesystems, this is effectively a reader for a directory at `fullname.replace('.', '/')`
-    fullname = None
+class SimpleReader(ABC):
 
+    @abc.abstractproperty
+    def package(self):
+        """
+        The name of the package for which this reader loads resources.
+        """
+
+    @abc.abstractmethod
     def child_readers(self) -> ['SimpleReader']:
-        """Obtain an iterable of ResourceReader for available child virtual packages of this one.
-
-        On filesystems, this essentially returns instances corresponding to immediate child directories.
+        """
+        Obtain an iterable of ResourceReader for available
+        child virtual packages of this one.
         """
 
+    @abc.abstractmethod
     def resources(self) -> [str]:
-        """Obtain available named resources for this virtual package.
-
-        On filesystems, this essentially returns files in the current directory.
-        TODO consider returning a special type that exposes an `open()`, etc.
+        """
+        Obtain available named resources for this virtual package.
         """
 
+    @abc.abstractmethod
     def open_binary(self, resource) -> BinaryIO:
-        """Obtain a File-like for a named resource.
-
-        On filesystems, this attempts to open os.path.join(self, resource).
-
-        Attempting to open a non-resource entity (such as a subdirectory) or a missing
-        resource raises NotAResourceError.
+        """
+        Obtain a File-like for a named resource.
         """
 
 
