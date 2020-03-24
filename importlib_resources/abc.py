@@ -112,6 +112,34 @@ class Traversable(Protocol):
         """
 
 
+class ResourceReader:
+    # Holds the string name of the virtual Python package this is a resource loader for.
+    # For filesystems, this is effectively a reader for a directory at `fullname.replace('.', '/')`
+    fullname = None
+
+    def child_readers(self) -> [ResourceReader]
+        """Obtain an iterable of ResourceReader for available child virtual packages of this one.
+
+        On filesystems, this essentially returns instances corresponding to immediate child directories.
+        """
+
+    def resources(self) -> [str]
+        """Obtain available named resources for this virtual package.
+
+        On filesystems, this essentially returns files in the current directory.
+        TODO consider returning a special type that exposes an `open()`, etc.
+        """"
+
+    def open_binary(self, resource) -> File
+        """Obtain a File-like for a named resource.
+
+        On filesystems, this attempts to open os.path.join(self, resource).
+
+        Attempting to open a non-resource entity (such as a subdirectory) or a missing
+        resource raises NotAResourceError.
+        """
+
+
 class TraversableResources(ResourceReader):
     @abc.abstractmethod
     def files(self):
