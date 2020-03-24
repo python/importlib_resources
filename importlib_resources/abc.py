@@ -61,17 +61,19 @@ class Traversable(Protocol):
         Yield Traversable objects in self
         """
 
-    @abc.abstractmethod
     def read_bytes(self):
         """
         Read contents of self as bytes
         """
+        with self.open('rb') as strm:
+            return strm.read()
 
-    @abc.abstractmethod
     def read_text(self, encoding=None):
         """
-        Read contents of self as bytes
+        Read contents of self as text
         """
+        with self.open(encoding=encoding) as strm:
+            return strm.read()
 
     @abc.abstractmethod
     def is_dir(self):
@@ -91,11 +93,11 @@ class Traversable(Protocol):
         Return Traversable child in self
         """
 
-    @abc.abstractmethod
     def __truediv__(self, child):
         """
         Return Traversable child in self
         """
+        return self.joinpath(child)
 
     @abc.abstractmethod
     def open(self, mode='r', *args, **kwargs):
