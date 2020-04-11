@@ -125,10 +125,10 @@ class SimpleReader(abc.ABC):
         """
 
     @abc.abstractmethod
-    def child_readers(self) -> List['SimpleReader']:
+    def children(self) -> List['SimpleReader']:
         """
-        Obtain an iterable of ResourceReader for available
-        child virtual packages of this one.
+        Obtain an iterable of SimpleReader for available
+        child containers (e.g. directories).
         """
 
     @abc.abstractmethod
@@ -210,7 +210,7 @@ class ResourceContainer(Traversable):
             ResourceHandle(self, name)
             for name in self.resources
             )
-        dirs = map(ResourceContainer, self.child_readers())
+        dirs = map(ResourceContainer, self.children())
         return itertools.chain(files, dirs)
 
     def open(self, *args, **kwargs):
