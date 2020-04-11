@@ -125,20 +125,23 @@ class SimpleReader(abc.ABC):
         """
 
     @abc.abstractmethod
-    def children(self) -> List['SimpleReader']:
+    def children(self):
+        # type: () -> List['SimpleReader']
         """
         Obtain an iterable of SimpleReader for available
         child containers (e.g. directories).
         """
 
     @abc.abstractmethod
-    def resources(self) -> List[str]:
+    def resources(self):
+        # type: () -> List[str]
         """
         Obtain available named resources for this virtual package.
         """
 
     @abc.abstractmethod
-    def open_binary(self, resource) -> BinaryIO:
+    def open_binary(self, resource):
+        # type: (str) -> BinaryIO
         """
         Obtain a File-like for a named resource.
         """
@@ -196,7 +199,8 @@ class ResourceContainer(Traversable):
     Traversable container for a package's resources via its reader.
     """
 
-    def __init__(self, reader: SimpleReader):
+    def __init__(self, reader):
+        # type: (SimpleReader) -> None
         self.reader = reader
 
     def is_dir(self):
