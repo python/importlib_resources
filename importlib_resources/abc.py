@@ -77,12 +77,14 @@ class Traversable(Protocol):
 
     @abc.abstractmethod
     def is_dir(self):
+        # type: () -> bool
         """
         Return True if self is a dir
         """
 
     @abc.abstractmethod
     def is_file(self):
+        # type: () -> bool
         """
         Return True if self is a file
         """
@@ -117,9 +119,14 @@ class Traversable(Protocol):
 
 
 class SimpleReader(abc.ABC):
+    """
+    The minimum, low-level interface required from a resource
+    provider.
+    """
 
     @abc.abstractproperty
     def package(self):
+        # type: () -> str
         """
         The name of the package for which this reader loads resources.
         """
@@ -152,6 +159,11 @@ class SimpleReader(abc.ABC):
 
 
 class TraversableResources(ResourceReader):
+    """
+    The required interface for providing traversable
+    resources.
+    """
+
     @abc.abstractmethod
     def files(self):
         """Return a Traversable object for the loaded package."""
@@ -174,8 +186,9 @@ class ResourceHandle(Traversable):
     Handle to a named resource in a ResourceReader.
     """
 
-    def __init__(self, reader, name):
-        self.reader = reader
+    def __init__(self, parent, name):
+        # type: (ResourceContainer, str) -> None
+        self.parent = parent
         self.name = name
 
     def is_file(self):
@@ -185,7 +198,7 @@ class ResourceHandle(Traversable):
         return False
 
     def open(self, mode='r', *args, **kwargs):
-        stream = self.reader.open_binary(self.name)
+        stream = self.parent.reader.open_binary(self.name)
         if 'b' not in mode:
             stream = io.TextIOWrapper(*args, **kwargs)
         return stream
@@ -212,9 +225,9 @@ class ResourceContainer(Traversable):
     def iterdir(self):
         files = (
             ResourceHandle(self, name)
-            for name in self.resources
+            for name in self.reader.resources
             )
-        dirs = map(ResourceContainer, self.children())
+        dirs = map(ResourceContainer, self.reader.children())
         return itertools.chain(files, dirs)
 
     def open(self, *args, **kwargs):
@@ -228,5 +241,10 @@ class ResourceContainer(Traversable):
 
 
 class TraversableReader(TraversableResources, SimpleReader):
+    """
+    A TraversableResources based on SimpleReader. Resource providers
+    may derive from this class to provide the TraversableResources
+    interface by supplying the SimpleReader interface.
+    """
     def files(self):
         return ResourceContainer(self)
