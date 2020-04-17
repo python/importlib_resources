@@ -115,6 +115,13 @@ class Traversable(ABC):
         accepted by io.TextIOWrapper.
         """
 
+    @abc.abstractproperty
+    def name(self):
+        # type: () -> str
+        """
+        The base name of this object without any parent references.
+        """
+
 
 class TraversableResources(ResourceReader):
     @abc.abstractmethod
