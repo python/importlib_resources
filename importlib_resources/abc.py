@@ -1,9 +1,8 @@
 from __future__ import absolute_import
 
 import abc
-import typing
 
-from ._compat import ABC, FileNotFoundError
+from ._compat import ABC, FileNotFoundError, runtime_checkable, Protocol
 
 # Use mypy's comment syntax for Python 2 compatibility
 try:
@@ -58,8 +57,8 @@ class ResourceReader(ABC):
         raise FileNotFoundError
 
 
-@typing.runtime_checkable
-class Traversable(typing.Protocol):
+@runtime_checkable
+class Traversable(Protocol):
     """
     An object with a subset of pathlib.Path methods suitable for
     traversing directories and opening files.
