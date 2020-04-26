@@ -1,6 +1,8 @@
+import typing
 import unittest
 
 import importlib_resources as resources
+from importlib_resources.abc import Traversable
 from . import data01
 from . import util
 
@@ -15,6 +17,13 @@ class FilesTests:
         files = resources.files(self.data)
         actual = files.joinpath('utf-8.file').read_text()
         assert actual == 'Hello, UTF-8 world!\n'
+
+    @unittest.skipUnless(
+        hasattr(typing, 'runtime_checkable'),
+        "Only suitable when typing supports runtime_checkable",
+        )
+    def test_traversable(self):
+        assert isinstance(resources.files(self.data), Traversable)
 
 
 class OpenDiskTests(FilesTests, unittest.TestCase):
