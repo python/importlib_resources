@@ -4,6 +4,10 @@
 
 v1.5.0
 ======
+
+* Traversable is now a Protocol instead of an Abstract Base
+  Class (Python 2.7 and Python 3.8+).
+
 * Traversable objects now require a ``.name`` property.
 
 v1.4.0
