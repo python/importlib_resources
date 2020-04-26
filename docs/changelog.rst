@@ -2,6 +2,10 @@
  importlib_resources NEWS
 ==========================
 
+v1.5.0
+======
+* Traversable objects now require a ``.name`` property.
+
 v1.4.0
 ======
 * #79: Temporary files created will now reflect the filename of
