@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import abc
+import typing
 
 from ._compat import ABC, FileNotFoundError
 
@@ -57,7 +58,8 @@ class ResourceReader(ABC):
         raise FileNotFoundError
 
 
-class Traversable(ABC):
+@typing.runtime_checkable
+class Traversable(typing.Protocol):
     """
     An object with a subset of pathlib.Path methods suitable for
     traversing directories and opening files.
