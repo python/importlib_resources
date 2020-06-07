@@ -6,21 +6,9 @@ from ._compat import FileNotFoundError
 from io import BytesIO, TextIOWrapper, open as io_open
 
 
-def _normalize_path(path):
-    """Normalize a path by ensuring it is a string.
-
-    If the resulting string contains path separators, an exception is raised.
-    """
-    str_path = str(path)
-    parent, file_name = os.path.split(str_path)
-    if parent:
-        raise ValueError("{!r} must be only a file name".format(path))
-    return file_name
-
-
 def open_binary(package, resource):
     """Return a file-like object opened for binary reading of the resource."""
-    resource = _normalize_path(resource)
+    resource = _common.normalize_path(resource)
     package = _common.get_package(package)
     # Using pathlib doesn't work well here due to the lack of 'strict' argument
     # for pathlib.Path.resolve() prior to Python 3.6.
@@ -79,7 +67,7 @@ def path(package, resource):
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    path = _common.files(package).joinpath(_normalize_path(resource))
+    path = _common.files(package).joinpath(_common.normalize_path(resource))
     if not path.is_file():
         raise FileNotFoundError(path)
     return _common.as_file(path)
@@ -91,7 +79,7 @@ def is_resource(package, name):
     Directories are *not* resources.
     """
     package = _common.get_package(package)
-    _normalize_path(name)
+    _common.normalize_path(name)
     try:
         package_contents = set(contents(package))
     except OSError as error:

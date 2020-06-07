@@ -12,7 +12,7 @@ from ._compat import (
     )
 
 if False:  # TYPE_CHECKING
-    from typing import Union
+    from typing import Union, Any
     Package = Union[types.ModuleType, str]
 
 
@@ -21,6 +21,19 @@ def files(package):
     Get a Traversable resource from a package
     """
     return from_package(get_package(package))
+
+
+def normalize_path(path):
+    # type: (Any) -> str
+    """Normalize a path by ensuring it is a string.
+
+    If the resulting string contains path separators, an exception is raised.
+    """
+    str_path = str(path)
+    parent, file_name = os.path.split(str_path)
+    if parent:
+        raise ValueError('{!r} must be only a file name'.format(path))
+    return file_name
 
 
 def resolve(cand):

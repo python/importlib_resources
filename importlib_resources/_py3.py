@@ -22,18 +22,6 @@ else:
     Resource = str                                  # pragma: >=36
 
 
-def _normalize_path(path) -> str:
-    """Normalize a path by ensuring it is a string.
-
-    If the resulting string contains path separators, an exception is raised.
-    """
-    str_path = str(path)
-    parent, file_name = os.path.split(str_path)
-    if parent:
-        raise ValueError('{!r} must be only a file name'.format(path))
-    return file_name
-
-
 def _get_resource_reader(
         package: ModuleType) -> Optional[resources_abc.ResourceReader]:
     # Return the package's loader if it's a ResourceReader.  We can't use
@@ -50,7 +38,7 @@ def _get_resource_reader(
 
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
     """Return a file-like object opened for binary reading of the resource."""
-    resource = _normalize_path(resource)
+    resource = _common.normalize_path(resource)
     package = _common.get_package(package)
     reader = _get_resource_reader(package)
     if reader is not None:
@@ -124,13 +112,13 @@ def path(
         _path_from_reader(reader, resource)
         if reader else
         _common.as_file(
-            _common.files(package).joinpath(_normalize_path(resource)))
+            _common.files(package).joinpath(_common.normalize_path(resource)))
         )
 
 
 @contextmanager
 def _path_from_reader(reader, resource):
-    norm_resource = _normalize_path(resource)
+    norm_resource = _common.normalize_path(resource)
     with suppress(FileNotFoundError):
         yield Path(reader.resource_path(norm_resource))
         return
@@ -145,7 +133,7 @@ def is_resource(package: Package, name: str) -> bool:
     Directories are *not* resources.
     """
     package = _common.get_package(package)
-    _normalize_path(name)
+    _common.normalize_path(name)
     reader = _get_resource_reader(package)
     if reader is not None:
         return reader.is_resource(name)
