@@ -11,8 +11,13 @@ from ._compat import (
     singledispatch, package_spec,
     )
 
+if False:  # TYPE_CHECKING
+    from typing import Union
+    Package = Union[types.ModuleType, str]
+
 
 def resolve(cand):
+    # type: (Package) -> types.ModuleType
     return (
         cand if isinstance(cand, types.ModuleType)
         else importlib.import_module(cand)
@@ -20,6 +25,7 @@ def resolve(cand):
 
 
 def get_package(package):
+    # type: (Package) -> types.ModuleType
     """Take a package name or module object and return the module.
 
     Raise an exception if the resolved module is not a package.
