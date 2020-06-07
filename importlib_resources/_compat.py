@@ -86,19 +86,36 @@ class LoaderAdapter:
         self.spec = spec
 
     def get_resource_reader(self, name):
+        """
+        Provide the preferred resource reader.
+        """
         from . import readers
-        try:
-            reader = self.spec.loader.get_resource_reader(name)
-            reader.files
-        except AttributeError:
-            reader = _zip_reader(self.spec) or readers.FileReader(self.spec)
-        return reader
+        def _zip_reader(spec):
+            with suppress(AttributeError):
+                return readers.ZipReader(spec)
 
+        def _source_reader(spec):
+            return Path(spec.origin).is_file() and readers.FileReader(spec)
 
-def _zip_reader(spec):
-    from . import readers
-    with suppress(AttributeError):
-        return readers.ZipReader(spec)
+        def _available_reader(spec):
+            with suppress(AttributeError):
+                return spec.loader.get_resource_reader(spec.name)
+
+        def _native_reader(spec):
+            reader = _available_reader(spec)
+            return reader if hasattr(reader, 'files') else None
+
+        return (
+            # native reader if it supplies 'files'
+            _native_reader(self.spec) or
+            # local ZipReader if a zip module
+            _zip_reader(self.spec) or
+            # local FileReader if a source module
+            _source_reader(self.spec) or
+            # any other reader (without Traversable support)
+            _available_reader(self.spec) or
+            readers.DegenerateReader(self.spec)
+            )
 
 
 def package_spec(package):
