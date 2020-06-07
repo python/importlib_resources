@@ -5,8 +5,8 @@ import tempfile
 import contextlib
 
 from ._compat import (
-    Path, package_spec, FileNotFoundError, ZipPath,
-    singledispatch, suppress,
+    Path, FileNotFoundError,
+    singledispatch, traversable_reader,
     )
 
 
@@ -15,28 +15,7 @@ def from_package(package):
     Return a Traversable object for the given package.
 
     """
-    spec = package_spec(package)
-    return from_traversable_resources(spec) or fallback_resources(spec)
-
-
-def from_traversable_resources(spec):
-    """
-    If the spec.loader implements TraversableResources,
-    directly or implicitly, it will have a ``files()`` method.
-    """
-    with suppress(AttributeError):
-        return spec.loader.files()
-
-
-def fallback_resources(spec):
-    package_directory = Path(spec.origin).parent
-    try:
-        archive_path = spec.loader.archive
-        rel_path = package_directory.relative_to(archive_path)
-        return ZipPath(archive_path, str(rel_path) + '/')
-    except Exception:
-        pass
-    return package_directory
+    return traversable_reader(package).files()
 
 
 @contextlib.contextmanager

@@ -61,13 +61,39 @@ except ImportError:
 
 
 class PackageSpec(object):
-	def __init__(self, **kwargs):
-		vars(self).update(kwargs)
+    def __init__(self, **kwargs):
+        vars(self).update(kwargs)
 
 
 def package_spec(package):
-	return getattr(package, '__spec__', None) or \
-		PackageSpec(
-			origin=package.__file__,
-			loader=getattr(package, '__loader__', None),
-		)
+    """
+    Construct a minimal package spec suitable for
+    matching the interfaces this library relies upon
+    in later Python versions.
+    """
+    return getattr(package, '__spec__', None) or \
+        PackageSpec(
+            origin=package.__file__,
+            loader=getattr(package, '__loader__', None),
+            name=package.__name__,
+        )
+
+
+def traversable_reader(package):
+    """
+    For a given package, ensure a TraversableResources.
+    """
+    from . import readers
+    try:
+        spec = package_spec(package)
+        reader = spec.loader.get_resource_reader(spec.name)
+        reader.files
+    except AttributeError:
+        reader = _zip_reader(spec) or readers.FileReader(spec)
+    return reader
+
+
+def _zip_reader(spec):
+    from . import readers
+    with suppress(AttributeError):
+        return readers.ZipReader(spec)
