@@ -1,7 +1,6 @@
 import os
 import sys
 
-from . import abc as resources_abc
 from . import _common
 from contextlib import contextmanager, suppress
 from importlib.abc import ResourceLoader
@@ -22,25 +21,11 @@ else:
     Resource = str                                  # pragma: >=36
 
 
-def _get_resource_reader(
-        package: ModuleType) -> Optional[resources_abc.ResourceReader]:
-    # Return the package's loader if it's a ResourceReader.  We can't use
-    # a issubclass() check here because apparently abc.'s __subclasscheck__()
-    # hook wants to create a weak reference to the object, but
-    # zipimport.zipimporter does not support weak references, resulting in a
-    # TypeError.  That seems terrible.
-    spec = package.__spec__
-    reader = getattr(spec.loader, 'get_resource_reader', None)
-    if reader is None:
-        return None
-    return cast(resources_abc.ResourceReader, reader(spec.name))
-
-
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
     """Return a file-like object opened for binary reading of the resource."""
     resource = _common.normalize_path(resource)
     package = _common.get_package(package)
-    reader = _get_resource_reader(package)
+    reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.open_resource(resource)
     # Using pathlib doesn't work well here due to the lack of 'strict'
@@ -107,7 +92,7 @@ def path(
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    reader = _get_resource_reader(_common.get_package(package))
+    reader = _common.get_resource_reader(_common.get_package(package))
     return (
         _path_from_reader(reader, resource)
         if reader else
@@ -134,7 +119,7 @@ def is_resource(package: Package, name: str) -> bool:
     """
     package = _common.get_package(package)
     _common.normalize_path(name)
-    reader = _get_resource_reader(package)
+    reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.is_resource(name)
     package_contents = set(contents(package))
@@ -151,7 +136,7 @@ def contents(package: Package) -> Iterable[str]:
     to check if it is a resource or not.
     """
     package = _common.get_package(package)
-    reader = _get_resource_reader(package)
+    reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.contents()
     # Is the package a namespace package?  By definition, namespace packages

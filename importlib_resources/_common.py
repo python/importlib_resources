@@ -12,7 +12,8 @@ from ._compat import (
     )
 
 if False:  # TYPE_CHECKING
-    from typing import Union, Any
+    from typing import Union, Any, Optional
+    from .abc import ResourceReader
     Package = Union[types.ModuleType, str]
 
 
@@ -34,6 +35,23 @@ def normalize_path(path):
     if parent:
         raise ValueError('{!r} must be only a file name'.format(path))
     return file_name
+
+
+def get_resource_reader(package):
+    # type: (types.ModuleType) -> Optional[ResourceReader]
+    """
+    Return the package's loader if it's a ResourceReader.
+    """
+    # We can't use
+    # a issubclass() check here because apparently abc.'s __subclasscheck__()
+    # hook wants to create a weak reference to the object, but
+    # zipimport.zipimporter does not support weak references, resulting in a
+    # TypeError.  That seems terrible.
+    spec = package.__spec__
+    reader = getattr(spec.loader, 'get_resource_reader', None)
+    if reader is None:
+        return None
+    return reader(spec.name)
 
 
 def resolve(cand):
