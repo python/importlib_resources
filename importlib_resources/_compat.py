@@ -112,5 +112,6 @@ def package_spec(package):
             origin=package.__file__,
             loader=getattr(package, '__loader__', None),
             name=package.__name__,
+            submodule_search_locations=getattr(package, '__path__', None),
         )
     return TraversableResourcesAdapter(spec)
