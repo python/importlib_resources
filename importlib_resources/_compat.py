@@ -71,7 +71,7 @@ class PackageSpec:
 class TraversableResourcesAdapter:
     def __init__(self, spec):
         self.spec = spec
-        self.loader = LoaderAdapter(self.spec)
+        self.loader = LoaderAdapter(spec)
 
     def __getattr__(self, name):
         return getattr(self.spec, name)
@@ -79,26 +79,32 @@ class TraversableResourcesAdapter:
 
 class LoaderAdapter:
     """
-    Adapt loaders on Python < 3.9 to provide TraversableResources
-    readers.
+    Adapt loaders to provide TraversableResources and other
+    compatibility.
     """
     def __init__(self, spec):
         self.spec = spec
 
+    @property
+    def path(self):
+        # Python < 3
+        return self.spec.origin
+
     def get_resource_reader(self, name):
+        # Python < 3.9
         from . import readers
         try:
             reader = self.spec.loader.get_resource_reader(name)
             reader.files
         except AttributeError:
-            reader = _zip_reader(self.spec) or readers.FileReader(self.spec)
+            reader = _zip_reader(self.spec) or readers.FileReader(self)
         return reader
 
 
 def _zip_reader(spec):
     from . import readers
     with suppress(AttributeError):
-        return readers.ZipReader(spec)
+        return readers.ZipReader(spec.loader, spec.name)
 
 
 def package_spec(package):
