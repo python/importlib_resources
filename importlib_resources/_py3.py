@@ -108,13 +108,6 @@ def read_text(package: Package,
         return fp.read()
 
 
-def files(package: Package) -> resources_abc.Traversable:
-    """
-    Get a Traversable resource from a package
-    """
-    return _common.from_package(_common.get_package(package))
-
-
 def path(
         package: Package, resource: Resource,
         ) -> 'ContextManager[Path]':
@@ -130,7 +123,8 @@ def path(
     return (
         _path_from_reader(reader, resource)
         if reader else
-        _common.as_file(files(package).joinpath(_normalize_path(resource)))
+        _common.as_file(
+            _common.files(package).joinpath(_normalize_path(resource)))
         )
 
 

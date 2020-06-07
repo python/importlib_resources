@@ -70,10 +70,6 @@ def read_text(package, resource, encoding='utf-8', errors='strict'):
         return fp.read()
 
 
-def files(package):
-    return _common.from_package(_common.get_package(package))
-
-
 def path(package, resource):
     """A context manager providing a file path object to the resource.
 
@@ -83,7 +79,7 @@ def path(package, resource):
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    path = files(package).joinpath(_normalize_path(resource))
+    path = _common.files(package).joinpath(_normalize_path(resource))
     if not path.is_file():
         raise FileNotFoundError(path)
     return _common.as_file(path)

@@ -16,6 +16,13 @@ if False:  # TYPE_CHECKING
     Package = Union[types.ModuleType, str]
 
 
+def files(package):
+    """
+    Get a Traversable resource from a package
+    """
+    return from_package(get_package(package))
+
+
 def resolve(cand):
     # type: (Package) -> types.ModuleType
     return (
