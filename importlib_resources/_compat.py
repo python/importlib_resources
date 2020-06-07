@@ -60,9 +60,45 @@ except ImportError:
     Protocol = ABC  # type: ignore
 
 
-class PackageSpec(object):
+__metaclass__ = type
+
+
+class PackageSpec:
     def __init__(self, **kwargs):
         vars(self).update(kwargs)
+
+
+class TraversableResourcesAdapter:
+    def __init__(self, spec):
+        self.spec = spec
+        self.loader = LoaderAdapter(self.spec)
+
+    def __getattr__(self, name):
+        return getattr(self.spec, name)
+
+
+class LoaderAdapter:
+    """
+    Adapt loaders on Python < 3.9 to provide TraversableResources
+    readers.
+    """
+    def __init__(self, spec):
+        self.spec = spec
+
+    def get_resource_reader(self, name):
+        from . import readers
+        try:
+            reader = self.spec.loader.get_resource_reader(name)
+            reader.files
+        except AttributeError:
+            reader = _zip_reader(self.spec) or readers.FileReader(self.spec)
+        return reader
+
+
+def _zip_reader(spec):
+    from . import readers
+    with suppress(AttributeError):
+        return readers.ZipReader(spec)
 
 
 def package_spec(package):
@@ -71,29 +107,10 @@ def package_spec(package):
     matching the interfaces this library relies upon
     in later Python versions.
     """
-    return getattr(package, '__spec__', None) or \
+    spec = getattr(package, '__spec__', None) or \
         PackageSpec(
             origin=package.__file__,
             loader=getattr(package, '__loader__', None),
             name=package.__name__,
         )
-
-
-def traversable_reader(package):
-    """
-    For a given package, ensure a TraversableResources.
-    """
-    from . import readers
-    try:
-        spec = package_spec(package)
-        reader = spec.loader.get_resource_reader(spec.name)
-        reader.files
-    except AttributeError:
-        reader = _zip_reader(spec) or readers.FileReader(spec)
-    return reader
-
-
-def _zip_reader(spec):
-    from . import readers
-    with suppress(AttributeError):
-        return readers.ZipReader(spec)
+    return TraversableResourcesAdapter(spec)

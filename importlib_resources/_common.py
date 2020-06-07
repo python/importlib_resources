@@ -6,7 +6,7 @@ import contextlib
 
 from ._compat import (
     Path, FileNotFoundError,
-    singledispatch, traversable_reader,
+    singledispatch, package_spec,
     )
 
 
@@ -15,7 +15,9 @@ def from_package(package):
     Return a Traversable object for the given package.
 
     """
-    return traversable_reader(package).files()
+    spec = package_spec(package)
+    reader = spec.loader.get_resource_reader(spec.name)
+    return reader.files()
 
 
 @contextlib.contextmanager
