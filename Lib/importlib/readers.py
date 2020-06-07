@@ -4,18 +4,18 @@ from . import abc
 
 
 class FileReader(abc.TraversableResources):
-    def __init__(self, spec):
-        self.path = pathlib.Path(spec.origin).parent
+    def __init__(self, loader):
+        self.path = pathlib.Path(loader.path).parent
 
     def files(self):
         return self.path
 
 
 class ZipReader(FileReader):
-    def __init__(self, spec):
-        _, _, name = spec.name.rpartition('.')
-        prefix = spec.loader.prefix.replace('\\', '/') + name + '/'
-        self.path = zipfile.Path(spec.loader.archive, prefix)
+    def __init__(self, loader, module):
+        _, _, name = module.rpartition('.')
+        prefix = loader.prefix.replace('\\', '/') + name + '/'
+        self.path = zipfile.Path(loader.archive, prefix)
 
     def open_resource(self, resource):
         try:
