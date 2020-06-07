@@ -60,14 +60,64 @@ except ImportError:
     Protocol = ABC  # type: ignore
 
 
-class PackageSpec(object):
-	def __init__(self, **kwargs):
-		vars(self).update(kwargs)
+__metaclass__ = type
+
+
+class PackageSpec:
+    def __init__(self, **kwargs):
+        vars(self).update(kwargs)
+
+
+class TraversableResourcesAdapter:
+    def __init__(self, spec):
+        self.spec = spec
+        self.loader = LoaderAdapter(spec)
+
+    def __getattr__(self, name):
+        return getattr(self.spec, name)
+
+
+class LoaderAdapter:
+    """
+    Adapt loaders to provide TraversableResources and other
+    compatibility.
+    """
+    def __init__(self, spec):
+        self.spec = spec
+
+    @property
+    def path(self):
+        # Python < 3
+        return self.spec.origin
+
+    def get_resource_reader(self, name):
+        # Python < 3.9
+        from . import readers
+        try:
+            reader = self.spec.loader.get_resource_reader(name)
+            reader.files
+        except AttributeError:
+            reader = _zip_reader(self.spec) or readers.FileReader(self)
+        return reader
+
+
+def _zip_reader(spec):
+    from . import readers
+    with suppress(AttributeError):
+        return readers.ZipReader(spec.loader, spec.name)
 
 
 def package_spec(package):
-	return getattr(package, '__spec__', None) or \
-		PackageSpec(
-			origin=package.__file__,
-			loader=getattr(package, '__loader__', None),
-		)
+    """
+    Construct a minimal package spec suitable for
+    matching the interfaces this library relies upon
+    in later Python versions.
+    """
+    spec = getattr(package, '__spec__', None) or \
+        PackageSpec(
+            origin=package.__file__,
+            loader=getattr(package, '__loader__', None),
+            name=package.__name__,
+            submodule_search_locations=getattr(package, '__path__', None),
+        )
+    return TraversableResourcesAdapter(spec)
