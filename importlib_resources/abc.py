@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import abc
 
-from ._compat import ABC, FileNotFoundError
+from ._compat import ABC, FileNotFoundError, runtime_checkable, Protocol
 
 # Use mypy's comment syntax for Python 2 compatibility
 try:
@@ -57,7 +57,8 @@ class ResourceReader(ABC):
         raise FileNotFoundError
 
 
-class Traversable(ABC):
+@runtime_checkable
+class Traversable(Protocol):
     """
     An object with a subset of pathlib.Path methods suitable for
     traversing directories and opening files.
@@ -115,6 +116,13 @@ class Traversable(ABC):
         accepted by io.TextIOWrapper.
         """
 
+    @abc.abstractproperty
+    def name(self):
+        # type: () -> str
+        """
+        The base name of this object without any parent references.
+        """
+
 
 class TraversableResources(ResourceReader):
     @abc.abstractmethod
@@ -128,7 +136,7 @@ class TraversableResources(ResourceReader):
         raise FileNotFoundError(resource)
 
     def is_resource(self, path):
-        return self.files().joinpath(path).isfile()
+        return self.files().joinpath(path).is_file()
 
     def contents(self):
         return (item.name for item in self.files().iterdir())

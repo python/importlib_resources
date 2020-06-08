@@ -3,7 +3,9 @@
 import sys
 
 from ._compat import metadata
-from ._common import as_file
+from ._common import (
+    as_file, files,
+    )
 
 # for compatibility. Ref #88
 __import__('importlib_resources.trees')
@@ -30,7 +32,6 @@ if sys.version_info >= (3,):
         Package,
         Resource,
         contents,
-        files,
         is_resource,
         open_binary,
         open_text,
@@ -42,7 +43,6 @@ if sys.version_info >= (3,):
 else:
     from importlib_resources._py2 import (
         contents,
-        files,
         is_resource,
         open_binary,
         open_text,
