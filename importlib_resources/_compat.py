@@ -93,18 +93,27 @@ class LoaderAdapter:
     def get_resource_reader(self, name):
         # Python < 3.9
         from . import readers
-        try:
-            reader = self.spec.loader.get_resource_reader(name)
-            reader.files
-        except AttributeError:
-            reader = _zip_reader(self.spec) or readers.FileReader(self)
-        return reader
 
+        def _zip_reader(spec):
+            with suppress(AttributeError):
+                return readers.ZipReader(spec.loader, spec.name)
 
-def _zip_reader(spec):
-    from . import readers
-    with suppress(AttributeError):
-        return readers.ZipReader(spec.loader, spec.name)
+        def _available_reader(spec):
+            with suppress(AttributeError):
+                return spec.loader.get_resource_reader(spec.name)
+
+        def _native_reader(spec):
+            reader = _available_reader(spec)
+            return reader if hasattr(reader, 'files') else None
+
+        return (
+            # native reader if it supplies 'files'
+            _native_reader(self.spec) or
+            # local ZipReader if a zip module
+            _zip_reader(self.spec) or
+            # local FileReader
+            readers.FileReader(self)
+            )
 
 
 def package_spec(package):
