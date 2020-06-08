@@ -1,6 +1,22 @@
+import os
 import itertools
-from ._compat import suppress
+from ._compat import suppress, ZipPath, Path
 from .abc import Traversable
+
+
+def infer_path(path):
+    return resolve_zip_path(path) or Path(path)
+
+
+def resolve_zip_path(candidate, tail=''):
+    if not candidate:
+        return
+    try:
+        return ZipPath(candidate, at=tail)
+    except Exception:
+        new_tail = os.path.basename(candidate) + '/' + tail
+        new_base = os.path.dirname(candidate)
+        return resolve_zip_path(new_base, new_tail)
 
 
 class Multiplexed(Traversable):
@@ -10,6 +26,9 @@ class Multiplexed(Traversable):
     namespace packages which may be multihomed at a single
     name.
     """
+    @classmethod
+    def load(cls, paths):
+        return cls(map(cls._infer_path, paths))
 
     def __init__(self, *paths):
         self._paths = paths

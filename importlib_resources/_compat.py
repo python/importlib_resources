@@ -106,9 +106,16 @@ class LoaderAdapter:
             reader = _available_reader(spec)
             return reader if hasattr(reader, 'files') else None
 
+        def _namespace_reader(spec):
+            from . import namespace
+            if 'NamespaceLoader' not in spec.loader.__class__.__name__:
+                return
+            return namespace.Multiplexed.load(spec.submodule_search_locations)
+
         return (
             # native reader if it supplies 'files'
             _native_reader(self.spec) or
+            _namespace_reader(self.spec) or
             # local ZipReader if a zip module
             _zip_reader(self.spec) or
             # local FileReader
