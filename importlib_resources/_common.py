@@ -40,18 +40,10 @@ def normalize_path(path):
 def get_resource_reader(package):
     # type: (types.ModuleType) -> Optional[ResourceReader]
     """
-    Return the package's loader if it's a ResourceReader.
+    Return a resource reader for the package if available.
     """
-    # We can't use
-    # a issubclass() check here because apparently abc.'s __subclasscheck__()
-    # hook wants to create a weak reference to the object, but
-    # zipimport.zipimporter does not support weak references, resulting in a
-    # TypeError.  That seems terrible.
-    spec = package.__spec__
-    reader = getattr(spec.loader, 'get_resource_reader', None)
-    if reader is None:
-        return None
-    return reader(spec.name)
+    spec = package_spec(package)
+    return spec.loader.get_resource_reader(spec.name)
 
 
 def resolve(cand):
@@ -79,9 +71,7 @@ def from_package(package):
     Return a Traversable object for the given package.
 
     """
-    spec = package_spec(package)
-    reader = spec.loader.get_resource_reader(spec.name)
-    return reader.files()
+    return get_resource_reader(package).files()
 
 
 @contextlib.contextmanager

@@ -90,6 +90,9 @@ class LoaderAdapter:
         # Python < 3
         return self.spec.origin
 
+    def __getattr__(self, name):
+        return getattr(self.spec.loader, name)
+
     def get_resource_reader(self, name):
         # Python < 3.9
         from . import readers
