@@ -2,6 +2,13 @@
  importlib_resources NEWS
 ==========================
 
+v2.0.1
+======
+
+* Select pathlib and contextlib imports based on Python version
+  and avoid pulling in deprecated
+  [pathlib](https://pypi.org/project/pathlib). Closes #97.
+
 v1.5.0
 ======
 
