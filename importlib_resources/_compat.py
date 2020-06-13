@@ -1,16 +1,17 @@
 from __future__ import absolute_import
+import sys
 
 # flake8: noqa
 
-try:
+if sys.version_info > (3,5):
     from pathlib import Path, PurePath
-except ImportError:
+else:
     from pathlib2 import Path, PurePath                         # type: ignore
 
 
-try:
+if sys.version_info > (3,):
     from contextlib import suppress
-except ImportError:
+else:
     from contextlib2 import suppress                         # type: ignore
 
 
