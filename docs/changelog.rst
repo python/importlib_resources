@@ -2,6 +2,14 @@
  importlib_resources NEWS
 ==========================
 
+v2.0.0
+======
+
+* Loaders are no longer expected to implement the
+  ``abc.TraversableResources`` interface, but are instead
+  expected to return ``TraversableResources`` from their
+  ``get_resource_reader`` method.
+
 v1.5.0
 ======
 
