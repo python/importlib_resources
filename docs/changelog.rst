@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v2.0.2
+======
+
+* Package now always includes its data. Closes #93.
+
 v2.0.1
 ======
 
