@@ -19,7 +19,7 @@ class FileReader(abc.TraversableResources):
         return self.path
 
 
-class ZipReader(FileReader):
+class ZipReader(abc.TraversableResources):
     def __init__(self, loader, module):
         _, _, name = module.rpartition('.')
         prefix = loader.prefix.replace('\\', '/') + name + '/'
@@ -36,3 +36,6 @@ class ZipReader(FileReader):
         # for non-existent paths.
         target = self.files().joinpath(path)
         return target.is_file() and target.exists()
+
+    def files(self):
+        return self.path
