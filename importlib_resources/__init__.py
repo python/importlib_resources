@@ -7,9 +7,6 @@ from ._common import (
     as_file, files,
     )
 
-# for compatibility. Ref #88
-__import__('importlib_resources.trees')
-
 
 __all__ = [
     'Package',

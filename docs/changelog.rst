@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v3.0.0
+======
+
+* Remove trees module, deprecated in v1.3.0.
+
 v2.0.2
 ======
 
