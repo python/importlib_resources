@@ -16,10 +16,15 @@ RELPATH = 'importlib_resources/tests/data{suffix}'
 BASEPATH = 'ziptestdata'
 ZF_BASE = 'importlib_resources/tests/zipdata{suffix}/ziptestdata.zip'
 
-for suffix in ('01', '02'):
+for suffix in ('01', '02', '_nested'):
     zfpath = ZF_BASE.format(suffix=suffix)
+    print("creating", zfpath)
     with ZipFile(zfpath, 'w') as zf:
-        relpath = RELPATH.format(suffix=suffix)
+        relpath = (
+            RELPATH.format(suffix='01')
+            if suffix == '_nested' else
+            RELPATH.format(suffix=suffix)
+            )
         for dirpath, dirnames, filenames in os.walk(relpath):
             for filename in filenames:
                 src = os.path.join(dirpath, filename)
@@ -30,5 +35,7 @@ for suffix in ('01', '02'):
                 commonpath = os.path.commonpath((relpath, dirpath))
                 dst = os.path.join(
                     BASEPATH, dirpath[len(commonpath)+1:], filename)
+                if 'nested' in suffix:
+                    dst = os.path.join('site-packages', dst)
                 print(src, '->', dst)
                 zf.write(src, dst)

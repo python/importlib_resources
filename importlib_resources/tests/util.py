@@ -7,7 +7,7 @@ import unittest
 
 from . import data01
 from . import zipdata01
-from .._compat import ABC, Path, PurePath, FileNotFoundError
+from .._compat import ABC, Path, PurePath, FileNotFoundError, suppress
 from ..abc import ResourceReader
 
 try:
@@ -181,7 +181,10 @@ class ZipSetupBase:
     def setUpClass(cls):
         data_path = Path(cls.ZIP_MODULE.__file__)
         data_dir = data_path.parent
-        cls._zip_path = str(data_dir / 'ziptestdata.zip')
+        zip_path = data_dir / 'ziptestdata.zip'
+        with suppress(AttributeError):
+            zip_path /= cls.path_subdir
+        cls._zip_path = str(zip_path)
         sys.path.append(cls._zip_path)
         cls.data = importlib.import_module('ziptestdata')
 

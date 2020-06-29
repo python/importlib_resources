@@ -3,7 +3,7 @@ import unittest
 import importlib_resources as resources
 
 from . import data01
-from . import zipdata01, zipdata02
+from . import zipdata01, zipdata02, zipdata_nested
 from . import util
 from importlib import import_module
 
@@ -134,6 +134,12 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
         self.assertEqual(
             set(resources.contents('ziptestdata.two')),
             {'__init__.py', 'resource2.txt'})
+
+
+class ResourceFromZipNested(
+        ResourceTests, util.ZipSetupBase, unittest.TestCase):
+    ZIP_MODULE = zipdata_nested
+    path_subdir = 'site-packages'
 
 
 @unittest.skipIf(sys.version_info < (3,), 'No namespace packages in Python 2')
