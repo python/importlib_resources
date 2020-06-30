@@ -7,7 +7,8 @@ from ._common import (
     as_file, files,
     )
 
-# for compatibility. Ref #88
+# For compatibility. Ref #88.
+# Also requires hook-importlib_resources.py (Ref #101).
 __import__('importlib_resources.trees')
 
 
