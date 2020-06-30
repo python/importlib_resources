@@ -13,6 +13,28 @@ tests:
   script:
     - tox -e py27,py35,py36,py37,py38
 
+Windows tests:
+  extends: tests
+  tags:
+  - windows
+  before_script:
+  # allow chocolatey to install without confirmation
+  - choco feature enable -n allowGlobalConfirmation
+  # Install latest stable Python
+  - choco install python
+  # Link latest stable Python to C:\Python
+  - cmd /c mklink /d C:\Python Python38
+  # Add Python and its scripts to the Path
+  - $env:PATH = 'C:\Python;C:\Python\Scripts;' + $env:PATH
+  # Install older Pythons
+  - choco install python --side-by-side --version=3.7.6
+  - choco install python --side-by-side --version=3.6.8
+  - choco install python --side-by-side --version=3.5.4.20200110
+  - choco install python2
+  # Install latest pip and tox
+  - py -m pip install -U pip
+  - py -m pip install tox
+
 coverage:
   script:
     - tox -e py27-cov,py35-cov,py36-cov,py37-cov,py38-cov
