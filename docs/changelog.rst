@@ -2,9 +2,17 @@
  importlib_resources NEWS
 ==========================
 
-v2.0.2
+v3.0.0
 ======
 
+* Package no longer exposes ``importlib_resources.__version__``.
+  Users that wish to inspect the version of ``importlib_resources``
+  should instead invoke ``.version('importlib_resources')`` from
+  ``importlib-metadata`` (
+  `stdlib <https://docs.python.org/3/library/importlib.metadata.html>`_
+  or `backport <https://pypi.org/project/importlib-metadata>`_)
+  directly. This change eliminates the dependency on
+  ``importlib_metadata``. Closes #100.
 * Package now always includes its data. Closes #93.
 * Declare hidden imports for PyInstaller. Closes #101.
 

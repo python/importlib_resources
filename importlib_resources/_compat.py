@@ -37,12 +37,6 @@ except NameError:
 
 
 try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata  # type: ignore
-
-
-try:
     from zipfile import Path as ZipPath  # type: ignore
 except ImportError:
     from zipp import Path as ZipPath  # type: ignore

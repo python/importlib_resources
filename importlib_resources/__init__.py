@@ -2,7 +2,6 @@
 
 import sys
 
-from ._compat import metadata
 from ._common import (
     as_file, files,
     )
@@ -52,6 +51,3 @@ else:
         read_text,
         )
     del __all__[:3]
-
-
-__version__ = metadata.version('importlib_resources')
