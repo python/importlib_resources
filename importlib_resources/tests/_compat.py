@@ -1,9 +1,16 @@
 try:
-    # Python 3.10
     from test.support import import_helper
 except ImportError:
-    class import_helper:
-        from test.support import modules_setup, modules_cleanup
+    try:
+        # Python 3.9 and earlier
+        class import_helper:
+            from test.support import modules_setup, modules_cleanup
+    except ImportError:
+        from . import py27compat
+
+        class import_helper:
+            modules_setup = staticmethod(py27compat.modules_setup)
+            modules_cleanup = staticmethod(py27compat.modules_cleanup)
 
 
 try:
