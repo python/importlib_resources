@@ -108,7 +108,11 @@ def as_file(path):
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
-    with _tempfile(path.read_bytes, suffix=path.name) as local:
+    reader = path.read_bytes
+    with _tempfile(reader, suffix=path.name) as local:
+        # release the handle to the path and reader
+        del reader
+        del path
         yield local
 
 
