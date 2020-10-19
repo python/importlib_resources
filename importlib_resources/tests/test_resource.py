@@ -209,32 +209,39 @@ class DeletingZipsTest(unittest.TestCase):
     def test_contents_does_not_keep_open(self):
         c = resources.contents('ziptestdata')
         self.zip_path.unlink()
+        del c
 
     def test_is_resource_does_not_keep_open(self):
         c = resources.is_resource('ziptestdata', 'binary.file')
         self.zip_path.unlink()
+        del c
 
     def test_is_resource_failure_does_not_keep_open(self):
         c = resources.is_resource('ziptestdata', 'not-present')
         self.zip_path.unlink()
+        del c
 
     def test_path_does_not_keep_open(self):
         c = resources.path('ziptestdata', 'binary.file')
         self.zip_path.unlink()
+        del c
 
     def test_entered_path_does_not_keep_open(self):
         # This is what certifi does on import to make its bundle
         # available for the process duration.
         c = resources.path('ziptestdata', 'binary.file').__enter__()
         self.zip_path.unlink()
+        del c
 
     def test_read_binary_does_not_keep_open(self):
         c = resources.read_binary('ziptestdata', 'binary.file')
         self.zip_path.unlink()
+        del c
 
     def test_read_text_does_not_keep_open(self):
         c = resources.read_text('ziptestdata', 'utf-8.file', encoding='utf-8')
         self.zip_path.unlink()
+        del c
 
 
 if __name__ == '__main__':
