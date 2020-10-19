@@ -7,7 +7,17 @@ except ImportError:
 
 
 try:
+    from os import fspath
+except ImportError:
+    # Python 3.5
+    fspath = str
+
+
+try:
     # Python 3.10
     from test.support.os_helper import unlink
 except ImportError:
-    from test.support import unlink  # noqa
+    from test.support import unlink as _unlink
+
+    def unlink(target):
+        return _unlink(fspath(target))
