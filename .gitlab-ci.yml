@@ -23,10 +23,11 @@ Windows tests:
   # Install latest stable Python
   - choco install python
   # Link latest stable Python to C:\Python
-  - cmd /c mklink /d C:\Python Python38
+  - py -c "import os, sys, pathlib; os.symlink(pathlib.Path(sys.executable).parent.name, r'C:\Python')"
   # Add Python and its scripts to the Path
   - $env:PATH = 'C:\Python;C:\Python\Scripts;' + $env:PATH
   # Install older Pythons
+  - choco install python --side-by-side --version=3.8.6
   - choco install python --side-by-side --version=3.7.6
   - choco install python --side-by-side --version=3.6.8
   - choco install python --side-by-side --version=3.5.4.20200110
