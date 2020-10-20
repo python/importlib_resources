@@ -93,6 +93,7 @@ def _tempfile(reader, suffix=''):
     try:
         os.write(fd, reader())
         os.close(fd)
+        del reader
         yield Path(raw_path)
     finally:
         try:
