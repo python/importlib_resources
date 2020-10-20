@@ -31,27 +31,30 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
         return reader.open_resource(resource)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
-    absolute_package_path = os.path.abspath(
-        package.__spec__.origin or 'non-existent file')
-    package_path = os.path.dirname(absolute_package_path)
-    full_path = os.path.join(package_path, resource)
-    try:
-        return open(full_path, mode='rb')
-    except OSError:
-        # Just assume the loader is a resource loader; all the relevant
-        # importlib.machinery loaders are and an AttributeError for
-        # get_data() will make it clear what is needed from the loader.
-        loader = cast(ResourceLoader, package.__spec__.loader)
-        data = None
-        if hasattr(package.__spec__.loader, 'get_data'):
-            with suppress(OSError):
-                data = loader.get_data(full_path)
-        if data is None:
-            package_name = package.__spec__.name
-            message = '{!r} resource not found in {!r}'.format(
-                resource, package_name)
-            raise FileNotFoundError(message)
-        return BytesIO(data)
+    spec = package.__spec__
+    if package.__spec__.submodule_search_locations is not None:
+        paths = package.__spec__.submodule_search_locations
+    elif package.__spec__.origin is not None:
+        paths = [os.path.dirname(os.path.abspath(package.__spec__.origin))]
+
+    for package_path in paths:
+        full_path = os.path.join(package_path, resource)
+        try:
+            return open(full_path, mode='rb')
+        except OSError:
+            # Just assume the loader is a resource loader; all the relevant
+            # importlib.machinery loaders are and an AttributeError for
+            # get_data() will make it clear what is needed from the loader.
+            loader = cast(ResourceLoader, package.__spec__.loader)
+            data = None
+            if hasattr(package.__spec__.loader, 'get_data'):
+                with suppress(OSError):
+                    data = loader.get_data(full_path)
+            if data is not None:
+                return BytesIO(data)
+
+    raise FileNotFoundError('{!r} resource not found in {!r}'.format(
+        resource, package.__spec__.name))
 
 
 def open_text(package: Package,
