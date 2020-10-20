@@ -113,7 +113,6 @@ def as_file(path):
         # release the handle to the path and reader
         del reader
         del path
-        __import__('time').sleep(.5)
         yield local
 
 

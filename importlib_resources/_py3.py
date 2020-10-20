@@ -109,6 +109,8 @@ def _path_from_reader(reader, resource):
         return
     opener_reader = reader.open_resource(norm_resource)
     with _common._tempfile(opener_reader.read, suffix=norm_resource) as res:
+        del opener_reader
+        del reader
         yield res
 
 
