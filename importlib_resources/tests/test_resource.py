@@ -140,36 +140,6 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
             {'__init__.py', 'resource2.txt'})
 
 
-@unittest.skipIf(sys.version_info < (3,), 'No namespace packages in Python 2')
-class NamespaceTest(unittest.TestCase):
-    def test_namespaces_cannot_have_resources(self):
-        contents = resources.contents(
-            'importlib_resources.tests.data03.namespace')
-        self.assertFalse(list(contents))
-        # Even though there is a file in the namespace directory, it is not
-        # considered a resource, since namespace packages can't have them.
-        self.assertFalse(resources.is_resource(
-            'importlib_resources.tests.data03.namespace',
-            'resource1.txt'))
-        # We should get an exception if we try to read it or open it.
-        self.assertRaises(
-            FileNotFoundError,
-            resources.open_text,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
-        self.assertRaises(
-            FileNotFoundError,
-            resources.open_binary,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
-        self.assertRaises(
-            FileNotFoundError,
-            resources.read_text,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
-        self.assertRaises(
-            FileNotFoundError,
-            resources.read_binary,
-            'importlib_resources.tests.data03.namespace', 'resource1.txt')
-
-
 class DeletingZipsTest(unittest.TestCase):
     """Having accessed resources in a zip file should not keep an open
     reference to the zip.
