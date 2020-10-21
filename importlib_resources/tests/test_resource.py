@@ -221,6 +221,7 @@ class DeletingZipsTest(unittest.TestCase):
         self.zip_path.unlink()
         del c
 
+    @unittest.skip("Desired but not supported.")
     def test_path_does_not_keep_open(self):
         c = resources.path('ziptestdata', 'binary.file')
         self.zip_path.unlink()
