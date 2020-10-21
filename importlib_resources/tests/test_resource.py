@@ -183,7 +183,7 @@ class DeletingZipsTest(unittest.TestCase):
         data_path = Path(self.ZIP_MODULE.__file__)
         data_dir = data_path.parent
         self.source_zip_path = data_dir / 'ziptestdata.zip'
-        self.zip_path = Path.cwd() / '{}.zip'.format(uuid.uuid4())
+        self.zip_path = Path('{}.zip'.format(uuid.uuid4())).absolute()
         self.zip_path.write_bytes(self.source_zip_path.read_bytes())
         sys.path.append(str(self.zip_path))
         self.data = import_module('ziptestdata')
