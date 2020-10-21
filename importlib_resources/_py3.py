@@ -3,6 +3,7 @@ import sys
 import io
 
 from . import _common
+from . import _functools
 from contextlib import suppress
 from importlib.abc import ResourceLoader
 from io import BytesIO, TextIOWrapper
@@ -82,6 +83,7 @@ def read_text(package: Package,
         return fp.read()
 
 
+# @_functools.defer
 def path(
         package: Package, resource: Resource,
         ) -> 'ContextManager[Path]':
