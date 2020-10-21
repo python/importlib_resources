@@ -93,6 +93,7 @@ def _tempfile(reader, suffix=''):
     try:
         os.write(fd, reader())
         os.close(fd)
+        del reader
         yield Path(raw_path)
     finally:
         try:
@@ -102,22 +103,12 @@ def _tempfile(reader, suffix=''):
 
 
 @singledispatch
-@contextlib.contextmanager
 def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
-    content = path.read_bytes()
-    name = path.name
-
-    def reader():
-        return content
-
-    del path.root
-    del path
-    with _tempfile(reader, suffix=name) as local:
-        yield local
+    return _tempfile(path.read_bytes, suffix=path.name)
 
 
 @as_file.register(Path)
