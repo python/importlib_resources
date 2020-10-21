@@ -96,9 +96,16 @@ def path(
     return (
         _path_from_reader(reader, resource)
         if reader else
-        _common.as_file(
-            _common.files(package).joinpath(_common.normalize_path(resource)))
+        _fallback_path(package, resource)
         )
+
+
+@contextmanager
+def _fallback_path(package, resource):
+    files = _common.files(package).joinpath(_common.normalize_path(resource))
+    with _common.as_file(files) as res:
+        del files
+        yield res
 
 
 @contextmanager
