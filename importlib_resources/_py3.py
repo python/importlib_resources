@@ -147,12 +147,7 @@ def contents(package: Package) -> Iterable[str]:
     reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.contents()
-    # Is the package a namespace package?  By definition, namespace packages
-    # cannot have resources.
-    namespace = (
-        package.__spec__.origin is None or
-        package.__spec__.origin == 'namespace'
-        )
-    if namespace or not package.__spec__.has_location:
-        return ()
-    return list(item.name for item in _common.from_package(package).iterdir())
+    transversable = _common.from_package(package)
+    if transversable.is_dir():
+        return list(item.name for item in transversable.iterdir())
+    return []

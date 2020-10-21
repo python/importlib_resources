@@ -93,6 +93,10 @@ class LoaderAdapter:
             with suppress(AttributeError):
                 return readers.ZipReader(spec.loader, spec.name)
 
+        def _namespace_reader(spec):
+            with suppress(AttributeError, ValueError):
+                return readers.NamespaceReader(spec.submodule_search_locations)
+
         def _available_reader(spec):
             with suppress(AttributeError):
                 return spec.loader.get_resource_reader(spec.name)
@@ -106,6 +110,8 @@ class LoaderAdapter:
             _native_reader(self.spec) or
             # local ZipReader if a zip module
             _zip_reader(self.spec) or
+            # local NamespaceReader if a namespace module
+            _namespace_reader(self.spec) or
             # local FileReader
             readers.FileReader(self)
             )

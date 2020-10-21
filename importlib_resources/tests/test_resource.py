@@ -1,3 +1,4 @@
+import os.path
 import sys
 import unittest
 import importlib_resources as resources
@@ -213,6 +214,40 @@ class DeletingZipsTest(unittest.TestCase):
         c = resources.read_text('ziptestdata', 'utf-8.file', encoding='utf-8')
         self.zip_path.unlink()
         del c
+
+
+@unittest.skipUnless(
+    sys.version_info[0] >= 3,
+    'namespace packages not available on Python 2'
+)
+class ResourceFromNamespaceTest01(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sys.path.append(os.path.abspath(os.path.join(__file__, '..')))
+
+    def test_is_submodule_resource(self):
+        self.assertTrue(
+            resources.is_resource(import_module('namespacedata01'), 'binary.file'))
+
+    def test_read_submodule_resource_by_name(self):
+        self.assertTrue(
+            resources.is_resource('namespacedata01', 'binary.file'))
+
+    def test_submodule_contents(self):
+        contents = set(resources.contents(import_module('namespacedata01')))
+        try:
+            contents.remove('__pycache__')
+        except KeyError:
+            pass
+        self.assertEqual(contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
+
+    def test_submodule_contents_by_name(self):
+        contents = set(resources.contents('namespacedata01'))
+        try:
+            contents.remove('__pycache__')
+        except KeyError:
+            pass
+        self.assertEqual(contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
 
 
 if __name__ == '__main__':
