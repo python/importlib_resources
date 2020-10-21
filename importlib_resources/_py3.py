@@ -83,7 +83,7 @@ def read_text(package: Package,
         return fp.read()
 
 
-# @_functools.defer
+@_functools.defer
 def path(
         package: Package, resource: Resource,
         ) -> 'ContextManager[Path]':
