@@ -20,6 +20,8 @@ jobs:
           python -m pip install tox
       - name: Run tests
         run: tox
+        env:
+          TOXENV: python
 
   release:
     needs: test
