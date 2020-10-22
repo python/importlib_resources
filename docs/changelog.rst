@@ -2,6 +2,14 @@
  importlib_resources NEWS
 ==========================
 
+v3.1.0
+======
+
+* #110 and bpo-41490: ``path`` method is more aggressive about
+  releasing handles to zipfile objects early, enabling use-cases
+  like ``certifi`` to leave the context open but delete the underlying
+  zip file.
+
 v3.0.0
 ======
 
