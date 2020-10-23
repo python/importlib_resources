@@ -32,7 +32,8 @@ class OpenTests:
 
     def test_open_text_given_encoding(self):
         with resources.open_text(
-                self.data, 'utf-16.file', 'utf-16', 'strict') as fp:
+                self.data, 'utf-16.file', 'utf-16', 'strict'
+                ) as fp:
             result = fp.read()
         self.assertEqual(result, 'Hello, UTF-16 world!\n')
 
@@ -69,7 +70,7 @@ class OpenDiskTests(OpenTests, unittest.TestCase):
 @unittest.skipUnless(
     sys.version_info[0] >= 3,
     'namespace packages not available on Python 2'
-)
+    )
 class OpenDiskNamespaceTests(OpenTests, unittest.TestCase):
     def setUp(self):
         from . import namespacedata01

@@ -31,7 +31,6 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
         return reader.open_resource(resource)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
-    spec = package.__spec__
     if package.__spec__.submodule_search_locations is not None:
         paths = package.__spec__.submodule_search_locations
     elif package.__spec__.origin is not None:
