@@ -219,7 +219,7 @@ class DeletingZipsTest(unittest.TestCase):
 @unittest.skipUnless(
     sys.version_info[0] >= 3,
     'namespace packages not available on Python 2'
-)
+    )
 class ResourceFromNamespaceTest01(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -227,7 +227,8 @@ class ResourceFromNamespaceTest01(unittest.TestCase):
 
     def test_is_submodule_resource(self):
         self.assertTrue(
-            resources.is_resource(import_module('namespacedata01'), 'binary.file'))
+            resources.is_resource(
+                import_module('namespacedata01'), 'binary.file'))
 
     def test_read_submodule_resource_by_name(self):
         self.assertTrue(
@@ -239,7 +240,8 @@ class ResourceFromNamespaceTest01(unittest.TestCase):
             contents.remove('__pycache__')
         except KeyError:
             pass
-        self.assertEqual(contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
+        self.assertEqual(
+            contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
 
     def test_submodule_contents_by_name(self):
         contents = set(resources.contents('namespacedata01'))
@@ -247,7 +249,8 @@ class ResourceFromNamespaceTest01(unittest.TestCase):
             contents.remove('__pycache__')
         except KeyError:
             pass
-        self.assertEqual(contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
+        self.assertEqual(
+            contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
 
 
 if __name__ == '__main__':

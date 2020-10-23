@@ -1,4 +1,3 @@
-import itertools
 import os.path
 
 from . import abc
