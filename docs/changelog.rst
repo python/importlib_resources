@@ -2,6 +2,12 @@
  importlib_resources NEWS
 ==========================
 
+v3.1.1
+======
+
+* bpo-41490: ``contents`` is now also more aggressive about
+  consuming any iterator from the ``Reader``.
+
 v3.1.0
 ======
 
