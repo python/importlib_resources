@@ -11,6 +11,8 @@ from types import ModuleType
 from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
+from collections.abc import Sequence
+from ._compat import singledispatch
 
 if False:  # TYPE_CHECKING
     from typing import ContextManager
@@ -146,8 +148,18 @@ def contents(package: Package) -> Iterable[str]:
     package = _common.get_package(package)
     reader = _common.get_resource_reader(package)
     if reader is not None:
-        return reader.contents()
+        return _ensure_sequence(reader.contents())
     transversable = _common.from_package(package)
     if transversable.is_dir():
         return list(item.name for item in transversable.iterdir())
     return []
+
+
+@singledispatch
+def _ensure_sequence(iterable):
+    return list(iterable)
+
+
+@_ensure_sequence.register(Sequence)
+def _(iterable):
+    return iterable

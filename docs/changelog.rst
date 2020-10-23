@@ -7,6 +7,12 @@ v3.2.0
 
 * #68: Resources in PEP 420 Namespace packages are now supported.
 
+v3.1.1
+======
+
+* bpo-41490: ``contents`` is now also more aggressive about
+  consuming any iterator from the ``Reader``.
+
 v3.1.0
 ======
 
