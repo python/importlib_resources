@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v3.2.0
+======
+
+* #68: Resources in PEP 420 Namespace packages are now supported.
+
 v3.1.0
 ======
 
