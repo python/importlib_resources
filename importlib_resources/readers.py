@@ -2,7 +2,7 @@ import os.path
 
 from . import abc
 
-from ._compat import suppress, Path, ZipPath
+from ._compat import Path, ZipPath
 
 
 class FileReader(abc.TraversableResources):
@@ -69,10 +69,10 @@ class MultiplexedPath(abc.Traversable):
                 yield file
 
     def read_bytes(self):
-        return self.open(mode='rb').read()
+        raise FileNotFoundError('{} is not a file'.format(self))
 
     def read_text(self, *args, **kwargs):
-        return self.open(mode='r', *args, **kwargs).read()
+        raise FileNotFoundError('{} is not a file'.format(self))
 
     def is_dir(self):
         return True
@@ -91,10 +91,7 @@ class MultiplexedPath(abc.Traversable):
     __truediv__ = joinpath
 
     def open(self, *args, **kwargs):
-        for path in self._paths[:-1]:
-            with suppress(Exception):
-                return path.open(*args, **kwargs)
-        return self._paths[-1].open(*args, **kwargs)
+        raise FileNotFoundError('{} is not a file'.format(self))
 
     def name(self):
         return os.path.basename(self._paths[0])
