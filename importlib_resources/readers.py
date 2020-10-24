@@ -89,7 +89,7 @@ class MultiplexedPath(abc.Traversable):
             if file.name == child:
                 return file
         # if it does not exist, construct it with the first path
-        return Path(os.path.join(self._paths[0], child))
+        return self._paths[0] / child
 
     __truediv__ = joinpath
 
