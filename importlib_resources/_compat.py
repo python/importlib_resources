@@ -37,6 +37,12 @@ except NameError:
 
 
 try:
+    NotADirectoryError = NotADirectoryError                       # type: ignore
+except NameError:
+    NotADirectoryError = OSError                                 # type: ignore
+
+
+try:
     from zipfile import Path as ZipPath  # type: ignore
 except ImportError:
     from zipp import Path as ZipPath  # type: ignore
