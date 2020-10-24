@@ -1,5 +1,7 @@
 import os.path
 
+from collections import OrderedDict
+
 from . import abc
 
 from ._compat import Path, ZipPath
@@ -51,7 +53,8 @@ class MultiplexedPath(abc.Traversable):
     name.
     """
     def __init__(self, *paths):
-        self._paths = list(map(Path, set(paths)))
+        paths = list(OrderedDict.fromkeys(paths))  # remove duplicates
+        self._paths = list(map(Path, paths))
         if not self._paths:
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
