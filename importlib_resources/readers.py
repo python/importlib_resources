@@ -5,6 +5,7 @@ from collections import OrderedDict
 from . import abc
 
 from ._compat import Path, ZipPath
+from ._compat import FileNotFoundError, NotADirectoryError
 
 
 class FileReader(abc.TraversableResources):
