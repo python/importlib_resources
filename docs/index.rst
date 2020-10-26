@@ -32,15 +32,6 @@ The documentation here includes a general :ref:`usage <using>` guide and a
    changelog (links).rst
 
 
-Project details
-===============
-
- * Project home: https://github.com/python/importlib_resources
- * Report bugs at: https://github.com/python/importlib_resources/issues
- * Code hosting: https://github.com/python/importlib_resources.git
- * Documentation: http://importlib_resources.readthedocs.io/
-
-
 Indices and tables
 ==================
 
