@@ -128,11 +128,10 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
     ZIP_MODULE = zipdata02                          # type: ignore
 
     def test_unrelated_contents(self):
-        # https://gitlab.com/python-devs/importlib_resources/issues/44
-        #
-        # Here we have a zip file with two unrelated subpackages.  The bug
-        # reports that getting the contents of a resource returns unrelated
-        # files.
+        """
+        Test thata zip with two unrelated subpackages return
+        distinct resources. Ref python/importlib_resources#44.
+        """
         self.assertEqual(
             set(resources.contents('ziptestdata.one')),
             {'__init__.py', 'resource1.txt'})
