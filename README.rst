@@ -1,7 +1,3 @@
-=========================
- ``importlib_resources``
-=========================
-
 ``importlib_resources`` is a backport of Python standard library
 `importlib.resources
 <https://docs.python.org/3.9/library/importlib.html#module-importlib.resources>`_
