@@ -19,7 +19,7 @@ semantics.
 Project details
 ===============
 
- * Project home: https://gitlab.com/python-devs/importlib_resources
- * Report bugs at: https://gitlab.com/python-devs/importlib_resources/issues
- * Code hosting: https://gitlab.com/python-devs/importlib_resources.git
+ * Project home: https://github.com/python/importlib_resources
+ * Report bugs at: https://github.com/python/importlib_resources/issues
+ * Code hosting: https://github.com/python/importlib_resources.git
  * Documentation: https://importlib-resources.readthedocs.io/
