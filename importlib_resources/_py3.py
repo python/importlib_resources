@@ -1,5 +1,4 @@
 import os
-import sys
 import io
 
 from . import _common
@@ -12,16 +11,13 @@ from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
 from collections.abc import Sequence
-from ._compat import singledispatch
+from functools import singledispatch
 
 if False:  # TYPE_CHECKING
     from typing import ContextManager
 
 Package = Union[ModuleType, str]
-if sys.version_info >= (3, 6):
-    Resource = Union[str, os.PathLike]              # pragma: <=35
-else:
-    Resource = str                                  # pragma: >=36
+Resource = Union[str, os.PathLike]
 
 
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
