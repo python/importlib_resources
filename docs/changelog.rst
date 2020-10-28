@@ -65,16 +65,19 @@ v1.5.0
 
 v1.4.0
 ======
+
 * #79: Temporary files created will now reflect the filename of
   their origin.
 
 v1.3.1
 ======
+
 * For improved compatibility, ``importlib_resources.trees`` is
   now imported implicitly. Closes #88.
 
 v1.3.0
 ======
+
 * Add extensibility support for non-standard loaders to supply
   ``Traversable`` resources. Introduces a new abstract base
   class ``abc.TraversableResources`` that supersedes (but
@@ -89,6 +92,7 @@ v1.3.0
 
 v1.2.0
 ======
+
 * Traversable now requires an ``open`` method. Closes #81.
 * Fixed error on ``Python 3.5.{0,3}``. Closes #83.
 * Updated packaging to resolve version from package metadata.
@@ -96,6 +100,7 @@ v1.2.0
 
 v1.1.0
 ======
+
 * Add support for retrieving resources from subdirectories of packages
   through the new ``files()`` function, which returns a ``Traversable``
   object with ``joinpath`` and ``read_*`` interfaces matching those
@@ -115,50 +120,60 @@ v1.1.0
 
 1.0.2
 =====
+
 * Fix ``setup_requires`` and ``install_requires`` metadata in ``setup.cfg``.
   Given by Anthony Sottile.
 
 1.0.1
 =====
+
 * Update Trove classifiers.  Closes #63
 
 1.0
 ===
+
 * Backport fix for test isolation from Python 3.8/3.7.  Closes #61
 
 0.8
 ===
+
 * Strip ``importlib_resources.__version__``.  Closes #56
 * Fix a metadata problem with older setuptools.  Closes #57
 * Add an ``__all__`` to ``importlib_resources``.  Closes #59
 
 0.7
 ===
+
 * Fix ``setup.cfg`` metadata bug.  Closes #55
 
 0.6
 ===
+
 * Move everything from ``pyproject.toml`` to ``setup.cfg``, with the added
   benefit of fixing the PyPI metadata.  Closes #54
 * Turn off mypy's ``strict_optional`` setting for now.
 
 0.5
 ===
+
 * Resynchronize with Python 3.7; changes the return type of ``contents()`` to
   be an ``Iterable``.  Closes #52
 
 0.4
 ===
+
 * Correctly find resources in subpackages inside a zip file.  Closes #51
 
 0.3
 ===
+
 * The API, implementation, and documentation is synchronized with the Python
   3.7 standard library.  Closes #47
 * When run under Python 3.7 this API shadows the stdlib versions.  Closes #50
 
 0.2
 ===
+
 * **Backward incompatible change**.  Split the ``open()`` and ``read()`` calls
   into separate binary and text versions, i.e. ``open_binary()``,
   ``open_text()``, ``read_binary()``, and ``read_text()``.  Closes #41
@@ -168,6 +183,7 @@ v1.1.0
 
 0.1
 ===
+
 * Initial release.
 
 
