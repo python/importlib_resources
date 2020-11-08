@@ -1,15 +1,12 @@
-from __future__ import absolute_import
-
 import os
 import tempfile
 import contextlib
 import types
 import importlib
+from pathlib import Path
+from functools import singledispatch
 
-from ._compat import (
-    Path, FileNotFoundError,
-    singledispatch, package_spec,
-    )
+from ._compat import package_spec
 
 if False:  # TYPE_CHECKING
     from typing import Union, Any, Optional

@@ -1,11 +1,11 @@
 import os.path
 
 from collections import OrderedDict
+from pathlib import Path
 
 from . import abc
 
-from ._compat import Path, ZipPath
-from ._compat import FileNotFoundError, NotADirectoryError
+from ._compat import ZipPath
 
 
 class FileReader(abc.TraversableResources):

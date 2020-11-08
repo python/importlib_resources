@@ -3,8 +3,7 @@ import sys
 import unittest
 import importlib_resources as resources
 import uuid
-
-from importlib_resources._compat import Path
+from pathlib import Path
 
 from . import data01
 from . import zipdata01, zipdata02

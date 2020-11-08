@@ -4,10 +4,10 @@ import io
 import sys
 import types
 import unittest
+from pathlib import Path, PurePath
 
 from . import data01
 from . import zipdata01
-from .._compat import ABC, Path, PurePath, FileNotFoundError
 from ..abc import ResourceReader
 from ._compat import import_helper
 
@@ -76,7 +76,7 @@ def create_package(file, path, is_package=True, contents=()):
     return module
 
 
-class CommonTests(ABC):
+class CommonTests(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def execute(self, package, path):

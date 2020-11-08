@@ -4,7 +4,6 @@ import unittest
 import importlib_resources as resources
 from . import data01
 from . import util
-from .._compat import FileNotFoundError
 
 
 class CommonBinaryTests(util.CommonTests, unittest.TestCase):
