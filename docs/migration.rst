@@ -27,9 +27,9 @@ pkg_resources.resource_filename()
 
 ``resource_filename()`` is one of the more interesting APIs because it
 guarantees that the return value names a file on the file system.  This means
-that if the resource is in a zip file, ``pkg_resources()`` will extract the
+that if the resource is in a zip file, ``pkg_resources`` will extract the
 file and return the name of the temporary file it created.  The problem is
-that ``pkg_resources()`` also *implicitly* cleans up this temporary file,
+that ``pkg_resources`` also *implicitly* cleans up this temporary file,
 without control over its lifetime by the programmer.
 
 ``importlib_resources`` takes a different approach.  Its equivalent API is the
@@ -41,7 +41,7 @@ context whose lifetime is managed by the user.  Note though
 that if the resource is *already* on the file system, ``importlib_resources``
 still returns a context manager, but nothing needs to get cleaned up.
 
-Here's an example from ``pkg_resources()``::
+Here's an example from ``pkg_resources``::
 
     path = pkg_resources.resource_filename('my.package', 'resource.dat')
 
