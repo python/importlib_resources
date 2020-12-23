@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v4.0.0
+======
+
+* #108: Drop support for Python 2.7. Now requires Python 3.6+.
+
 v3.3.1
 ======
 
