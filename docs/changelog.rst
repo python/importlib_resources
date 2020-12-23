@@ -2,6 +2,11 @@
  importlib_resources NEWS
 ==========================
 
+v3.3.1
+======
+
+* Minor cleanup.
+
 v3.3.0
 ======
 
