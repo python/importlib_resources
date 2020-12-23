@@ -1,46 +1,8 @@
-from __future__ import absolute_import
+import abc
 import sys
+from contextlib import suppress
 
 # flake8: noqa
-
-if sys.version_info > (3,5):
-    from pathlib import Path, PurePath
-else:
-    from pathlib2 import Path, PurePath                         # type: ignore
-
-
-if sys.version_info > (3,):
-    from contextlib import suppress
-else:
-    from contextlib2 import suppress                         # type: ignore
-
-
-try:
-    from functools import singledispatch
-except ImportError:
-    from singledispatch import singledispatch                   # type: ignore
-
-
-try:
-    from abc import ABC                                         # type: ignore
-except ImportError:
-    from abc import ABCMeta
-
-    class ABC(object):                                          # type: ignore
-        __metaclass__ = ABCMeta
-
-
-try:
-    FileNotFoundError = FileNotFoundError                       # type: ignore
-except NameError:
-    FileNotFoundError = OSError                                 # type: ignore
-
-
-try:
-    NotADirectoryError = NotADirectoryError                       # type: ignore
-except NameError:
-    NotADirectoryError = OSError                                 # type: ignore
-
 
 try:
     from zipfile import Path as ZipPath  # type: ignore
@@ -58,15 +20,7 @@ except ImportError:
 try:
     from typing import Protocol  # type: ignore
 except ImportError:
-    Protocol = ABC  # type: ignore
-
-
-__metaclass__ = type
-
-
-class PackageSpec:
-    def __init__(self, **kwargs):
-        vars(self).update(kwargs)
+    Protocol = abc.ABC  # type: ignore
 
 
 class TraversableResourcesAdapter:
@@ -88,7 +42,6 @@ class LoaderAdapter:
 
     @property
     def path(self):
-        # Python < 3
         return self.spec.origin
 
     def get_resource_reader(self, name):
@@ -129,11 +82,4 @@ def package_spec(package):
     matching the interfaces this library relies upon
     in later Python versions.
     """
-    spec = getattr(package, '__spec__', None) or \
-        PackageSpec(
-            origin=package.__file__,
-            loader=getattr(package, '__loader__', None),
-            name=package.__name__,
-            submodule_search_locations=getattr(package, '__path__', None),
-        )
-    return TraversableResourcesAdapter(spec)
+    return TraversableResourcesAdapter(package.__spec__)
