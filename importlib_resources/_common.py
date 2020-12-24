@@ -46,10 +46,10 @@ def get_resource_reader(package):
     # zipimport.zipimporter does not support weak references, resulting in a
     # TypeError.  That seems terrible.
     spec = package.__spec__
-    reader = getattr(spec.loader, 'get_resource_reader', None)
+    reader = getattr(spec.loader, 'get_resource_reader', None)  # type: ignore
     if reader is None:
         return None
-    return reader(spec.name)
+    return reader(spec.name)  # type: ignore
 
 
 def resolve(cand):

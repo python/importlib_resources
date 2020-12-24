@@ -4,6 +4,7 @@ import io
 from . import _common
 from contextlib import suppress
 from importlib.abc import ResourceLoader
+from importlib.machinery import ModuleSpec
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
@@ -27,12 +28,13 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
     reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.open_resource(resource)
+    spec = cast(ModuleSpec, package.__spec__)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
-    if package.__spec__.submodule_search_locations is not None:
-        paths = package.__spec__.submodule_search_locations
-    elif package.__spec__.origin is not None:
-        paths = [os.path.dirname(os.path.abspath(package.__spec__.origin))]
+    if spec.submodule_search_locations is not None:
+        paths = spec.submodule_search_locations
+    elif spec.origin is not None:
+        paths = [os.path.dirname(os.path.abspath(spec.origin))]
 
     for package_path in paths:
         full_path = os.path.join(package_path, resource)
@@ -42,16 +44,16 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
             # Just assume the loader is a resource loader; all the relevant
             # importlib.machinery loaders are and an AttributeError for
             # get_data() will make it clear what is needed from the loader.
-            loader = cast(ResourceLoader, package.__spec__.loader)
+            loader = cast(ResourceLoader, spec.loader)
             data = None
-            if hasattr(package.__spec__.loader, 'get_data'):
+            if hasattr(spec.loader, 'get_data'):
                 with suppress(OSError):
                     data = loader.get_data(full_path)
             if data is not None:
                 return BytesIO(data)
 
     raise FileNotFoundError(
-        '{!r} resource not found in {!r}'.format(resource, package.__spec__.name)
+        '{!r} resource not found in {!r}'.format(resource, spec.name)
     )
 
 
