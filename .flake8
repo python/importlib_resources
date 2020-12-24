@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 88
+ignore =
+	# W503 violates spec https://github.com/PyCQA/pycodestyle/issues/513
+	W503
+	# W504 has issues https://github.com/OCA/maintainer-quality-tools/issues/545
+	W504
+	# Black creates whitespace before colon
+	E203
+exclude =
+	# Exclude the entire top-level __init__.py file since its only purpose is
+	# to expose the version string and to handle Python 2/3 compatibility.
+	importlib_resources/__init__.py
