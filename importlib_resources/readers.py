@@ -53,6 +53,7 @@ class MultiplexedPath(abc.Traversable):
     namespace packages which may be multihomed at a single
     name.
     """
+
     def __init__(self, *paths):
         paths = list(OrderedDict.fromkeys(paths))  # remove duplicates
         self._paths = list(map(Path, paths))
@@ -60,8 +61,7 @@ class MultiplexedPath(abc.Traversable):
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
         if any(not path.is_dir() for path in self._paths):
-            raise NotADirectoryError(
-                'MultiplexedPath only supports directories')
+            raise NotADirectoryError('MultiplexedPath only supports directories')
 
     def iterdir(self):
         visited = []
@@ -102,7 +102,8 @@ class MultiplexedPath(abc.Traversable):
 
     def __repr__(self):
         return 'MultiplexedPath({})'.format(
-            ', '.join("'{}'".format(path) for path in self._paths))
+            ', '.join("'{}'".format(path) for path in self._paths)
+        )
 
 
 class NamespaceReader(abc.TraversableResources):

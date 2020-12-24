@@ -15,7 +15,7 @@ from ._compat import import_helper
 try:
     from importlib.machinery import ModuleSpec
 except ImportError:
-    ModuleSpec = None                               # type: ignore
+    ModuleSpec = None  # type: ignore
 
 
 def create_package(file, path, is_package=True, contents=()):
@@ -67,17 +67,13 @@ def create_package(file, path, is_package=True, contents=()):
     else:
         # Python 3.
         loader = Reader()
-        spec = ModuleSpec(
-            name, loader,
-            origin='does-not-exist',
-            is_package=is_package)
+        spec = ModuleSpec(name, loader, origin='does-not-exist', is_package=is_package)
         module.__spec__ = spec
         module.__loader__ = loader
     return module
 
 
 class CommonTests(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def execute(self, package, path):
         raise NotImplementedError
@@ -104,7 +100,7 @@ class CommonTests(metaclass=abc.ABCMeta):
     def test_absolute_path(self):
         # An absolute path is a ValueError.
         path = Path(__file__)
-        full_path = path.parent/'utf-8.file'
+        full_path = path.parent / 'utf-8.file'
         with self.assertRaises(ValueError):
             self.execute(data01, full_path)
 
@@ -145,8 +141,7 @@ class CommonTests(metaclass=abc.ABCMeta):
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
     def test_useless_loader(self):
-        package = create_package(file=FileNotFoundError(),
-                                 path=FileNotFoundError())
+        package = create_package(file=FileNotFoundError(), path=FileNotFoundError())
         with self.assertRaises(FileNotFoundError):
             self.execute(package, 'utf-8.file')
 
@@ -187,4 +182,4 @@ class ZipSetupBase:
 
 
 class ZipSetup(ZipSetupBase):
-    ZIP_MODULE = zipdata01                          # type: ignore
+    ZIP_MODULE = zipdata01  # type: ignore

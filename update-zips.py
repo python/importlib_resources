@@ -28,7 +28,6 @@ for suffix in ('01', '02'):
                 if src == zfpath:
                     continue
                 commonpath = os.path.commonpath((relpath, dirpath))
-                dst = os.path.join(
-                    BASEPATH, dirpath[len(commonpath)+1:], filename)
+                dst = os.path.join(BASEPATH, dirpath[len(commonpath) + 1 :], filename)
                 print(src, '->', dst)
                 zf.write(src, dst)

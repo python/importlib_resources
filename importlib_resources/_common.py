@@ -11,6 +11,7 @@ from ._compat import package_spec
 if False:  # TYPE_CHECKING
     from typing import Union, Any, Optional
     from .abc import ResourceReader
+
     Package = Union[types.ModuleType, str]
 
 
@@ -53,10 +54,7 @@ def get_resource_reader(package):
 
 def resolve(cand):
     # type: (Package) -> types.ModuleType
-    return (
-        cand if isinstance(cand, types.ModuleType)
-        else importlib.import_module(cand)
-        )
+    return cand if isinstance(cand, types.ModuleType) else importlib.import_module(cand)
 
 
 def get_package(package):
