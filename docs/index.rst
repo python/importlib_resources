@@ -29,7 +29,7 @@ The documentation here includes a general :ref:`usage <using>` guide and a
 
    using.rst
    migration.rst
-   changelog (links).rst
+   history.rst
 
 
 Indices and tables
