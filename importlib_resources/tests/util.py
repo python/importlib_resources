@@ -3,7 +3,6 @@ import importlib
 import io
 import sys
 import types
-import unittest
 from pathlib import Path, PurePath
 
 from . import data01
@@ -12,10 +11,7 @@ from ..abc import ResourceReader
 from ._compat import import_helper
 
 
-try:
-    from importlib.machinery import ModuleSpec
-except ImportError:
-    ModuleSpec = None                               # type: ignore
+from importlib.machinery import ModuleSpec
 
 
 def create_package(file, path, is_package=True, contents=()):
