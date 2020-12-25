@@ -4,10 +4,11 @@ import io
 from . import _common
 from contextlib import suppress
 from importlib.abc import ResourceLoader
+from importlib.machinery import ModuleSpec
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
-from typing import Iterable, Iterator, Optional, Set, Union   # noqa: F401
+from typing import Iterable, Iterator, Optional, Set, Union  # noqa: F401
 from typing import cast
 from typing.io import BinaryIO, TextIO
 from collections.abc import Sequence
@@ -27,12 +28,13 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
     reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.open_resource(resource)
+    spec = cast(ModuleSpec, package.__spec__)
     # Using pathlib doesn't work well here due to the lack of 'strict'
     # argument for pathlib.Path.resolve() prior to Python 3.6.
-    if package.__spec__.submodule_search_locations is not None:
-        paths = package.__spec__.submodule_search_locations
-    elif package.__spec__.origin is not None:
-        paths = [os.path.dirname(os.path.abspath(package.__spec__.origin))]
+    if spec.submodule_search_locations is not None:
+        paths = spec.submodule_search_locations
+    elif spec.origin is not None:
+        paths = [os.path.dirname(os.path.abspath(spec.origin))]
 
     for package_path in paths:
         full_path = os.path.join(package_path, resource)
@@ -42,25 +44,29 @@ def open_binary(package: Package, resource: Resource) -> BinaryIO:
             # Just assume the loader is a resource loader; all the relevant
             # importlib.machinery loaders are and an AttributeError for
             # get_data() will make it clear what is needed from the loader.
-            loader = cast(ResourceLoader, package.__spec__.loader)
+            loader = cast(ResourceLoader, spec.loader)
             data = None
-            if hasattr(package.__spec__.loader, 'get_data'):
+            if hasattr(spec.loader, 'get_data'):
                 with suppress(OSError):
                     data = loader.get_data(full_path)
             if data is not None:
                 return BytesIO(data)
 
-    raise FileNotFoundError('{!r} resource not found in {!r}'.format(
-        resource, package.__spec__.name))
+    raise FileNotFoundError(
+        '{!r} resource not found in {!r}'.format(resource, spec.name)
+    )
 
 
-def open_text(package: Package,
-              resource: Resource,
-              encoding: str = 'utf-8',
-              errors: str = 'strict') -> TextIO:
+def open_text(
+    package: Package,
+    resource: Resource,
+    encoding: str = 'utf-8',
+    errors: str = 'strict',
+) -> TextIO:
     """Return a file-like object opened for text reading of the resource."""
     return TextIOWrapper(
-        open_binary(package, resource), encoding=encoding, errors=errors)
+        open_binary(package, resource), encoding=encoding, errors=errors
+    )
 
 
 def read_binary(package: Package, resource: Resource) -> bytes:
@@ -69,10 +75,12 @@ def read_binary(package: Package, resource: Resource) -> bytes:
         return fp.read()
 
 
-def read_text(package: Package,
-              resource: Resource,
-              encoding: str = 'utf-8',
-              errors: str = 'strict') -> str:
+def read_text(
+    package: Package,
+    resource: Resource,
+    encoding: str = 'utf-8',
+    errors: str = 'strict',
+) -> str:
     """Return the decoded string of the resource.
 
     The decoding-related arguments have the same semantics as those of
@@ -83,8 +91,9 @@ def read_text(package: Package,
 
 
 def path(
-        package: Package, resource: Resource,
-        ) -> 'ContextManager[Path]':
+    package: Package,
+    resource: Resource,
+) -> 'ContextManager[Path]':
     """A context manager providing a file path object to the resource.
 
     If the resource does not already exist on its own on the file system,
@@ -96,15 +105,17 @@ def path(
     reader = _common.get_resource_reader(_common.get_package(package))
     return (
         _path_from_reader(reader, _common.normalize_path(resource))
-        if reader else
-        _common.as_file(
-            _common.files(package).joinpath(_common.normalize_path(resource)))
+        if reader
+        else _common.as_file(
+            _common.files(package).joinpath(_common.normalize_path(resource))
         )
+    )
 
 
 def _path_from_reader(reader, resource):
-    return _path_from_resource_path(reader, resource) or \
-        _path_from_open_resource(reader, resource)
+    return _path_from_resource_path(reader, resource) or _path_from_open_resource(
+        reader, resource
+    )
 
 
 def _path_from_resource_path(reader, resource):

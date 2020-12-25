@@ -6,14 +6,12 @@ from . import util
 
 
 class CommonTests(util.CommonTests, unittest.TestCase):
-
     def execute(self, package, path):
         with resources.path(package, path):
             pass
 
 
 class PathTests:
-
     def test_reading(self):
         # Path should be readable.
         # Test also implicitly verifies the returned object is a pathlib.Path

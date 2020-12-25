@@ -13,6 +13,7 @@ except ImportError:
 try:
     from typing import runtime_checkable  # type: ignore
 except ImportError:
+
     def runtime_checkable(cls):  # type: ignore
         return cls
 
@@ -37,6 +38,7 @@ class LoaderAdapter:
     Adapt loaders to provide TraversableResources and other
     compatibility.
     """
+
     def __init__(self, spec):
         self.spec = spec
 
@@ -66,14 +68,17 @@ class LoaderAdapter:
 
         return (
             # native reader if it supplies 'files'
-            _native_reader(self.spec) or
+            _native_reader(self.spec)
+            or
             # local ZipReader if a zip module
-            _zip_reader(self.spec) or
+            _zip_reader(self.spec)
+            or
             # local NamespaceReader if a namespace module
-            _namespace_reader(self.spec) or
+            _namespace_reader(self.spec)
+            or
             # local FileReader
             readers.FileReader(self)
-            )
+        )
 
 
 def package_spec(package):

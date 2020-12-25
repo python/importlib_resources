@@ -1,8 +1,9 @@
 """Read resources contained within a package."""
 
 from ._common import (
-    as_file, files,
-    )
+    as_file,
+    files,
+)
 
 from importlib_resources._py3 import (
     Package,
@@ -14,7 +15,7 @@ from importlib_resources._py3 import (
     path,
     read_binary,
     read_text,
-    )
+)
 from importlib_resources.abc import ResourceReader
 
 # For compatibility. Ref #88.
@@ -35,4 +36,4 @@ __all__ = [
     'path',
     'read_binary',
     'read_text',
-    ]
+]
