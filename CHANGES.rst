@@ -1,3 +1,13 @@
+v4.1.0
+======
+
+* #209: Adopt
+  `jaraco/skeleton <https://github.com/jaraco/skeleton>`_.
+
+* Cleaned up some straggling Python 2 compatibility code.
+
+* Refreshed test zip files without .pyc and .pyo files.
+
 v4.0.0
 ======
 
