@@ -1,20 +1,14 @@
 import abc
+from typing import BinaryIO, Iterable, Text
 
 from ._compat import runtime_checkable, Protocol
-
-# Use mypy's comment syntax for Python 2 compatibility
-try:
-    from typing import BinaryIO, Iterable, Text
-except ImportError:
-    pass
 
 
 class ResourceReader(metaclass=abc.ABCMeta):
     """Abstract base class for loaders to provide resource reading support."""
 
     @abc.abstractmethod
-    def open_resource(self, resource):
-        # type: (Text) -> BinaryIO
+    def open_resource(self, resource: Text) -> BinaryIO:
         """Return an opened, file-like object for binary reading.
 
         The 'resource' argument is expected to represent only a file name.
@@ -26,8 +20,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def resource_path(self, resource):
-        # type: (Text) -> Text
+    def resource_path(self, resource: Text) -> Text:
         """Return the file system path to the specified resource.
 
         The 'resource' argument is expected to represent only a file name.
@@ -40,8 +33,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def is_resource(self, path):
-        # type: (Text) -> bool
+    def is_resource(self, path: Text) -> bool:
         """Return True if the named 'path' is a resource.
 
         Files are resources, directories are not.
@@ -49,8 +41,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def contents(self):
-        # type: () -> Iterable[str]
+    def contents(self) -> Iterable[str]:
         """Return an iterable of entries in `package`."""
         raise FileNotFoundError
 
@@ -115,8 +106,7 @@ class Traversable(Protocol):
         """
 
     @abc.abstractproperty
-    def name(self):
-        # type: () -> str
+    def name(self) -> str:
         """
         The base name of this object without any parent references.
         """

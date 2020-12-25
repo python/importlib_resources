@@ -104,10 +104,6 @@ class NamespaceReaderTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             NamespaceReader(['path1', 'path2'])
 
-    @unittest.skipUnless(
-        sys.version_info[0] >= 3,
-        'namespace packages not available on Python 2'
-        )
     def test_resource_path(self):
         namespacedata01 = import_module('namespacedata01')
         reader = NamespaceReader(
@@ -122,10 +118,6 @@ class NamespaceReaderTest(unittest.TestCase):
             root, 'imaginary'
             ))
 
-    @unittest.skipUnless(
-        sys.version_info[0] >= 3,
-        'namespace packages not available on Python 2'
-        )
     def test_files(self):
         namespacedata01 = import_module('namespacedata01')
         reader = NamespaceReader(
