@@ -28,13 +28,11 @@ class ResourceTests:
     def test_contents(self):
         contents = set(resources.contents(self.data))
         # There may be cruft in the directory listing of the data directory.
-        # Under Python 3 we could have a __pycache__ directory, and under
-        # Python 2 we could have .pyc files.  These are both artifacts of the
-        # test suite importing these modules and writing these caches.  They
-        # aren't germane to this test, so just filter them out.
+        # It could have a __pycache__ directory,
+        # an artifact of the
+        # test suite importing these modules, which
+        # are not germane to this test, so just filter them out.
         contents.discard('__pycache__')
-        contents.discard('__init__.pyc')
-        contents.discard('__init__.pyo')
         self.assertEqual(
             contents,
             {
@@ -56,7 +54,6 @@ class ResourceZipTests(ResourceTests, util.ZipSetup, unittest.TestCase):
     pass
 
 
-@unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
 class ResourceLoaderTests(unittest.TestCase):
     def test_resource_contents(self):
         package = util.create_package(
@@ -96,9 +93,8 @@ class ResourceCornerCaseTests(unittest.TestCase):
         module.__loader__ = object()
         # Give the module a dummy origin.
         module.__file__ = '/path/which/shall/not/be/named'
-        if sys.version_info >= (3,):
-            module.__spec__.loader = module.__loader__
-            module.__spec__.origin = module.__file__
+        module.__spec__.loader = module.__loader__
+        module.__spec__.origin = module.__file__
         self.assertFalse(resources.is_resource(module, 'A'))
 
 
@@ -219,9 +215,6 @@ class DeletingZipsTest(unittest.TestCase):
         del c
 
 
-@unittest.skipUnless(
-    sys.version_info[0] >= 3, 'namespace packages not available on Python 2'
-)
 class ResourceFromNamespaceTest01(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

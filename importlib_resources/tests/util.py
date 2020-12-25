@@ -3,7 +3,6 @@ import importlib
 import io
 import sys
 import types
-import unittest
 from pathlib import Path, PurePath
 
 from . import data01
@@ -50,26 +49,14 @@ def create_package(file, path, is_package=True, contents=()):
         def contents(self):
             if isinstance(path, Exception):
                 raise path
-            # There's no yield from in baseball, er, Python 2.
-            for entry in contents:
-                yield entry
+            yield from contents
 
     name = 'testingpackage'
-    # Unforunately importlib.util.module_from_spec() was not introduced until
-    # Python 3.5.
     module = types.ModuleType(name)
-    if ModuleSpec is None:
-        # Python 2.
-        module.__name__ = name
-        module.__file__ = 'does-not-exist'
-        if is_package:
-            module.__path__ = []
-    else:
-        # Python 3.
-        loader = Reader()
-        spec = ModuleSpec(name, loader, origin='does-not-exist', is_package=is_package)
-        module.__spec__ = spec
-        module.__loader__ = loader
+    loader = Reader()
+    spec = ModuleSpec(name, loader, origin='does-not-exist', is_package=is_package)
+    module.__spec__ = spec
+    module.__loader__ = loader
     return module
 
 
@@ -91,7 +78,6 @@ class CommonTests(metaclass=abc.ABCMeta):
         path = 'utf-8.file'
         self.execute(data01, path)
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'requires os.PathLike support')
     def test_pathlib_path(self):
         # Passing in a pathlib.PurePath object for the path should succeed.
         path = PurePath('utf-8.file')
@@ -125,14 +111,12 @@ class CommonTests(metaclass=abc.ABCMeta):
             module = sys.modules['importlib_resources.tests.util']
             self.execute(module, 'utf-8.file')
 
-    @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
     def test_resource_opener(self):
         bytes_data = io.BytesIO(b'Hello, world!')
         package = create_package(file=bytes_data, path=FileNotFoundError())
         self.execute(package, 'utf-8.file')
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
-    @unittest.skipIf(sys.version_info < (3,), 'No ResourceReader in Python 2')
     def test_resource_path(self):
         bytes_data = io.BytesIO(b'Hello, world!')
         path = __file__

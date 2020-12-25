@@ -1,4 +1,3 @@
-import sys
 import unittest
 
 import importlib_resources as resources
@@ -63,9 +62,6 @@ class OpenDiskTests(OpenTests, unittest.TestCase):
         self.data = data01
 
 
-@unittest.skipUnless(
-    sys.version_info[0] >= 3, 'namespace packages not available on Python 2'
-)
 class OpenDiskNamespaceTests(OpenTests, unittest.TestCase):
     def setUp(self):
         from . import namespacedata01
