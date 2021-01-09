@@ -1,6 +1,5 @@
-================================
- Welcome to importlib_resources
-================================
+Welcome to |project| documentation!
+===================================
 
 ``importlib_resources`` is a library which provides for access to *resources*
 in Python packages.  It provides functionality similar to ``pkg_resources``

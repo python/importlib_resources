@@ -6,9 +6,9 @@
 
 .. _PyPI link: https://pypi.org/project/importlib_resources
 
-.. image:: https://github.com/python/importlib_resources/workflows/Automated%20Tests/badge.svg
-   :target: https://github.com/python/importlib_resources/actions?query=workflow%3A%22Automated+Tests%22
-   :alt: Automated Tests
+.. image:: https://github.com/python/importlib_resources/workflows/tests/badge.svg
+   :target: https://github.com/python/importlib_resources/actions?query=workflow%3A%22tests%22
+   :alt: tests
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
