@@ -1,18 +1,17 @@
 import os
+import pathlib
 import tempfile
+import functools
 import contextlib
 import types
 import importlib
-from pathlib import Path
-from functools import singledispatch
+
+from typing import Union, Any, Optional
+from .abc import ResourceReader
 
 from ._compat import package_spec
 
-if False:  # TYPE_CHECKING
-    from typing import Union, Any, Optional
-    from .abc import ResourceReader
-
-    Package = Union[types.ModuleType, str]
+Package = Union[types.ModuleType, str]
 
 
 def files(package):
@@ -89,7 +88,7 @@ def _tempfile(reader, suffix=''):
         os.write(fd, reader())
         os.close(fd)
         del reader
-        yield Path(raw_path)
+        yield pathlib.Path(raw_path)
     finally:
         try:
             os.remove(raw_path)
@@ -97,7 +96,7 @@ def _tempfile(reader, suffix=''):
             pass
 
 
-@singledispatch
+@functools.singledispatch
 def as_file(path):
     """
     Given a Traversable object, return that object as a
@@ -106,7 +105,7 @@ def as_file(path):
     return _tempfile(path.read_bytes, suffix=path.name)
 
 
-@as_file.register(Path)
+@as_file.register(pathlib.Path)
 @contextlib.contextmanager
 def _(path):
     """

@@ -8,16 +8,13 @@ from importlib.machinery import ModuleSpec
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
-from typing import Iterable, Iterator, Optional, Set, Union  # noqa: F401
+from typing import ContextManager, Iterable, Union
 from typing import cast
 from typing.io import BinaryIO, TextIO
 from collections.abc import Sequence
 from functools import singledispatch
 
-if False:  # TYPE_CHECKING
-    from typing import ContextManager
-
-Package = Union[ModuleType, str]
+Package = Union[str, ModuleType]
 Resource = Union[str, os.PathLike]
 
 
