@@ -1,7 +1,6 @@
-import os.path
-
-from collections import OrderedDict
-from pathlib import Path
+import os
+import collections
+import pathlib
 
 from . import abc
 
@@ -10,7 +9,7 @@ from ._compat import ZipPath
 
 class FileReader(abc.TraversableResources):
     def __init__(self, loader):
-        self.path = Path(loader.path).parent
+        self.path = pathlib.Path(loader.path).parent
 
     def resource_path(self, resource):
         """
@@ -55,8 +54,8 @@ class MultiplexedPath(abc.Traversable):
     """
 
     def __init__(self, *paths):
-        paths = list(OrderedDict.fromkeys(paths))  # remove duplicates
-        self._paths = list(map(Path, paths))
+        paths = list(collections.OrderedDict.fromkeys(paths))  # remove duplicates
+        self._paths = list(map(pathlib.Path, paths))
         if not self._paths:
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
