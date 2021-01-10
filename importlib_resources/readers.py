@@ -1,4 +1,3 @@
-import os
 import collections
 import pathlib
 
@@ -100,7 +99,7 @@ class MultiplexedPath(abc.Traversable):
         raise FileNotFoundError('{} is not a file'.format(self))
 
     def name(self):
-        return os.path.basename(self._paths[0])
+        return self._paths[0].name
 
     def __repr__(self):
         return 'MultiplexedPath({})'.format(
