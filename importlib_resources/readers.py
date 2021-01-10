@@ -7,6 +7,10 @@ from . import abc
 from ._compat import ZipPath
 
 
+def remove_duplicates(items):
+    return iter(collections.OrderedDict.fromkeys(items))
+
+
 class FileReader(abc.TraversableResources):
     def __init__(self, loader):
         self.path = pathlib.Path(loader.path).parent
@@ -54,8 +58,7 @@ class MultiplexedPath(abc.Traversable):
     """
 
     def __init__(self, *paths):
-        paths = list(collections.OrderedDict.fromkeys(paths))  # remove duplicates
-        self._paths = list(map(pathlib.Path, paths))
+        self._paths = list(map(pathlib.Path, remove_duplicates(paths)))
         if not self._paths:
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
