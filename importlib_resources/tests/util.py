@@ -14,43 +14,47 @@ from ._compat import import_helper
 from importlib.machinery import ModuleSpec
 
 
+class Reader(ResourceReader):
+    def __init__(self, **kwargs):
+        vars(self).update(kwargs)
+
+    def get_resource_reader(self, package):
+        return self
+
+    def open_resource(self, path):
+        self._path = path
+        if isinstance(self.file, Exception):
+            raise self.file
+        else:
+            return self.file
+
+    def resource_path(self, path_):
+        self._path = path_
+        if isinstance(self.path, Exception):
+            raise self.path
+        else:
+            return self.path
+
+    def is_resource(self, path_):
+        self._path = path_
+        if isinstance(self.path, Exception):
+            raise self.path
+        for entry in self._contents:
+            parts = entry.split('/')
+            if len(parts) == 1 and parts[0] == path_:
+                return True
+        return False
+
+    def contents(self):
+        if isinstance(self.path, Exception):
+            raise self.path
+        yield from self._contents
+
+
 def create_package(file, path, is_package=True, contents=()):
-    class Reader(ResourceReader):
-        def get_resource_reader(self, package):
-            return self
-
-        def open_resource(self, path):
-            self._path = path
-            if isinstance(file, Exception):
-                raise file
-            else:
-                return file
-
-        def resource_path(self, path_):
-            self._path = path_
-            if isinstance(path, Exception):
-                raise path
-            else:
-                return path
-
-        def is_resource(self, path_):
-            self._path = path_
-            if isinstance(path, Exception):
-                raise path
-            for entry in contents:
-                parts = entry.split('/')
-                if len(parts) == 1 and parts[0] == path_:
-                    return True
-            return False
-
-        def contents(self):
-            if isinstance(path, Exception):
-                raise path
-            yield from contents
-
     name = 'testingpackage'
     module = types.ModuleType(name)
-    loader = Reader()
+    loader = Reader(file=file, path=path, _contents=contents)
     spec = ModuleSpec(name, loader, origin='does-not-exist', is_package=is_package)
     module.__spec__ = spec
     module.__loader__ = loader
