@@ -75,10 +75,10 @@ class MultiplexedPath(abc.Traversable):
                 yield file
 
     def read_bytes(self):
-        raise FileNotFoundError('{} is not a file'.format(self))
+        raise FileNotFoundError(f'{self} is not a file')
 
     def read_text(self, *args, **kwargs):
-        raise FileNotFoundError('{} is not a file'.format(self))
+        raise FileNotFoundError(f'{self} is not a file')
 
     def is_dir(self):
         return True
