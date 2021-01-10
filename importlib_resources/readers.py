@@ -62,7 +62,7 @@ class MultiplexedPath(abc.Traversable):
         if not self._paths:
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
-        if any(not path.is_dir() for path in self._paths):
+        if not all(path.is_dir() for path in self._paths):
             raise NotADirectoryError('MultiplexedPath only supports directories')
 
     def iterdir(self):
