@@ -18,10 +18,6 @@ from importlib_resources._py3 import (
 )
 from importlib_resources.abc import ResourceReader
 
-# For compatibility. Ref #88.
-# Also requires hook-importlib_resources.py (Ref #101).
-__import__('importlib_resources.trees')
-
 
 __all__ = [
     'Package',

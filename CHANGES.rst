@@ -1,3 +1,8 @@
+v5.0.0
+======
+
+* Removed ``importlib_resources.trees``, deprecated since 1.3.0.
+
 v4.1.1
 ======
 
