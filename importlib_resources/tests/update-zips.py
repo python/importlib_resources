@@ -21,17 +21,10 @@ def main():
     >>> monkeypatch.setattr(zipfile, 'ZipFile', mock.MagicMock())
     >>> print(); main()  # print workaround for bpo-32509
     <BLANKLINE>
-    .../data01/utf-16.file -> ziptestdata/utf-16.file
-    .../data01/utf-8.file -> ziptestdata/utf-8.file
-    .../data01/__init__.py -> ziptestdata/__init__.py
-    .../data01/binary.file -> ziptestdata/binary.file
-    .../data01/subdirectory/__init__.py -> ziptestdata/subdirectory/__init__.py
-    .../data01/subdirectory/binary.file -> ziptestdata/subdirectory/binary.file
-    .../data02/__init__.py -> ziptestdata/__init__.py
-    .../data02/one/__init__.py -> ziptestdata/one/__init__.py
-    .../data02/one/resource1.txt -> ziptestdata/one/resource1.txt
-    .../data02/two/__init__.py -> ziptestdata/two/__init__.py
-    .../data02/two/resource2.txt -> ziptestdata/two/resource2.txt
+    .../data01/... -> ziptestdata/...
+    ...
+    .../data02/... -> ziptestdata/...
+    ...
     """
     suffixes = '01', '02'
     tuple(map(generate, suffixes))
