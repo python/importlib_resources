@@ -19,7 +19,8 @@ def main():
     >>> from unittest import mock
     >>> monkeypatch = getfixture('monkeypatch')
     >>> monkeypatch.setattr(zipfile, 'ZipFile', mock.MagicMock())
-    >>> main()
+    >>> print(); main()  # print workaround for bpo-32509
+    <BLANKLINE>
     .../data01/utf-16.file -> ziptestdata/utf-16.file
     .../data01/utf-8.file -> ziptestdata/utf-8.file
     .../data01/__init__.py -> ziptestdata/__init__.py
