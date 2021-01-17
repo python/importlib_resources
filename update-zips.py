@@ -1,18 +1,17 @@
-#!/usr/bin/env python3
+"""
+Generate the zip test data files.
 
-"""Remake the ziptestdata.zip file.
+Run to build the tests/zipdataNN/ziptestdata.zip files from
+files in tests/dataNN.
 
-Run this to rebuild the importlib_resources/tests/data/ziptestdata.zip file,
-e.g. if you want to add a new file to the zip.
-
-This will replace the file with the new build, but it won't commit anything to
-git.
+Replaces the file with the working copy, but does commit anything
+to the source repo.
 """
 
 import contextlib
 import os
 import pathlib
-from zipfile import ZipFile
+import zipfile
 
 
 def main():
@@ -23,7 +22,7 @@ def main():
 def generate(suffix):
     root = pathlib.Path('importlib_resources/tests')
     zfpath = root / f'zipdata{suffix}/ziptestdata.zip'
-    with ZipFile(zfpath, 'w') as zf:
+    with zipfile.ZipFile(zfpath, 'w') as zf:
         for src, rel in walk(root / f'data{suffix}'):
             dst = 'ziptestdata' / rel
             print(src, '->', dst)
