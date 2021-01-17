@@ -20,7 +20,7 @@ def main():
 
 
 def generate(suffix):
-    root = pathlib.Path('importlib_resources/tests')
+    root = pathlib.Path(__file__).parent.relative_to(os.getcwd())
     zfpath = root / f'zipdata{suffix}/ziptestdata.zip'
     with zipfile.ZipFile(zfpath, 'w') as zf:
         for src, rel in walk(root / f'data{suffix}'):
