@@ -25,16 +25,16 @@ def generate(suffix):
     base = pathlib.Path('importlib_resources/tests')
     zfpath = base / f'zipdata{suffix}/ziptestdata.zip'
     with ZipFile(zfpath, 'w') as zf:
-        relpath = base / f'data{suffix}'
-        for dirpath, dirnames, filenames in os.walk(relpath):
+        datapath = base / f'data{suffix}'
+        for dirpath, dirnames, filenames in os.walk(datapath):
             with contextlib.suppress(KeyError):
                 dirnames.remove('__pycache__')
+            loc = pathlib.Path(dirpath).relative_to(datapath)
             for filename in filenames:
                 src = os.path.join(dirpath, filename)
                 if src == zfpath:
                     continue
-                commonpath = os.path.commonpath((relpath, dirpath))
-                dst = basepath / dirpath[len(commonpath) + 1 :] / filename
+                dst = basepath / loc / filename
                 print(src, '->', dst)
                 zf.write(src, dst)
 
