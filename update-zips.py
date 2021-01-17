@@ -11,22 +11,21 @@ git.
 
 import contextlib
 import os
+import pathlib
 from zipfile import ZipFile
-
-RELPATH = 'importlib_resources/tests/data{suffix}'
-BASEPATH = 'ziptestdata'
-ZF_BASE = 'importlib_resources/tests/zipdata{suffix}/ziptestdata.zip'
-suffixes = '01', '02'
 
 
 def main():
+    suffixes = '01', '02'
     tuple(map(generate, suffixes))
 
 
 def generate(suffix):
-    zfpath = ZF_BASE.format(suffix=suffix)
+    basepath = pathlib.Path('ziptestdata')
+    base = pathlib.Path('importlib_resources/tests')
+    zfpath = base / f'zipdata{suffix}/ziptestdata.zip'
     with ZipFile(zfpath, 'w') as zf:
-        relpath = RELPATH.format(suffix=suffix)
+        relpath = base / f'data{suffix}'
         for dirpath, dirnames, filenames in os.walk(relpath):
             with contextlib.suppress(KeyError):
                 dirnames.remove('__pycache__')
@@ -35,7 +34,7 @@ def generate(suffix):
                 if src == zfpath:
                     continue
                 commonpath = os.path.commonpath((relpath, dirpath))
-                dst = os.path.join(BASEPATH, dirpath[len(commonpath) + 1 :], filename)
+                dst = basepath / dirpath[len(commonpath) + 1 :] / filename
                 print(src, '->', dst)
                 zf.write(src, dst)
 
