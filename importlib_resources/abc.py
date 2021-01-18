@@ -1,7 +1,7 @@
 import abc
 import io
 import itertools
-from typing import BinaryIO, Iterable, Text
+from typing import BinaryIO, Iterable, Text, List
 
 from ._compat import runtime_checkable, Protocol
 
@@ -125,14 +125,14 @@ class SimpleReader(abc.ABC):
         """
 
     @abc.abstractmethod
-    def child_readers(self) -> ['SimpleReader']:
+    def child_readers(self) -> List['SimpleReader']:
         """
         Obtain an iterable of ResourceReader for available
         child virtual packages of this one.
         """
 
     @abc.abstractmethod
-    def resources(self) -> [str]:
+    def resources(self) -> List[str]:
         """
         Obtain available named resources for this virtual package.
         """
