@@ -223,10 +223,7 @@ class ResourceContainer(Traversable):
         return False
 
     def iterdir(self):
-        files = (
-            ResourceHandle(self, name)
-            for name in self.reader.resources
-            )
+        files = (ResourceHandle(self, name) for name in self.reader.resources)
         dirs = map(ResourceContainer, self.reader.children())
         return itertools.chain(files, dirs)
 
@@ -235,9 +232,8 @@ class ResourceContainer(Traversable):
 
     def joinpath(self, name):
         return next(
-            traversable
-            for traversable in self.iterdir()
-            if traversable.name == name)
+            traversable for traversable in self.iterdir() if traversable.name == name
+        )
 
 
 class TraversableReader(TraversableResources, SimpleReader):
@@ -246,5 +242,6 @@ class TraversableReader(TraversableResources, SimpleReader):
     may derive from this class to provide the TraversableResources
     interface by supplying the SimpleReader interface.
     """
+
     def files(self):
         return ResourceContainer(self)
