@@ -76,15 +76,13 @@ class Traversable(Protocol):
             return strm.read()
 
     @abc.abstractmethod
-    def is_dir(self):
-        # type: () -> bool
+    def is_dir(self) -> bool:
         """
         Return True if self is a dir
         """
 
     @abc.abstractmethod
-    def is_file(self):
-        # type: () -> bool
+    def is_file(self) -> bool:
         """
         Return True if self is a file
         """
