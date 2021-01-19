@@ -1,3 +1,10 @@
+v5.1.0
+======
+
+* Added ``simple`` module implementing adapters from
+  a low-level resource reader interface to a
+  ``TraversableResources`` interface. Closes #90.
+
 v5.0.1
 ======
 
