@@ -1,8 +1,9 @@
+# flake8: noqa
+
 import abc
 import sys
+import pathlib
 from contextlib import suppress
-
-# flake8: noqa
 
 try:
     from zipfile import Path as ZipPath  # type: ignore
@@ -24,16 +25,7 @@ except ImportError:
     Protocol = abc.ABC  # type: ignore
 
 
-class TraversableResourcesAdapter:
-    def __init__(self, spec):
-        self.spec = spec
-        self.loader = LoaderAdapter(spec)
-
-    def __getattr__(self, name):
-        return getattr(self.spec, name)
-
-
-class LoaderAdapter:
+class TraversableResourcesLoader:
     """
     Adapt loaders to provide TraversableResources and other
     compatibility.
@@ -47,7 +39,7 @@ class LoaderAdapter:
         return self.spec.origin
 
     def get_resource_reader(self, name):
-        from . import readers
+        from . import readers, _adapters
 
         def _zip_reader(spec):
             with suppress(AttributeError):
@@ -65,6 +57,10 @@ class LoaderAdapter:
             reader = _available_reader(spec)
             return reader if hasattr(reader, 'files') else None
 
+        def _file_reader(spec):
+            if pathlib.Path(self.path).exists():
+                return readers.FileReader(self)
+
         return (
             # native reader if it supplies 'files'
             _native_reader(self.spec)
@@ -76,14 +72,16 @@ class LoaderAdapter:
             _namespace_reader(self.spec)
             or
             # local FileReader
-            readers.FileReader(self)
+            _file_reader(self.spec)
+            or _adapters.DegenerateFiles(self.spec)
         )
 
 
-def package_spec(package):
+def wrap_spec(package):
     """
-    Construct a minimal package spec suitable for
-    matching the interfaces this library relies upon
-    in later Python versions.
+    Construct a package spec with traversable compatibility
+    on the spec/loader/reader.
     """
-    return TraversableResourcesAdapter(package.__spec__)
+    from . import _adapters
+
+    return _adapters.SpecLoaderAdapter(package.__spec__, TraversableResourcesLoader)
