@@ -47,7 +47,6 @@ class LoaderAdapter:
         return self.spec.origin
 
     def get_resource_reader(self, name):
-        # Python < 3.9
         from . import readers
 
         def _zip_reader(spec):
