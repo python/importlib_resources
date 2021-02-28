@@ -1,3 +1,13 @@
+v5.0.2
+======
+
+* #214: Added ``_adapters`` module to ensure that degenerate
+  ``files`` behavior can be made available for legacy loaders
+  whose resource readers don't implement it. Fixes issue where
+  backport compatibility module was masking this fallback
+  behavior only to discover the defect when applying changes to
+  CPython.
+
 v5.0.1
 ======
 
