@@ -1,3 +1,8 @@
+v5.1.1
+======
+
+* Re-release with changes from 5.0.x.
+
 v5.0.3
 ======
 
