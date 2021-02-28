@@ -38,12 +38,6 @@ class DegenerateFiles:
         def iterdir(self):
             return iter(())
 
-        def read_bytes(self):
-            raise ValueError()
-
-        def read_text(self):
-            raise ValueError()
-
         def is_dir(self):
             return False
 
@@ -51,8 +45,6 @@ class DegenerateFiles:
 
         def joinpath(self, other):
             return DegenerateFiles.Path()
-
-        __truediv__ = joinpath
 
         def name(self):
             return ''
