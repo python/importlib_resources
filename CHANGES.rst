@@ -1,3 +1,8 @@
+v5.0.3
+======
+
+* Simplified DegenerateFiles.Path.
+
 v5.0.2
 ======
 
