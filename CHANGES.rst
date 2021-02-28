@@ -1,3 +1,8 @@
+v5.0.1
+======
+
+* Remove pyinstaller hook for hidden 'trees' module.
+
 v5.0.0
 ======
 

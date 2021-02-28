@@ -47,7 +47,7 @@ class DegenerateFiles:
         def is_dir(self):
             return False
 
-        is_file = exists = is_dir
+        is_file = exists = is_dir  # type: ignore
 
         def joinpath(self, other):
             return DegenerateFiles.Path()

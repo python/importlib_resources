@@ -39,7 +39,6 @@ class TraversableResourcesLoader:
         return self.spec.origin
 
     def get_resource_reader(self, name):
-        # Python < 3.9
         from . import readers, _adapters
 
         def _zip_reader(spec):
