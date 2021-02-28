@@ -87,4 +87,7 @@ def package_spec(package):
     matching the interfaces this library relies upon
     in later Python versions.
     """
-    return TraversableResourcesAdapter(package.__spec__)
+    spec = package.__spec__
+    # avoid adapting the spec in test_package_has_no_reader_fallback
+    adapt = spec.loader.__class__ is not object
+    return TraversableResourcesAdapter(spec) if adapt else spec
