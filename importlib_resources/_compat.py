@@ -24,16 +24,20 @@ except ImportError:
     Protocol = abc.ABC  # type: ignore
 
 
-class TraversableResourcesAdapter:
-    def __init__(self, spec):
+class SpecLoaderAdapter:
+    """
+    Adapt a package spec to adapt the underlying loader.
+    """
+
+    def __init__(self, spec, adapter=lambda spec: spec.loader):
         self.spec = spec
-        self.loader = LoaderAdapter(spec)
+        self.loader = adapter(spec)
 
     def __getattr__(self, name):
         return getattr(self.spec, name)
 
 
-class LoaderAdapter:
+class TraversableResourcesLoader:
     """
     Adapt loaders to provide TraversableResources and other
     compatibility.
@@ -90,4 +94,4 @@ def package_spec(package):
     spec = package.__spec__
     # avoid adapting the spec in test_package_has_no_reader_fallback
     adapt = spec.loader.__class__ is not object
-    return TraversableResourcesAdapter(spec) if adapt else spec
+    return SpecLoaderAdapter(spec, TraversableResourcesLoader) if adapt else spec
