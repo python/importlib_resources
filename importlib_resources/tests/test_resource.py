@@ -1,9 +1,8 @@
-import os.path
 import sys
 import unittest
 import importlib_resources as resources
 import uuid
-from pathlib import Path
+import pathlib
 
 from . import data01
 from . import zipdata01, zipdata02
@@ -150,10 +149,10 @@ class DeletingZipsTest(unittest.TestCase):
         modules = import_helper.modules_setup()
         self.addCleanup(import_helper.modules_cleanup, *modules)
 
-        data_path = Path(self.ZIP_MODULE.__file__)
+        data_path = pathlib.Path(self.ZIP_MODULE.__file__)
         data_dir = data_path.parent
         self.source_zip_path = data_dir / 'ziptestdata.zip'
-        self.zip_path = Path('{}.zip'.format(uuid.uuid4())).absolute()
+        self.zip_path = pathlib.Path('{}.zip'.format(uuid.uuid4())).absolute()
         self.zip_path.write_bytes(self.source_zip_path.read_bytes())
         sys.path.append(str(self.zip_path))
         self.data = import_module('ziptestdata')
@@ -216,9 +215,11 @@ class DeletingZipsTest(unittest.TestCase):
 
 
 class ResourceFromNamespaceTest01(unittest.TestCase):
+    site_dir = str(pathlib.Path(__file__).parent)
+
     @classmethod
     def setUpClass(cls):
-        sys.path.append(os.path.abspath(os.path.join(__file__, '..')))
+        sys.path.append(cls.site_dir)
 
     def test_is_submodule_resource(self):
         self.assertTrue(
