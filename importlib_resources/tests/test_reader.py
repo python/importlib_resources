@@ -91,6 +91,10 @@ class NamespaceReaderTest(unittest.TestCase):
     def setUpClass(cls):
         sys.path.append(cls.site_dir)
 
+    @classmethod
+    def tearDownClass(cls):
+        sys.path.remove(cls.site_dir)
+
     def test_init_error(self):
         with self.assertRaises(ValueError):
             NamespaceReader(['path1', 'path2'])

@@ -221,6 +221,10 @@ class ResourceFromNamespaceTest01(unittest.TestCase):
     def setUpClass(cls):
         sys.path.append(cls.site_dir)
 
+    @classmethod
+    def tearDownClass(cls):
+        sys.path.remove(cls.site_dir)
+
     def test_is_submodule_resource(self):
         self.assertTrue(
             resources.is_resource(import_module('namespacedata01'), 'binary.file')
