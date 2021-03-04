@@ -1,3 +1,8 @@
+v5.1.2
+======
+
+* Re-release with changes from 5.0.4.
+
 v5.0.4
 ======
 
@@ -7,7 +12,7 @@ v5.0.4
 v5.1.1
 ======
 
-* Re-release with changes from 5.0.x.
+* Re-release with changes from 5.0.3.
 
 v5.0.3
 ======
