@@ -1,3 +1,9 @@
+v5.0.4
+======
+
+* Fixed non-hermetic test in test_reader, revealed by
+  GH-24670.
+
 v5.1.1
 ======
 
