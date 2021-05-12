@@ -6,56 +6,37 @@ from . import util
 
 
 class ContentsTests:
-    @property
-    def contents(self):
-        return sorted(
-            [el for el in list(resources.contents(self.data)) if el != '__pycache__']
-        )
+    expected = {
+        '__init__.py',
+        'binary.file',
+        'subdirectory',
+        'utf-16.file',
+        'utf-8.file',
+    }
+
+    def test_contents(self):
+        assert self.expected <= set(resources.contents(self.data))
 
 
 class ContentsDiskTests(ContentsTests, unittest.TestCase):
     def setUp(self):
         self.data = data01
 
-    def test_contents(self):
-        self.assertEqual(
-            self.contents,
-            [
-                '__init__.py',
-                'binary.file',
-                'subdirectory',
-                'utf-16.file',
-                'utf-8.file',
-            ],
-        )
-
 
 class ContentsZipTests(ContentsTests, util.ZipSetup, unittest.TestCase):
-    def test_contents(self):
-        self.assertEqual(
-            self.contents,
-            [
-                '__init__.py',
-                'binary.file',
-                'subdirectory',
-                'utf-16.file',
-                'utf-8.file',
-            ],
-        )
+    pass
 
 
 class ContentsNamespaceTests(ContentsTests, unittest.TestCase):
+    expected = {
+        # no __init__ because of namespace design
+        # no subdirectory as incidental difference in fixture
+        'binary.file',
+        'utf-16.file',
+        'utf-8.file',
+    }
+
     def setUp(self):
         from . import namespacedata01
 
         self.data = namespacedata01
-
-    def test_contents(self):
-        self.assertEqual(
-            self.contents,
-            [
-                'binary.file',
-                'utf-16.file',
-                'utf-8.file',
-            ],
-        )
