@@ -152,9 +152,9 @@ def contents(package: Package) -> Iterable[str]:
     reader = _common.get_resource_reader(package)
     if reader is not None:
         return _ensure_sequence(reader.contents())
-    transversable = _common.from_package(package)
-    if transversable.is_dir():
-        return list(item.name for item in transversable.iterdir())
+    traversable = _common.from_package(package)
+    if traversable.is_dir():
+        return list(item.name for item in traversable.iterdir())
     return []
 
 
