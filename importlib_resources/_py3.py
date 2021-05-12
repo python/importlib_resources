@@ -8,7 +8,7 @@ from importlib.machinery import ModuleSpec
 from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
-from typing import ContextManager, Iterable, Union
+from typing import ContextManager, Union
 from typing import cast
 from typing.io import BinaryIO, TextIO
 from collections.abc import Sequence
@@ -133,27 +133,10 @@ def is_resource(package: Package, name: str) -> bool:
     reader = _common.get_resource_reader(package)
     if reader is not None:
         return reader.is_resource(name)
-    package_contents = set(contents(package))
+    package_contents = set(_common.contents(package))
     if name not in package_contents:
         return False
     return (_common.from_package(package) / name).is_file()
-
-
-def contents(package: Package) -> Iterable[str]:
-    """Return an iterable of entries in `package`.
-
-    Note that not all entries are resources.  Specifically, directories are
-    not considered resources.  Use `is_resource()` on each entry returned here
-    to check if it is a resource or not.
-    """
-    package = _common.get_package(package)
-    reader = _common.get_resource_reader(package)
-    if reader is not None:
-        return _ensure_sequence(reader.contents())
-    traversable = _common.from_package(package)
-    if traversable.is_dir():
-        return list(item.name for item in traversable.iterdir())
-    return []
 
 
 @singledispatch

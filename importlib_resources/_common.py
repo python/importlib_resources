@@ -6,7 +6,7 @@ import contextlib
 import types
 import importlib
 
-from typing import Union, Any, Optional
+from typing import Union, Any, Optional, Iterable
 from .abc import ResourceReader, Traversable
 
 from ._compat import wrap_spec
@@ -113,3 +113,16 @@ def _(path):
     Degenerate behavior for pathlib.Path objects.
     """
     yield path
+
+
+# legacy API
+
+
+def contents(package: Package) -> Iterable[str]:
+    """Return an iterable of entries in `package`.
+
+    Note that not all entries are resources.  Specifically, directories are
+    not considered resources.  Use `is_resource()` on each entry returned here
+    to check if it is a resource or not.
+    """
+    return [path.name for path in files(package).iterdir()]

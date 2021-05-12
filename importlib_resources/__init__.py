@@ -3,12 +3,12 @@
 from ._common import (
     as_file,
     files,
+    contents,
 )
 
 from importlib_resources._py3 import (
     Package,
     Resource,
-    contents,
     is_resource,
     open_binary,
     open_text,

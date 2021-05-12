@@ -33,14 +33,14 @@ class ResourceTests:
         # are not germane to this test, so just filter them out.
         contents.discard('__pycache__')
         self.assertEqual(
-            contents,
-            {
+            sorted(contents),
+            [
                 '__init__.py',
-                'subdirectory',
-                'utf-8.file',
                 'binary.file',
+                'subdirectory',
                 'utf-16.file',
-            },
+                'utf-8.file',
+            ],
         )
 
 
