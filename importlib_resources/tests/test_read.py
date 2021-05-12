@@ -56,5 +56,12 @@ class ReadZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
         self.assertEqual(result, b'\0\1\2\3')
 
 
+class ReadNamespaceTests(ReadTests, unittest.TestCase):
+    def setUp(self):
+        from . import namespacedata01
+
+        self.data = namespacedata01
+
+
 if __name__ == '__main__':
     unittest.main()

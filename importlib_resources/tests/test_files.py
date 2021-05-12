@@ -35,5 +35,12 @@ class OpenZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
     pass
 
 
+class OpenNamespaceTests(FilesTests, unittest.TestCase):
+    def setUp(self):
+        from . import namespacedata01
+
+        self.data = namespacedata01
+
+
 if __name__ == '__main__':
     unittest.main()
