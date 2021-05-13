@@ -1,3 +1,8 @@
+v5.1.3
+======
+
+* Refresh packaging and improve tests.
+
 v5.1.2
 ======
 
