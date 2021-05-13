@@ -76,7 +76,8 @@ class TraversableResourcesLoader:
             or
             # local FileReader
             _file_reader(self.spec)
-            or _adapters.DegenerateFiles(self.spec)
+            # fallback - adapt the spec ResourceReader to TraversableReader
+            or _adapters.CompatibilityFiles(self.spec)
         )
 
 
