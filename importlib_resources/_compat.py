@@ -5,9 +5,9 @@ import sys
 import pathlib
 from contextlib import suppress
 
-try:
+if sys.version_info >= (3, 10):
     from zipfile import Path as ZipPath  # type: ignore
-except ImportError:
+else:
     from zipp import Path as ZipPath  # type: ignore
 
 
