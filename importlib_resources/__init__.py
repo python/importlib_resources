@@ -8,12 +8,12 @@ from ._common import (
     read_binary,
     open_text,
     read_text,
+    is_resource,
 )
 
 from importlib_resources._py3 import (
     Package,
     Resource,
-    is_resource,
     path,
 )
 from importlib_resources.abc import ResourceReader

@@ -51,22 +51,6 @@ def _path_from_open_resource(reader, resource):
     return _common._tempfile(saved.read, suffix=resource)
 
 
-def is_resource(package: Package, name: str) -> bool:
-    """True if `name` is a resource inside `package`.
-
-    Directories are *not* resources.
-    """
-    package = _common.get_package(package)
-    _common.normalize_path(name)
-    reader = _common.get_resource_reader(package)
-    if reader is not None:
-        return reader.is_resource(name)
-    package_contents = set(_common.contents(package))
-    if name not in package_contents:
-        return False
-    return (_common.from_package(package) / name).is_file()
-
-
 @singledispatch
 def _ensure_sequence(iterable):
     return list(iterable)

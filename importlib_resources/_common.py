@@ -165,3 +165,15 @@ def contents(package: Package) -> Iterable[str]:
     to check if it is a resource or not.
     """
     return [path.name for path in files(package).iterdir()]
+
+
+def is_resource(package: Package, name: str) -> bool:
+    """True if `name` is a resource inside `package`.
+
+    Directories are *not* resources.
+    """
+    resource = normalize_path(name)
+    return any(
+        traversable.name == resource and traversable.is_file()
+        for traversable in files(package).iterdir()
+    )
