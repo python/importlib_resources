@@ -4,17 +4,17 @@ from ._common import (
     as_file,
     files,
     contents,
+    open_binary,
+    read_binary,
+    open_text,
+    read_text,
 )
 
 from importlib_resources._py3 import (
     Package,
     Resource,
     is_resource,
-    open_binary,
-    open_text,
     path,
-    read_binary,
-    read_text,
 )
 from importlib_resources.abc import ResourceReader
 

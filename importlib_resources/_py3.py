@@ -3,86 +3,14 @@ import io
 
 from . import _common
 from contextlib import suppress
-from importlib.abc import ResourceLoader
-from importlib.machinery import ModuleSpec
-from io import BytesIO, TextIOWrapper
 from pathlib import Path
 from types import ModuleType
 from typing import ContextManager, Union
-from typing import cast
-from typing.io import BinaryIO, TextIO
 from collections.abc import Sequence
 from functools import singledispatch
 
 Package = Union[str, ModuleType]
 Resource = Union[str, os.PathLike]
-
-
-def open_binary(package: Package, resource: Resource) -> BinaryIO:
-    """Return a file-like object opened for binary reading of the resource."""
-    resource = _common.normalize_path(resource)
-    package = _common.get_package(package)
-    reader = _common.get_resource_reader(package)
-    if reader is not None:
-        return reader.open_resource(resource)
-    spec = cast(ModuleSpec, package.__spec__)
-    # Using pathlib doesn't work well here due to the lack of 'strict'
-    # argument for pathlib.Path.resolve() prior to Python 3.6.
-    if spec.submodule_search_locations is not None:
-        paths = spec.submodule_search_locations
-    elif spec.origin is not None:
-        paths = [os.path.dirname(os.path.abspath(spec.origin))]
-
-    for package_path in paths:
-        full_path = os.path.join(package_path, resource)
-        try:
-            return open(full_path, mode='rb')
-        except OSError:
-            # Just assume the loader is a resource loader; all the relevant
-            # importlib.machinery loaders are and an AttributeError for
-            # get_data() will make it clear what is needed from the loader.
-            loader = cast(ResourceLoader, spec.loader)
-            data = None
-            if hasattr(spec.loader, 'get_data'):
-                with suppress(OSError):
-                    data = loader.get_data(full_path)
-            if data is not None:
-                return BytesIO(data)
-
-    raise FileNotFoundError(f'{resource!r} resource not found in {spec.name!r}')
-
-
-def open_text(
-    package: Package,
-    resource: Resource,
-    encoding: str = 'utf-8',
-    errors: str = 'strict',
-) -> TextIO:
-    """Return a file-like object opened for text reading of the resource."""
-    return TextIOWrapper(
-        open_binary(package, resource), encoding=encoding, errors=errors
-    )
-
-
-def read_binary(package: Package, resource: Resource) -> bytes:
-    """Return the binary contents of the resource."""
-    with open_binary(package, resource) as fp:
-        return fp.read()
-
-
-def read_text(
-    package: Package,
-    resource: Resource,
-    encoding: str = 'utf-8',
-    errors: str = 'strict',
-) -> str:
-    """Return the decoded string of the resource.
-
-    The decoding-related arguments have the same semantics as those of
-    bytes.decode().
-    """
-    with open_text(package, resource, encoding, errors) as fp:
-        return fp.read()
 
 
 def path(
