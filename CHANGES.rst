@@ -1,3 +1,10 @@
+v5.1.4
+======
+
+* #225: Require
+  `zipp 3.1.0 <https://zipp.readthedocs.io/en/latest/history.html#v3-1-0>`_
+  or later on Python prior to 3.10 to incorporate those fixes.
+
 v5.0.5
 ======
 
