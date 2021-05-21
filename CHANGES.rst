@@ -1,3 +1,9 @@
+v5.0.5
+======
+
+* #216: Make MultiplexedPath.name a property per the
+  spec.
+
 v5.0.4
 ======
 
