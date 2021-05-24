@@ -25,25 +25,25 @@ class Reader(ResourceReader):
         self._path = path
         if isinstance(self.file, Exception):
             raise self.file
-        else:
-            return self.file
+        return self.file
 
     def resource_path(self, path_):
         self._path = path_
         if isinstance(self.path, Exception):
             raise self.path
-        else:
-            return self.path
+        return self.path
 
     def is_resource(self, path_):
         self._path = path_
         if isinstance(self.path, Exception):
             raise self.path
-        for entry in self._contents:
-            parts = entry.split('/')
-            if len(parts) == 1 and parts[0] == path_:
-                return True
-        return False
+
+        def part(entry):
+            return entry.split('/')
+
+        return any(
+            len(parts) == 1 and parts[0] == path_ for parts in map(part, self._contents)
+        )
 
     def contents(self):
         if isinstance(self.path, Exception):
