@@ -64,7 +64,10 @@ def create_package(file, path, is_package=True, contents=()):
 class CommonTests(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def execute(self, package, path):
-        raise NotImplementedError
+        """
+        Call the pertinent legacy API function (e.g. open_text, path)
+        on package and path.
+        """
 
     def test_package_name(self):
         # Passing in the package name should succeed.
