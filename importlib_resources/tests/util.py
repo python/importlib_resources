@@ -62,6 +62,9 @@ def create_package(file, path, is_package=True, contents=()):
 
 
 class CommonTests(metaclass=abc.ABCMeta):
+    """
+    Tests shared by test_open, test_path, and test_read.
+    """
     @abc.abstractmethod
     def execute(self, package, path):
         """
@@ -115,14 +118,21 @@ class CommonTests(metaclass=abc.ABCMeta):
             module = sys.modules['importlib_resources.tests.util']
             self.execute(module, 'utf-8.file')
 
-    def test_resource_opener(self):
+    def test_missing_path(self):
+        # Attempting to open or read or request the path for a
+        # non-existent path should succeed if open_resource
+        # can return a viable data stream.
         bytes_data = io.BytesIO(b'Hello, world!')
         package = create_package(file=bytes_data, path=FileNotFoundError())
         self.execute(package, 'utf-8.file')
         self.assertEqual(package.__loader__._path, 'utf-8.file')
 
-    def test_resource_path(self):
+    def test_extant_path(self):
+        # Attempting to open or read or request the path when the
+        # path does exist should still succeed. Does not assert
+        # anything about the result.
         bytes_data = io.BytesIO(b'Hello, world!')
+        # any path that exists
         path = __file__
         package = create_package(file=bytes_data, path=path)
         self.execute(package, 'utf-8.file')
