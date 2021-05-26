@@ -1,3 +1,8 @@
+v5.0.6
+======
+
+* bpo-38693: Prefer f-strings to ``.format`` calls.
+
 v5.1.4
 ======
 
