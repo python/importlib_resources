@@ -65,6 +65,7 @@ class CommonTests(metaclass=abc.ABCMeta):
     """
     Tests shared by test_open, test_path, and test_read.
     """
+
     @abc.abstractmethod
     def execute(self, package, path):
         """
