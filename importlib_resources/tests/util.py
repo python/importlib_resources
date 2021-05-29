@@ -51,14 +51,20 @@ class Reader(ResourceReader):
         yield from self._contents
 
 
-def create_package(file, path, is_package=True, contents=()):
+def create_package_from_loader(loader, is_package=True):
     name = 'testingpackage'
     module = types.ModuleType(name)
-    loader = Reader(file=file, path=path, _contents=contents)
     spec = ModuleSpec(name, loader, origin='does-not-exist', is_package=is_package)
     module.__spec__ = spec
     module.__loader__ = loader
     return module
+
+
+def create_package(file=None, path=None, is_package=True, contents=()):
+    return create_package_from_loader(
+        Reader(file=file, path=path, _contents=contents),
+        is_package,
+    )
 
 
 class CommonTests(metaclass=abc.ABCMeta):
