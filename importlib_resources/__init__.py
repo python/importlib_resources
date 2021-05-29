@@ -10,12 +10,10 @@ from ._common import (
     read_text,
     is_resource,
     path,
-)
-
-from importlib_resources._py3 import (
     Package,
     Resource,
 )
+
 from importlib_resources.abc import ResourceReader
 
 
