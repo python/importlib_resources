@@ -95,7 +95,7 @@ def _tempfile(reader, suffix=''):
     finally:
         try:
             os.remove(raw_path)
-        except FileNotFoundError:
+        except (FileNotFoundError, PermissionError):
             pass
 
 
