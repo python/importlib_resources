@@ -6,7 +6,7 @@ import contextlib
 import types
 import importlib
 
-from typing import Union, Any, Optional, Iterable
+from typing import Union, Any, Optional, Iterable, ContextManager
 from typing.io import BinaryIO, TextIO
 from .abc import ResourceReader, Traversable
 
@@ -177,3 +177,18 @@ def is_resource(package: Package, name: str) -> bool:
         traversable.name == resource and traversable.is_file()
         for traversable in files(package).iterdir()
     )
+
+
+def path(
+    package: Package,
+    resource: Resource,
+) -> ContextManager[pathlib.Path]:
+    """A context manager providing a file path object to the resource.
+
+    If the resource does not already exist on its own on the file system,
+    a temporary file will be created. If the file was created, the file
+    will be deleted upon exiting the context manager (no exception is
+    raised if the file was deleted prior to the context manager
+    exiting).
+    """
+    return as_file(files(package) / normalize_path(resource))
