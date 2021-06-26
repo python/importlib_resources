@@ -3,6 +3,11 @@
 from ._common import (
     as_file,
     files,
+    Package,
+    Resource,
+)
+
+from ._legacy import (
     contents,
     open_binary,
     read_binary,
@@ -10,8 +15,6 @@ from ._common import (
     read_text,
     is_resource,
     path,
-    Package,
-    Resource,
 )
 
 from importlib_resources.abc import ResourceReader
