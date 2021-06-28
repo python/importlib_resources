@@ -3,19 +3,20 @@
 from ._common import (
     as_file,
     files,
-)
-
-from importlib_resources._py3 import (
     Package,
     Resource,
-    contents,
-    is_resource,
-    open_binary,
-    open_text,
-    path,
-    read_binary,
-    read_text,
 )
+
+from ._legacy import (
+    contents,
+    open_binary,
+    read_binary,
+    open_text,
+    read_text,
+    is_resource,
+    path,
+)
+
 from importlib_resources.abc import ResourceReader
 
 

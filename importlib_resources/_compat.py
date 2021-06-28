@@ -61,7 +61,11 @@ class TraversableResourcesLoader:
             return reader if hasattr(reader, 'files') else None
 
         def _file_reader(spec):
-            if pathlib.Path(self.path).exists():
+            try:
+                path = pathlib.Path(self.path)
+            except TypeError:
+                return None
+            if path.exists():
                 return readers.FileReader(self)
 
         return (
@@ -76,7 +80,8 @@ class TraversableResourcesLoader:
             or
             # local FileReader
             _file_reader(self.spec)
-            or _adapters.DegenerateFiles(self.spec)
+            # fallback - adapt the spec ResourceReader to TraversableReader
+            or _adapters.CompatibilityFiles(self.spec)
         )
 
 
