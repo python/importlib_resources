@@ -1,3 +1,11 @@
+v5.2.0
+======
+
+* #80 via #221: Legacy API (``path``, ``contents``, ...)
+  is now supported entirely by the ``.files()`` API with
+  a compatibility shim supplied for resource loaders without
+  that functionality.
+
 v5.0.6
 ======
 
