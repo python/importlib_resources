@@ -91,7 +91,7 @@ bytes.  E.g.::
 The equivalent code in ``importlib_resources`` is pretty straightforward::
 
     ref = importlib_resources.files('my.package').joinpath('resource.dat')
-    with ref.open() as fp:
+    with ref.open('rb') as fp:
         my_bytes = fp.read()
 
 
