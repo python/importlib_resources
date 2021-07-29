@@ -55,11 +55,19 @@ class CompatibilityFiles:
             self._spec = spec
             self._reader = reader
 
+        @classmethod
+        def new(cls, spec, reader):
+            try:
+                fspath = reader.resource_path(None)
+            except (FileNotFoundError, AttributeError):
+                return cls(spec, reader)
+            return CompatibilityFiles.PathLikeSpecPath(spec, reader, fspath)
+
         def iterdir(self):
             if not self._reader:
                 return iter(())
             return iter(
-                CompatibilityFiles.ChildPath(self._reader, path)
+                CompatibilityFiles.ChildPath.new(self._reader, path)
                 for path in self._reader.contents()
             )
 
@@ -71,7 +79,7 @@ class CompatibilityFiles:
         def joinpath(self, other):
             if not self._reader:
                 return CompatibilityFiles.OrphanPath(other)
-            return CompatibilityFiles.ChildPath(self._reader, other)
+            return CompatibilityFiles.ChildPath.new(self._reader, other)
 
         @property
         def name(self):
@@ -79,6 +87,16 @@ class CompatibilityFiles:
 
         def open(self, mode='r', *args, **kwargs):
             return _io_wrapper(self._reader.open_resource(None), mode, *args, **kwargs)
+
+    class PathLikeSpecPath(SpecPath):
+        """SpecPath but os.PathLike"""
+
+        def __init__(self, spec, reader, fspath):
+            super().__init__(spec, reader)
+            self._fspath = fspath
+
+        def __fspath__(self):
+            return self._fspath
 
     class ChildPath(abc.Traversable):
         """
@@ -89,6 +107,14 @@ class CompatibilityFiles:
         def __init__(self, reader, name):
             self._reader = reader
             self._name = name
+
+        @classmethod
+        def new(cls, reader, name):
+            try:
+                fspath = reader.resource_path(name)
+            except (FileNotFoundError, AttributeError):
+                return cls(reader, name)
+            return CompatibilityFiles.PathLikeChildPath(reader, name, fspath)
 
         def iterdir(self):
             return iter(())
@@ -110,6 +136,16 @@ class CompatibilityFiles:
             return _io_wrapper(
                 self._reader.open_resource(self.name), mode, *args, **kwargs
             )
+
+    class PathLikeChildPath(ChildPath):
+        """ChildPath but os.PathLike"""
+
+        def __init__(self, reader, name, fspath):
+            super().__init__(reader, name)
+            self._fspath = fspath
+
+        def __fspath__(self):
+            return self._fspath
 
     class OrphanPath(abc.Traversable):
         """
@@ -159,7 +195,7 @@ class CompatibilityFiles:
         return getattr(self._reader, attr)
 
     def files(self):
-        return CompatibilityFiles.SpecPath(self.spec, self._reader)
+        return CompatibilityFiles.SpecPath.new(self.spec, self._reader)
 
 
 def wrap_spec(package):

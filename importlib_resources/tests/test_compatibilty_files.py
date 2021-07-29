@@ -1,4 +1,5 @@
 import io
+import os
 import unittest
 
 import importlib_resources as resources
@@ -87,6 +88,10 @@ class CompatibilityFilesTests(unittest.TestCase):
     def test_wrap_spec(self):
         spec = wrap_spec(self.package)
         self.assertIsInstance(spec.loader.get_resource_reader(None), CompatibilityFiles)
+
+    def test_fspath(self):
+        self.assertEqual(os.fspath(self.files), 'some_path')
+        self.assertEqual(os.fspath(self.files / 'a'), 'some_path')
 
 
 class CompatibilityFilesNoReaderTests(unittest.TestCase):
