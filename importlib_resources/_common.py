@@ -109,8 +109,17 @@ def as_file(path):
 
 @as_file.register(pathlib.Path)
 @contextlib.contextmanager
-def _(path):
+def _as_file_pathlib(path):
     """
     Degenerate behavior for pathlib.Path objects.
     """
     yield path
+
+
+@as_file.register(os.PathLike)
+@contextlib.contextmanager
+def _as_file_pathlike(path):
+    """
+    Degenerate behavior for os.PathLike objects.
+    """
+    yield pathlib.Path(os.fspath(path))

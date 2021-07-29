@@ -1,7 +1,10 @@
 import io
+import os
+import pathlib
 import unittest
 
 import importlib_resources as resources
+from importlib_resources.abc import TraversableResources
 from . import data01
 from . import util
 
@@ -55,6 +58,40 @@ class PathZipTests(PathTests, util.ZipSetup, unittest.TestCase):
         # file system is removed inside the `with` stanza.
         with resources.path(self.data, 'utf-8.file') as path:
             path.unlink()
+
+
+class PathLikeTests(PathTests, unittest.TestCase):
+    class PathLikeTraversable:
+        """pathlib.Path proxy, is os.PathLike but is not pathlib.Path"""
+
+        def __init__(self, *args, **kwargs):
+            self._path = pathlib.Path(*args, **kwargs)
+
+        def __fspath__(self):
+            return os.fspath(self._path)
+
+        def joinpath(self, other):
+            return self.__class__(self, other)
+
+        __truediv__ = joinpath
+
+        @property
+        def parent(self):
+            return self.__class__(self._path.parent)
+
+    class PathLikeResources(TraversableResources):
+        def __init__(self, loader):
+            self.path = PathLikeTests.PathLikeTraversable(loader.path).parent
+
+        def get_resource_reader(self, package):
+            return self
+
+        def files(self):
+            return self.path
+
+    def setUp(self):
+        reader = self.PathLikeResources(data01.__loader__)
+        self.data = util.create_package_from_loader(reader)
 
 
 if __name__ == '__main__':
