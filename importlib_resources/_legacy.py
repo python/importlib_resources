@@ -2,8 +2,7 @@ import os
 import pathlib
 import types
 
-from typing import Union, Iterable, ContextManager
-from typing.io import BinaryIO, TextIO
+from typing import Union, Iterable, ContextManager, BinaryIO, TextIO
 
 from . import _common
 

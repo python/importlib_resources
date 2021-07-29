@@ -1,3 +1,8 @@
+v5.2.1
+======
+
+* bpo-38291: Avoid DeprecationWarning on ``typing.io``.
+
 v5.2.0
 ======
 
