@@ -1,3 +1,8 @@
+v5.2.2
+======
+
+* #234: Fix refleak in ``as_file`` caught by CPython tests.
+
 v5.2.1
 ======
 
