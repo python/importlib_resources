@@ -1,3 +1,9 @@
+v5.0.7
+======
+
+* bpo-45419: Correct ``DegenerateFiles.Path`` ``.name``
+  and ``.open()`` interfaces to match ``Traversable``.
+
 v5.0.6
 ======
 
