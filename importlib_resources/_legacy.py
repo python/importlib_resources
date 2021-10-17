@@ -1,4 +1,4 @@
-import inspect
+import functools
 import os
 import pathlib
 import types
@@ -12,27 +12,32 @@ Package = Union[types.ModuleType, str]
 Resource = Union[str, os.PathLike]
 
 
-def _warn():
-    func = inspect.stack()[1].function
-    warnings.warn(
-        f"{func} is deprecated. Use files() instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
+def deprecated(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f"{func.__name__} is deprecated. Use files() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
+@deprecated
 def open_binary(package: Package, resource: Resource) -> BinaryIO:
     """Return a file-like object opened for binary reading of the resource."""
-    _warn()
     return (_common.files(package) / _common.normalize_path(resource)).open('rb')
 
 
+@deprecated
 def read_binary(package: Package, resource: Resource) -> bytes:
     """Return the binary contents of the resource."""
-    _warn()
     return (_common.files(package) / _common.normalize_path(resource)).read_bytes()
 
 
+@deprecated
 def open_text(
     package: Package,
     resource: Resource,
@@ -40,12 +45,12 @@ def open_text(
     errors: str = 'strict',
 ) -> TextIO:
     """Return a file-like object opened for text reading of the resource."""
-    _warn()
     return (_common.files(package) / _common.normalize_path(resource)).open(
         'r', encoding=encoding, errors=errors
     )
 
 
+@deprecated
 def read_text(
     package: Package,
     resource: Resource,
@@ -57,11 +62,11 @@ def read_text(
     The decoding-related arguments have the same semantics as those of
     bytes.decode().
     """
-    _warn()
     with open_text(package, resource, encoding, errors) as fp:
         return fp.read()
 
 
+@deprecated
 def contents(package: Package) -> Iterable[str]:
     """Return an iterable of entries in `package`.
 
@@ -69,16 +74,15 @@ def contents(package: Package) -> Iterable[str]:
     not considered resources.  Use `is_resource()` on each entry returned here
     to check if it is a resource or not.
     """
-    _warn()
     return [path.name for path in _common.files(package).iterdir()]
 
 
+@deprecated
 def is_resource(package: Package, name: str) -> bool:
     """True if `name` is a resource inside `package`.
 
     Directories are *not* resources.
     """
-    _warn()
     resource = _common.normalize_path(name)
     return any(
         traversable.name == resource and traversable.is_file()
@@ -86,6 +90,7 @@ def is_resource(package: Package, name: str) -> bool:
     )
 
 
+@deprecated
 def path(
     package: Package,
     resource: Resource,
@@ -98,5 +103,4 @@ def path(
     raised if the file was deleted prior to the context manager
     exiting).
     """
-    _warn()
     return _common.as_file(_common.files(package) / _common.normalize_path(resource))
