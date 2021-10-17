@@ -30,3 +30,24 @@ The key goal of this module is to replace parts of `pkg_resources
 solution in Python's stdlib that relies on well-defined APIs.  This makes
 reading resources included in packages easier, with more stable and consistent
 semantics.
+
+Compatibility
+=============
+
+New features are introduced in this third-party library and later merged
+into CPython. The following table indicates which versions of this library
+were contributed to different versions in the standard library:
+
+.. list-table::
+   :header-rows: 1
+
+   * - importlib_resources
+     - stdlib
+   * - 5.2
+     - 3.11
+   * - 5.0
+     - 3.10
+   * - 1.3
+     - 3.9
+   * - 0.5 (?)
+     - 3.7
