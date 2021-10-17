@@ -1,3 +1,10 @@
+v5.3.0
+======
+
+* #80: Now raise a ``DeprecationWarning`` for all legacy
+  functions. Instead, users should rely on the ``files()``
+  API introduced in importlib_resources 1.3.
+
 v5.2.3
 ======
 
