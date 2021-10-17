@@ -1,3 +1,9 @@
+v5.2.3
+======
+
+* Updated readme to reflect current behavior and show
+  which versions correspond to which behavior in CPython.
+
 v5.0.7
 ======
 
