@@ -16,7 +16,9 @@ def deprecated(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         warnings.warn(
-            f"{func.__name__} is deprecated. Use files() instead.",
+            f"{func.__name__} is deprecated. Use files() instead. "
+            "Refer to https://importlib-resources.readthedocs.io"
+            "/en/latest/using.html#migrating-from-legacy for migration advice.",
             DeprecationWarning,
             stacklevel=2,
         )

@@ -175,7 +175,9 @@ To port to the ``files()`` API, refer to the
 `_legacy module <https://github.com/python/importlib_resources/blob/66ea2dc7eb12b1be2322b7ad002cefb12d364dff/importlib_resources/_legacy.py>`_
 to see simple wrappers that enable drop-in replacement based on the
 preferred API, and either copy those or adapt the usage to utilize the
-``files`` and ``Traversable`` interfaces directly.
+``files`` and
+`Traversable <https://github.com/python/importlib_resources/blob/b665a3ea907d93b1b6457217f34e1bfc06f51fe6/importlib_resources/abc.py#L49-L114>`_
+interfaces directly.
 
 
 Extending
