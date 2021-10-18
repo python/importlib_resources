@@ -163,6 +163,23 @@ manager.
 Both relative and absolute paths work for Python 3.7 and newer.
 
 
+Migrating from Legacy
+=====================
+
+Starting with Python 3.9 and ``importlib_resources`` 1.4, this package
+introduced the ``files()`` API, to be preferred over the legacy API,
+i.e. the functions ``open_binary``, ``open_text``, ``path``,
+``contents``, ``read_text``, ``read_binary``, and ``is_resource``.
+
+To port to the ``files()`` API, refer to the
+`_legacy module <https://github.com/python/importlib_resources/blob/66ea2dc7eb12b1be2322b7ad002cefb12d364dff/importlib_resources/_legacy.py>`_
+to see simple wrappers that enable drop-in replacement based on the
+preferred API, and either copy those or adapt the usage to utilize the
+``files`` and
+`Traversable <https://github.com/python/importlib_resources/blob/b665a3ea907d93b1b6457217f34e1bfc06f51fe6/importlib_resources/abc.py#L49-L114>`_
+interfaces directly.
+
+
 Extending
 =========
 

@@ -1,3 +1,12 @@
+v5.3.0
+======
+
+* #80: Now raise a ``DeprecationWarning`` for all legacy
+  functions. Instead, users should rely on the ``files()``
+  API introduced in importlib_resources 1.3. See
+  `Migrating from Legacy <https://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy>`_
+  for guidance on avoiding the deprecated functions.
+
 v5.2.3
 ======
 
