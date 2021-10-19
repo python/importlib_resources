@@ -11,11 +11,13 @@ importable `Python package`_.  Resources can live on the file system or in a
 zip file, with support for other loader_ classes that implement the appropriate
 API for reading resources.
 
-``importlib_resources`` is a backport of Python 3.9's standard library
-`importlib.resources`_ module for Python 2.7, and 3.5 through 3.8.  Users of
-Python 3.9 and beyond are encouraged to use the standard library module.
-Developers looking for detailed API descriptions should refer to the Python
-3.9 standard library documentation.
+``importlib_resources`` supplies a backport of
+:doc:`importlib.resources <library/importlib>`,
+enabling early access to features of future Python versions and making
+functionality available for older Python versions. Users are encouraged to
+use the Python standard library where suitable and fall back to
+this library for future compatibility. Developers looking for detailed API
+descriptions should refer to the standard library documentation.
 
 The documentation here includes a general :ref:`usage <using>` guide and a
 :ref:`migration <migration>` guide for projects that want to adopt
@@ -39,7 +41,6 @@ Indices and tables
 * :ref:`search`
 
 
-.. _`importlib.resources`: https://docs.python.org/3.7/library/importlib.html#module-importlib.resources
 .. _`Basic Resource Access`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
 .. _`Python package`: https://docs.python.org/3/reference/import.html#packages
 .. _loader: https://docs.python.org/3/reference/import.html#finders-and-loaders
