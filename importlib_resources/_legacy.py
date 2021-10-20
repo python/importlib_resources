@@ -19,7 +19,7 @@ def deprecated(func):
             f"{func.__name__} is deprecated. Use files() instead. "
             "Refer to https://importlib-resources.readthedocs.io"
             "/en/latest/using.html#migrating-from-legacy for migration advice.",
-            DeprecationWarning,
+            PendingDeprecationWarning,
             stacklevel=2,
         )
         return func(*args, **kwargs)
