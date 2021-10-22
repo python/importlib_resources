@@ -12,7 +12,6 @@ from .abc import ResourceReader, Traversable
 from ._compat import wrap_spec
 
 Package = Union[types.ModuleType, str]
-Resource = Union[str, os.PathLike]
 
 
 def files(package):
