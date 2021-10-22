@@ -3,6 +3,7 @@ omit =
 	# leading `*/` for pytest-dev/pytest-cov#456
 	*/.tox/*
 	*/_itertools.py
+	*/_legacy.py
 
 [report]
 show_missing = True
