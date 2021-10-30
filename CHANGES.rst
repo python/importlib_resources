@@ -1,3 +1,9 @@
+v5.4.0
+======
+
+* *80: Test suite now relies entirely on the traversable
+  API.
+
 v5.3.0
 ======
 
