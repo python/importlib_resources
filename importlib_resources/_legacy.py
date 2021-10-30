@@ -9,7 +9,7 @@ from typing import Union, Iterable, ContextManager, BinaryIO, TextIO, Any
 from . import _common
 
 Package = Union[types.ModuleType, str]
-Resource = Union[str, os.PathLike]
+Resource = str
 
 
 def deprecated(func):
