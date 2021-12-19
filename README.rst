@@ -43,7 +43,7 @@ were contributed to different versions in the standard library:
 
    * - importlib_resources
      - stdlib
-   * - 5.2
+   * - 5.4
      - 3.11
    * - 5.0
      - 3.10
