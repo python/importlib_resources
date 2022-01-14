@@ -1,7 +1,16 @@
 import abc
-from typing import BinaryIO, Iterable, Text
+from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text
+from io import BufferedReader
+from typing import Union, Optional
+from os import PathLike
 
 from ._compat import runtime_checkable, Protocol
+
+
+__all__ = ["ResourceReader", "Traversable", "TraversableResources"]
+
+
+StrPath = Union[str, PathLike[str]]
 
 
 class ResourceReader(metaclass=abc.ABCMeta):
@@ -54,19 +63,19 @@ class Traversable(Protocol):
     """
 
     @abc.abstractmethod
-    def iterdir(self):
+    def iterdir(self) -> Iterator["Traversable"]:
         """
         Yield Traversable objects in self
         """
 
-    def read_bytes(self):
+    def read_bytes(self) -> bytes:
         """
         Read contents of self as bytes
         """
         with self.open('rb') as strm:
             return strm.read()
 
-    def read_text(self, encoding=None):
+    def read_text(self, encoding: Optional[str] = None) -> str:
         """
         Read contents of self as text
         """
@@ -86,12 +95,12 @@ class Traversable(Protocol):
         """
 
     @abc.abstractmethod
-    def joinpath(self, child):
+    def joinpath(self, child: StrPath) -> "Traversable":
         """
         Return Traversable child in self
         """
 
-    def __truediv__(self, child):
+    def __truediv__(self, child: StrPath) -> "Traversable":
         """
         Return Traversable child in self
         """
@@ -121,17 +130,17 @@ class TraversableResources(ResourceReader):
     """
 
     @abc.abstractmethod
-    def files(self):
+    def files(self) -> "Traversable":
         """Return a Traversable object for the loaded package."""
 
-    def open_resource(self, resource):
+    def open_resource(self, resource: StrPath) -> BufferedReader:
         return self.files().joinpath(resource).open('rb')
 
-    def resource_path(self, resource):
+    def resource_path(self, resource: Any) -> NoReturn:
         raise FileNotFoundError(resource)
 
-    def is_resource(self, path):
+    def is_resource(self, path: StrPath) -> bool:
         return self.files().joinpath(path).is_file()
 
-    def contents(self):
+    def contents(self) -> Iterator[str]:
         return (item.name for item in self.files().iterdir())
