@@ -10,7 +10,8 @@ from ._compat import runtime_checkable, Protocol
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
 
 
-StrPath = Union[str, PathLike[str]]
+# PathLike is only subscriptable at runtime in 3.9+
+StrPath = Union[str, "PathLike[str]"]
 
 
 class ResourceReader(metaclass=abc.ABCMeta):
