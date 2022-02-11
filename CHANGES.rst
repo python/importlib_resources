@@ -1,3 +1,10 @@
+v5.5.0
+======
+
+* Require Python 3.7 or later.
+* #243: Fix error when no ``__pycache__`` directories exist
+  when testing ``update-zips``.
+
 v5.4.0
 ======
 
