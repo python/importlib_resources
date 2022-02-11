@@ -17,7 +17,7 @@
 .. image:: https://readthedocs.org/projects/importlib-resources/badge/?version=latest
    :target: https://importlib-resources.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://img.shields.io/badge/skeleton-2021-informational
+.. image:: https://img.shields.io/badge/skeleton-2022-informational
    :target: https://blog.jaraco.com/skeleton
 
 ``importlib_resources`` is a backport of Python standard library
