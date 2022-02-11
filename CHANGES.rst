@@ -8,7 +8,7 @@ v5.5.0
 v5.4.0
 ======
 
-* *80: Test suite now relies entirely on the traversable
+* #80: Test suite now relies entirely on the traversable
   API.
 
 v5.3.0
