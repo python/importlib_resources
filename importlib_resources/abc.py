@@ -1,6 +1,6 @@
 import abc
+import io
 from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text, Optional
-from io import BufferedReader
 
 from ._compat import runtime_checkable, Protocol, StrPath
 
@@ -128,7 +128,7 @@ class TraversableResources(ResourceReader):
     def files(self) -> "Traversable":
         """Return a Traversable object for the loaded package."""
 
-    def open_resource(self, resource: StrPath) -> BufferedReader:
+    def open_resource(self, resource: StrPath) -> io.BufferedReader:
         return self.files().joinpath(resource).open('rb')
 
     def resource_path(self, resource: Any) -> NoReturn:
