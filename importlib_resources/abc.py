@@ -1,17 +1,11 @@
 import abc
-from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text
+from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text, Optional
 from io import BufferedReader
-from typing import Union, Optional
-from os import PathLike
 
-from ._compat import runtime_checkable, Protocol
+from ._compat import runtime_checkable, Protocol, StrPath
 
 
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
-
-
-# PathLike is only subscriptable at runtime in 3.9+
-StrPath = Union[str, "PathLike[str]"]
 
 
 class ResourceReader(metaclass=abc.ABCMeta):
