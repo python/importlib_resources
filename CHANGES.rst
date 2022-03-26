@@ -1,3 +1,8 @@
+v5.6.0
+======
+
+* #244: Add type declarations in ABCs.
+
 v5.5.0
 ======
 
