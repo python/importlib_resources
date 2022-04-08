@@ -4,6 +4,7 @@ omit =
 	*/.tox/*
 	*/_itertools.py
 	*/_legacy.py
+	*/simple.py
 
 [report]
 show_missing = True
