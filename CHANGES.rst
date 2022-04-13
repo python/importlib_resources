@@ -1,3 +1,13 @@
+v5.7.0
+======
+
+* #248: ``abc.Traversable.joinpath`` now allows for multiple
+  arguments and specifies that ``posixpath.sep`` is allowed
+  in any argument to accept multiple arguments, matching the
+  behavior found in ``zipfile.Path`` and ``pathlib.Path``.
+
+  ``simple.ResourceContainer`` now honors this behavior.
+
 v5.6.0
 ======
 
