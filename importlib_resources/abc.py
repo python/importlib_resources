@@ -98,8 +98,8 @@ class Traversable(Protocol):
         Return Traversable resolved with any descendants applied.
 
         Each descendant should be a path segment relative to self
-        and main contain multiple levels separated by
-        `posixpath.sep` (``/``).
+        and each may contain multiple levels separated by
+        ``posixpath.sep`` (``/``).
         """
 
     def __truediv__(self, child: StrPath) -> "Traversable":
