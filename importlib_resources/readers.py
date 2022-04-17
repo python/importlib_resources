@@ -82,15 +82,16 @@ class MultiplexedPath(abc.Traversable):
     def is_file(self):
         return False
 
-    def joinpath(self, child):
-        # first try to find child in current paths
-        for file in self.iterdir():
-            if file.name == child:
-                return file
-        # if it does not exist, construct it with the first path
-        return self._paths[0] / child
-
-    __truediv__ = joinpath
+    def joinpath(self, *descendants):
+        try:
+            return super().joinpath(*descendants)
+        except abc.TraversalError as exc:
+            # One of the paths didn't resolve.
+            msg, target, names = exc.args
+            if names:
+                raise
+            # It was the last; construct result with the first path.
+            return self._paths[0].joinpath(target)
 
     def open(self, *args, **kwargs):
         raise FileNotFoundError(f'{self} is not a file')
