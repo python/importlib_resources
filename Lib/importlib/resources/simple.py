@@ -99,13 +99,19 @@ class ResourceContainer(Traversable):
     def open(self, *args, **kwargs):
         raise IsADirectoryError()
 
-    def joinpath(self, *names):
-        if not names:
+    @staticmethod
+    def _flatten(compound_names):
+        for name in compound_names:
+            yield from name.split('/')
+
+    def joinpath(self, *descendants):
+        if not descendants:
             return self
-        name, rest = names[0], names[1:]
+        names = self._flatten(descendants)
+        target = next(names)
         return next(
-            traversable for traversable in self.iterdir() if traversable.name == name
-        ).joinpath(*rest)
+            traversable for traversable in self.iterdir() if traversable.name == target
+        ).joinpath(*names)
 
 
 class TraversableReader(TraversableResources, SimpleReader):
