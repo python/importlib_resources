@@ -1,3 +1,9 @@
+v5.7.1
+======
+
+* #249: In ``simple.ResourceContainer.joinpath``, honor
+  names split by ``posixpath.sep``.
+
 v5.7.0
 ======
 
