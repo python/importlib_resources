@@ -92,7 +92,6 @@ class Traversable(Protocol):
         Return True if self is a file
         """
 
-    @abc.abstractmethod
     def joinpath(self, *descendants: StrPath) -> "Traversable":
         """
         Return Traversable resolved with any descendants applied.
@@ -101,6 +100,13 @@ class Traversable(Protocol):
         and each may contain multiple levels separated by
         ``posixpath.sep`` (``/``).
         """
+        if not descendants:
+            return self
+        names = (name for compound in descendants for name in compound.split('/'))
+        target = next(names)
+        return next(
+            traversable for traversable in self.iterdir() if traversable.name == target
+        ).joinpath(*names)
 
     def __truediv__(self, child: StrPath) -> "Traversable":
         """
