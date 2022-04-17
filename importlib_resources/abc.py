@@ -1,5 +1,7 @@
 import abc
 import io
+import itertools
+import pathlib
 from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text, Optional
 
 from ._compat import runtime_checkable, Protocol, StrPath
@@ -102,7 +104,9 @@ class Traversable(Protocol):
         """
         if not descendants:
             return self
-        names = (name for compound in descendants for name in compound.split('/'))
+        names = itertools.chain.from_iterable(
+            path.parts for path in map(pathlib.PurePosixPath, descendants)
+        )
         target = next(names)
         return next(
             traversable for traversable in self.iterdir() if traversable.name == target
