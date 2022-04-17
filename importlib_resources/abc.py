@@ -52,6 +52,10 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
 
+class TraversalError(Exception):
+    pass
+
+
 @runtime_checkable
 class Traversable(Protocol):
     """
@@ -108,9 +112,15 @@ class Traversable(Protocol):
             path.parts for path in map(pathlib.PurePosixPath, descendants)
         )
         target = next(names)
-        return next(
+        matches = (
             traversable for traversable in self.iterdir() if traversable.name == target
-        ).joinpath(*names)
+        )
+        try:
+            return next(matches).joinpath(*names)
+        except StopIteration:
+            raise TraversalError(
+                "Target not found during traversal.", target, list(names)
+            )
 
     def __truediv__(self, child: StrPath) -> "Traversable":
         """
