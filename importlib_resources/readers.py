@@ -88,7 +88,7 @@ class MultiplexedPath(abc.Traversable):
         except abc.TraversalError as exc:
             # One of the paths didn't resolve.
             msg, target, names = exc.args
-            if names:
+            if names:  # pragma: nocover
                 raise
             # It was the last; construct result with the first path.
             return self._paths[0].joinpath(target)
