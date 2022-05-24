@@ -31,7 +31,7 @@ If you have a file system layout such as::
 
 then the directories are ``data``, ``data/one``, and ``data/two``.  Each of
 these are also Python packages by virtue of the fact that they all contain
-``__init__.py`` files [#fn1]_.  That means that in Python, all of these import
+``__init__.py`` files.  That means that in Python, all of these import
 statements work::
 
     import data
@@ -41,7 +41,7 @@ statements work::
 Each import statement gives you a Python *module* corresponding to the
 ``__init__.py`` file in each of the respective directories.  These modules are
 packages since packages are just special module instances that have an
-additional attribute, namely a ``__path__`` [#fn2]_.
+additional attribute, namely a ``__path__`` [#fn1]_.
 
 In this analogy then, resources are just files or directories contained in a
 package directory, so
@@ -108,7 +108,7 @@ Packages or package names
 
 All of the ``importlib_resources`` APIs take a *package* as their first
 parameter, but this can either be a package name (as a ``str``) or an actual
-module object, though the module *must* be a package [#fn3]_.  If a string is
+module object, though the module *must* be a package [#fn2]_.  If a string is
 passed in, it must name an importable Python package, and this is first
 imported.  Thus the above example could also be written as::
 
@@ -192,18 +192,12 @@ should return a ``TraversableResources`` instance.
 
 .. rubric:: Footnotes
 
-.. [#fn1] We're ignoring `PEP 420
-          <https://www.python.org/dev/peps/pep-0420/>`_ style namespace
-          packages, since ``importlib_resources`` does not support resources
-          within namespace packages.  Also, the example assumes that the
-          parent directory containing ``data/`` is on ``sys.path``.
-
-.. [#fn2] As of `PEP 451 <https://www.python.org/dev/peps/pep-0451/>`_ this
+.. [#fn1] As of `PEP 451 <https://www.python.org/dev/peps/pep-0451/>`_ this
           information is also available on the module's
           ``__spec__.submodule_search_locations`` attribute, which will not be
           ``None`` for packages.
 
-.. [#fn3] Specifically, this means that in Python 2, the module object must
+.. [#fn2] Specifically, this means that in Python 2, the module object must
           have an ``__path__`` attribute, while in Python 3, the module's
           ``__spec__.submodule_search_locations`` must not be ``None``.
           Otherwise a ``TypeError`` is raised.
