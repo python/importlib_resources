@@ -108,7 +108,7 @@ Packages or package names
 
 All of the ``importlib_resources`` APIs take a *package* as their first
 parameter, but this can either be a package name (as a ``str``) or an actual
-module object, though the module *must* be a package [#fn2]_.  If a string is
+module object, though the module *must* be a package.  If a string is
 passed in, it must name an importable Python package, and this is first
 imported.  Thus the above example could also be written as::
 
@@ -196,12 +196,6 @@ should return a ``TraversableResources`` instance.
           information is also available on the module's
           ``__spec__.submodule_search_locations`` attribute, which will not be
           ``None`` for packages.
-
-.. [#fn2] Specifically, this means that in Python 2, the module object must
-          have an ``__path__`` attribute, while in Python 3, the module's
-          ``__spec__.submodule_search_locations`` must not be ``None``.
-          Otherwise a ``TypeError`` is raised.
-
 
 .. _`pkg_resources API`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
 .. _`loader`: https://docs.python.org/3/reference/import.html#finders-and-loaders
