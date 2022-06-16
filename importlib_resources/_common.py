@@ -67,10 +67,14 @@ def from_package(package):
 
 
 @contextlib.contextmanager
-def _tempfile(reader, suffix='',
-              # gh-93353: Keep a reference to call os.remove() in late Python
-              # finalization.
-              *, _os_remove=os.remove):
+def _tempfile(
+    reader,
+    suffix='',
+    # gh-93353: Keep a reference to call os.remove() in late Python
+    # finalization.
+    *,
+    _os_remove=os.remove,
+):
     # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
     # blocks due to the need to close the temporary file to work on Windows
     # properly.
