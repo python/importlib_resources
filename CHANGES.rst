@@ -1,3 +1,10 @@
+v5.8.0
+======
+
+* #250: Now ``Traversable.joinpath`` provides a concrete
+  implementation, replacing the implementation in ``.simple``
+  and converging with the behavior in ``MultiplexedPath``.
+
 v5.7.1
 ======
 
