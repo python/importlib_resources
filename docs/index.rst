@@ -11,8 +11,7 @@ importable `Python package`_.  Resources can live on the file system or in a
 zip file, with support for other loader_ classes that implement the appropriate
 API for reading resources.
 
-``importlib_resources`` supplies a backport of
-:doc:`importlib.resources <library/importlib>`,
+``importlib_resources`` supplies a backport of :mod:`importlib.resources`,
 enabling early access to features of future Python versions and making
 functionality available for older Python versions. Users are encouraged to
 use the Python standard library where suitable and fall back to
