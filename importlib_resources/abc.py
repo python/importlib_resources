@@ -116,11 +116,12 @@ class Traversable(Protocol):
             traversable for traversable in self.iterdir() if traversable.name == target
         )
         try:
-            return next(matches).joinpath(*names)
+            match = next(matches)
         except StopIteration:
             raise TraversalError(
                 "Target not found during traversal.", target, list(names)
             )
+        return match.joinpath(*names)
 
     def __truediv__(self, child: StrPath) -> "Traversable":
         """
