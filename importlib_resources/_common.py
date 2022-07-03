@@ -136,16 +136,16 @@ def _temp_dir(path):
     to the file system in a context manager.
     """
     assert path.is_dir()
-    with _temp_path(tempfile.TemporaryDirectory(suffix=path.name)) as temp_dir:
-        _write_contents(temp_dir, path)
-        yield temp_dir
+    with _temp_path(tempfile.TemporaryDirectory()) as temp_dir:
+        yield _write_contents(temp_dir, path)
 
 
 def _write_contents(target, source):
-    for item in source.iterdir():
-        child = target.joinpath(item.name)
-        if item.is_dir():
-            child.mkdir()
+    child = target.joinpath(source.name)
+    if source.is_dir():
+        child.mkdir()
+        for item in source.iterdir():
             _write_contents(child, item)
-        else:
-            child.open('wb').write(item.read_bytes())
+    else:
+        child.open('wb').write(source.read_bytes())
+    return child
