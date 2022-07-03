@@ -93,13 +93,22 @@ def _tempfile(
             pass
 
 
+def _temp_file(path):
+    return _tempfile(path.read_bytes, suffix=path.name)
+
+
 @functools.singledispatch
 def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
-    return _tempfile(path.read_bytes, suffix=path.name)
+    try:
+        is_dir = path.is_dir()
+    except FileNotFoundError:
+        is_dir = False
+
+    return _temp_dir(path) if is_dir else _temp_file(path)
 
 
 @as_file.register(pathlib.Path)
@@ -121,7 +130,7 @@ def _temp_path(dir: tempfile.TemporaryDirectory):
 
 
 @contextlib.contextmanager
-def _as_tree(path):
+def _temp_dir(path):
     """
     Given a traversable dir, recursively replicate the whole tree
     to the file system in a context manager.
