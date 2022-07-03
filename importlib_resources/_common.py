@@ -6,7 +6,7 @@ import contextlib
 import types
 import importlib
 
-from typing import Union, Optional, ContextManager
+from typing import Union, Optional
 from .abc import ResourceReader, Traversable
 
 from ._compat import wrap_spec
@@ -94,7 +94,7 @@ def _tempfile(
 
 
 @functools.singledispatch
-def as_file(path: Traversable) -> pathlib.Path:
+def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
@@ -112,7 +112,7 @@ def _(path):
 
 
 @contextlib.contextmanager
-def _temp_path(dir: tempfile.TemporaryDirectory) -> ContextManager[pathlib.Path]:
+def _temp_path(dir: tempfile.TemporaryDirectory):
     """
     Wrap tempfile.TemporyDirectory to return a pathlib object.
     """
@@ -121,7 +121,7 @@ def _temp_path(dir: tempfile.TemporaryDirectory) -> ContextManager[pathlib.Path]
 
 
 @contextlib.contextmanager
-def _as_tree(path: Traversable) -> pathlib.Path:
+def _as_tree(path):
     """
     Given a traversable dir, recursively replicate the whole tree
     to the file system in a context manager.
@@ -132,7 +132,7 @@ def _as_tree(path: Traversable) -> pathlib.Path:
         yield temp_dir
 
 
-def _write_contents(target: pathlib.Path, source: Traversable):
+def _write_contents(target, source):
     for item in source.iterdir():
         child = target.joinpath(item.name)
         if item.is_dir():
