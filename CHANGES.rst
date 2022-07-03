@@ -1,3 +1,10 @@
+v5.8.1
+======
+
+* #253: In ``MultiplexedPath``, restore expectation that
+  a compound path with a non-existent directory does not
+  raise an exception.
+
 v5.8.0
 ======
 
