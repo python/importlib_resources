@@ -3,6 +3,8 @@ import sys
 import pathlib
 import unittest
 
+import pytest
+
 from importlib import import_module
 from importlib_resources.readers import MultiplexedPath, NamespaceReader
 
@@ -76,6 +78,11 @@ class MultiplexedPathTest(unittest.TestCase):
             os.path.join('namespacedata01', 'imaginary'),
         )
         self.assertEqual(path.joinpath(), path)
+
+    @pytest.mark.xfail(reason="#253")
+    def test_join_path_compound(self):
+        path = MultiplexedPath(self.folder)
+        assert not path.joinpath('imaginary/foo.py').exists()
 
     def test_repr(self):
         self.assertEqual(
