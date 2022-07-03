@@ -1,3 +1,10 @@
+v5.9.0
+======
+
+* #228: ``as_file`` now also supports a ``Traversable``
+  representing a directory and (when needed) renders the
+  full tree to a temporary directory.
+
 v5.8.0
 ======
 
