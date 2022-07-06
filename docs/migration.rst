@@ -148,7 +148,7 @@ a package is a directory or not::
 
 The ``importlib_resources`` equivalent is straightforward::
 
-    if importlib_resources.files('my.package').joinpath('resource').isdir():
+    if importlib_resources.files('my.package').joinpath('resource').is_dir():
         print('A directory')
 
 
