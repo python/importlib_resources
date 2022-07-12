@@ -31,6 +31,8 @@ The documentation here includes a general :ref:`usage <using>` guide and a
    migration.rst
    history.rst
 
+.. tidelift-referral-banner::
+
 
 Indices and tables
 ==================

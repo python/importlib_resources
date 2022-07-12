@@ -38,3 +38,5 @@ extensions += ['sphinx.ext.intersphinx']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
 }
+
+extensions += ['jaraco.tidelift']

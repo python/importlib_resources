@@ -20,6 +20,9 @@
 .. image:: https://img.shields.io/badge/skeleton-2022-informational
    :target: https://blog.jaraco.com/skeleton
 
+.. image:: https://tidelift.com/badges/package/pypi/importlib-resources
+   :target: https://tidelift.com/subscription/pkg/pypi-importlib-resources?utm_source=pypi-importlib-resources&utm_medium=readme
+
 ``importlib_resources`` is a backport of Python standard library
 `importlib.resources
 <https://docs.python.org/3/library/importlib.html#module-importlib.resources>`_
@@ -53,3 +56,19 @@ were contributed to different versions in the standard library:
      - 3.9
    * - 0.5 (?)
      - 3.7
+
+For Enterprise
+==============
+
+Available as part of the Tidelift Subscription.
+
+This project and the maintainers of thousands of other packages are working with Tidelift to deliver one enterprise subscription that covers all of the open source you use.
+
+`Learn more <https://tidelift.com/subscription/pkg/pypi-importlib-resources?utm_source=pypi-importlib-resources&utm_medium=referral&utm_campaign=github>`_.
+
+Security Contact
+================
+
+To report a security vulnerability, please use the
+`Tidelift security contact <https://tidelift.com/security>`_.
+Tidelift will coordinate the fix and disclosure.
