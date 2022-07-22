@@ -97,18 +97,26 @@ def _temp_file(path):
     return _tempfile(path.read_bytes, suffix=path.name)
 
 
+def _is_present_dir(path: Traversable) -> bool:
+    """
+    Some Traversables implement ``is_dir()`` to raise an
+    exception (i.e. ``FileNotFoundError``) when the
+    directory doesn't exist. This function wraps that call
+    to always return a boolean and only return True
+    if there's a dir and it exists.
+    """
+    with contextlib.suppress(FileNotFoundError):
+        return path.is_dir()
+    return False
+
+
 @functools.singledispatch
 def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
-    try:
-        is_dir = path.is_dir()
-    except FileNotFoundError:
-        is_dir = False
-
-    return _temp_dir(path) if is_dir else _temp_file(path)
+    return _temp_dir(path) if _is_present_dir(path) else _temp_file(path)
 
 
 @as_file.register(pathlib.Path)
