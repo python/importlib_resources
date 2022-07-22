@@ -64,10 +64,8 @@ class ModulesFilesTests(unittest.TestCase):
         _path.build(spec, self.site_dir)
         import mod
 
-        # currently a failure occurs; ref #203
-        with self.assertRaisesRegex(TypeError, '.*mod.* is not a package'):
-            actual = resources.files(mod).joinpath('res.txt').read_text()
-            assert actual == spec['res.txt']
+        actual = resources.files(mod).joinpath('res.txt').read_text()
+        assert actual == spec['res.txt']
 
 
 if __name__ == '__main__':

@@ -102,17 +102,6 @@ class CommonTests(metaclass=abc.ABCMeta):
         del sys.modules[data01.__name__]
         self.execute(data01.__name__, 'utf-8.file')
 
-    def test_non_package_by_name(self):
-        # The anchor package cannot be a module.
-        with self.assertRaises(TypeError):
-            self.execute(__name__, 'utf-8.file')
-
-    def test_non_package_by_package(self):
-        # The anchor package cannot be a module.
-        with self.assertRaises(TypeError):
-            module = sys.modules['importlib_resources.tests.util']
-            self.execute(module, 'utf-8.file')
-
     def test_missing_path(self):
         # Attempting to open or read or request the path for a
         # non-existent path should succeed if open_resource

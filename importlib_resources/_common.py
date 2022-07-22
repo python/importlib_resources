@@ -18,7 +18,7 @@ def files(package: Package) -> Traversable:
     """
     Get a Traversable resource from a package
     """
-    return from_package(get_package(package))
+    return from_package(resolve(package))
 
 
 def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
@@ -45,17 +45,6 @@ def resolve(cand: Package):
 @resolve.register
 def _(cand: str):
     return importlib.import_module(cand)
-
-
-def get_package(package: Package) -> types.ModuleType:
-    """Take a package name or module object and return the module.
-
-    Raise an exception if the resolved module is not a package.
-    """
-    resolved = resolve(package)
-    if wrap_spec(resolved).submodule_search_locations is None:
-        raise TypeError(f'{package!r} is not a package')
-    return resolved
 
 
 def from_package(package):
