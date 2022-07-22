@@ -1,3 +1,13 @@
+v5.10.0
+=======
+
+* #203: Lifted restriction on modules passed to ``as_file``.
+  Now modules need not be a package and if a non-package
+  module is passed, resources will be resolved adjacent to
+  those modules, even for modules not found in any package.
+  For example, ``files(import_module('mod.py'))`` will
+  resolve resources found at the root.
+
 v5.9.0
 ======
 
