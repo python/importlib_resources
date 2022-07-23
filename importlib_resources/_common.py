@@ -37,8 +37,14 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
     return reader(spec.name)  # type: ignore
 
 
-def resolve(cand: Package) -> types.ModuleType:
-    return cand if isinstance(cand, types.ModuleType) else importlib.import_module(cand)
+@functools.singledispatch
+def resolve(cand: Package):
+    return cand
+
+
+@resolve.register
+def _(cand: str):
+    return importlib.import_module(cand)
 
 
 def get_package(package: Package) -> types.ModuleType:
