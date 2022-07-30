@@ -1,6 +1,8 @@
 import typing
+import textwrap
 import unittest
 import warnings
+import importlib
 import contextlib
 
 import importlib_resources as resources
@@ -82,6 +84,34 @@ class ModulesFilesTests(unittest.TestCase):
 
         actual = resources.files(mod).joinpath('res.txt').read_text()
         assert actual == spec['res.txt']
+
+
+class ImplicitContextFilesTests(unittest.TestCase):
+    def setUp(self):
+        self.fixtures = contextlib.ExitStack()
+        self.addCleanup(self.fixtures.close)
+        self.site_dir = self.fixtures.enter_context(os_helper.temp_dir())
+        self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
+        self.fixtures.enter_context(import_helper.CleanImport())
+
+    @__import__('pytest').mark.xfail(reason="work in progress")
+    def test_implicit_files(self):
+        """
+        Without any parameter, files() will infer the location as the caller.
+        """
+        spec = {
+            'somepkg': {
+                '__init__.py': textwrap.dedent(
+                    """
+                    import importlib_resources as res
+                    val = res.files().joinpath('res.txt').read_text()
+                    """
+                ),
+                'res.txt': 'resources are the best',
+            },
+        }
+        _path.build(spec, self.site_dir)
+        assert importlib.import_module('somepkg').val == 'resources are the best'
 
 
 if __name__ == '__main__':
