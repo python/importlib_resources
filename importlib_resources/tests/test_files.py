@@ -63,7 +63,7 @@ class OpenNamespaceTests(FilesTests, unittest.TestCase):
         self.data = namespacedata01
 
 
-class ModulesFilesTests(unittest.TestCase):
+class SiteDir:
     def setUp(self):
         self.fixtures = contextlib.ExitStack()
         self.addCleanup(self.fixtures.close)
@@ -71,6 +71,8 @@ class ModulesFilesTests(unittest.TestCase):
         self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
         self.fixtures.enter_context(import_helper.CleanImport())
 
+
+class ModulesFilesTests(SiteDir, unittest.TestCase):
     def test_module_resources(self):
         """
         A module can have resources found adjacent to the module.
@@ -86,14 +88,7 @@ class ModulesFilesTests(unittest.TestCase):
         assert actual == spec['res.txt']
 
 
-class ImplicitContextFilesTests(unittest.TestCase):
-    def setUp(self):
-        self.fixtures = contextlib.ExitStack()
-        self.addCleanup(self.fixtures.close)
-        self.site_dir = self.fixtures.enter_context(os_helper.temp_dir())
-        self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
-        self.fixtures.enter_context(import_helper.CleanImport())
-
+class ImplicitContextFilesTests(SiteDir, unittest.TestCase):
     @__import__('pytest').mark.xfail(reason="work in progress")
     def test_implicit_files(self):
         """
