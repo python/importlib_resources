@@ -16,7 +16,8 @@ class SimpleReader(abc.ABC):
     provider.
     """
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def package(self) -> str:
         """
         The name of the package for which this reader loads resources.
