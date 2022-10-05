@@ -12,11 +12,12 @@ from .abc import ResourceReader, Traversable
 from ._compat import wrap_spec
 
 Package = Union[types.ModuleType, str]
+Anchor = Package
 
 
-def files(package: Package) -> Traversable:
+def files(package: Anchor) -> Traversable:
     """
-    Get a Traversable resource from a package
+    Get a Traversable resource for an anchor.
     """
     return from_package(resolve(package))
 
