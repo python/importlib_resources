@@ -72,9 +72,6 @@ class TraversableResourcesLoader:
                 return readers.FileReader(self)
 
         return (
-            # native reader if it supplies 'files'
-            _native_reader(self.spec)
-            or
             # local ZipReader if a zip module
             _zip_reader(self.spec)
             or
