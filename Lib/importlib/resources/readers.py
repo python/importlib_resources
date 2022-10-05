@@ -85,13 +85,10 @@ class MultiplexedPath(abc.Traversable):
     def joinpath(self, *descendants):
         try:
             return super().joinpath(*descendants)
-        except abc.TraversalError as exc:
-            # One of the paths didn't resolve.
-            msg, target, names = exc.args
-            if names:  # pragma: nocover
-                raise
-            # It was the last; construct result with the first path.
-            return self._paths[0].joinpath(target)
+        except abc.TraversalError:
+            # One of the paths did not resolve (a directory does not exist).
+            # Just return something that will not exist.
+            return self._paths[0].joinpath(*descendants)
 
     def open(self, *args, **kwargs):
         raise FileNotFoundError(f'{self} is not a file')

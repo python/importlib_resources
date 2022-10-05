@@ -77,6 +77,10 @@ class MultiplexedPathTest(unittest.TestCase):
         )
         self.assertEqual(path.joinpath(), path)
 
+    def test_join_path_compound(self):
+        path = MultiplexedPath(self.folder)
+        assert not path.joinpath('imaginary/foo.py').exists()
+
     def test_repr(self):
         self.assertEqual(
             repr(MultiplexedPath(self.folder)),
