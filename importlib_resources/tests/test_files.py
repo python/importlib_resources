@@ -89,7 +89,6 @@ class ModulesFilesTests(SiteDir, unittest.TestCase):
 
 
 class ImplicitContextFilesTests(SiteDir, unittest.TestCase):
-    @__import__('pytest').mark.xfail(reason="work in progress")
     def test_implicit_files(self):
         """
         Without any parameter, files() will infer the location as the caller.

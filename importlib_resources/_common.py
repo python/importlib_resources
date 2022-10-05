@@ -5,7 +5,9 @@ import functools
 import contextlib
 import types
 import importlib
+import inspect
 import warnings
+import itertools
 
 from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
@@ -22,12 +24,9 @@ def package_to_anchor(func):
 
     Other errors should fall through.
 
-    >>> files()
-    Traceback (most recent call last):
-    TypeError: files() missing 1 required positional argument: 'anchor'
     >>> files('a', 'b')
     Traceback (most recent call last):
-    TypeError: files() takes 1 positional argument but 2 were given
+    TypeError: files() takes from 0 to 1 positional arguments but 2 were given
     """
     undefined = object()
 
@@ -50,7 +49,7 @@ def package_to_anchor(func):
 
 
 @package_to_anchor
-def files(anchor: Anchor) -> Traversable:
+def files(anchor: Optional[Anchor] = None) -> Traversable:
     """
     Get a Traversable resource for an anchor.
     """
@@ -74,13 +73,35 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
 
 
 @functools.singledispatch
-def resolve(cand: Anchor) -> types.ModuleType:
+def resolve(cand: Optional[Anchor]) -> types.ModuleType:
     return cast(types.ModuleType, cand)
 
 
 @resolve.register
 def _(cand: str) -> types.ModuleType:
     return importlib.import_module(cand)
+
+
+@resolve.register
+def _(cand: None) -> types.ModuleType:
+    return resolve(_infer_caller().f_globals['__name__'])
+
+
+def _infer_caller():
+    """
+    Walk the stack and find the frame of the first caller not in this module.
+    """
+
+    def is_this_file(frame_info):
+        return frame_info.filename == __file__
+
+    def is_wrapper(frame_info):
+        return frame_info.function == 'wrapper'
+
+    not_this_file = itertools.filterfalse(is_this_file, inspect.stack())
+    # also exclude 'wrapper' due to singledispatch in the call stack
+    callers = itertools.filterfalse(is_wrapper, not_this_file)
+    return next(callers).frame
 
 
 def from_package(package: types.ModuleType):
