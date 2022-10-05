@@ -6,7 +6,7 @@ import contextlib
 import types
 import importlib
 
-from typing import Union, Optional
+from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
 
 from ._compat import wrap_spec
@@ -39,16 +39,16 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
 
 
 @functools.singledispatch
-def resolve(cand: Package):
-    return cand
+def resolve(cand: Anchor) -> types.ModuleType:
+    return cast(types.ModuleType, cand)
 
 
 @resolve.register
-def _(cand: str):
+def _(cand: str) -> types.ModuleType:
     return importlib.import_module(cand)
 
 
-def from_package(package):
+def from_package(package: types.ModuleType):
     """
     Return a Traversable object for the given package.
 
