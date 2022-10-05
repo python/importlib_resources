@@ -140,27 +140,6 @@ returned is a context manager for use in a ``with``-statement::
 
 Use all the standard :py:mod:`contextlib` APIs to manage this context manager.
 
-.. attention::
-
-   There is an odd interaction with Python 3.4, 3.5, and 3.6 regarding adding
-   zip or wheel file paths to ``sys.path``.  Due to limitations in `zipimport
-   <https://docs.python.org/3/library/zipimport.html>`_, which can't be
-   changed without breaking backward compatibility, you **must** use an
-   absolute path to the zip/wheel file.  If you use a relative path, you will
-   not be able to find resources inside these zip files.  E.g.:
-
-   **No**::
-
-       sys.path.append('relative/path/to/foo.whl')
-       files('foo')  # This will fail!
-
-   **Yes**::
-
-       sys.path.append(os.path.abspath('relative/path/to/foo.whl'))
-       files('foo')
-
-Both relative and absolute paths work for Python 3.7 and newer.
-
 
 Migrating from Legacy
 =====================
