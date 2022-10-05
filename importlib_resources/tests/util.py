@@ -3,7 +3,7 @@ import importlib
 import io
 import sys
 import types
-from pathlib import Path, PurePath
+import pathlib
 
 from . import data01
 from . import zipdata01
@@ -94,7 +94,7 @@ class CommonTests(metaclass=abc.ABCMeta):
 
     def test_pathlib_path(self):
         # Passing in a pathlib.PurePath object for the path should succeed.
-        path = PurePath('utf-8.file')
+        path = pathlib.PurePath('utf-8.file')
         self.execute(data01, path)
 
     def test_importing_module_as_side_effect(self):
@@ -144,7 +144,7 @@ class ZipSetupBase:
 
     @classmethod
     def setUpClass(cls):
-        data_path = Path(cls.ZIP_MODULE.__file__)
+        data_path = pathlib.Path(cls.ZIP_MODULE.__file__)
         data_dir = data_path.parent
         cls._zip_path = str(data_dir / 'ziptestdata.zip')
         sys.path.append(cls._zip_path)
