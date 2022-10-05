@@ -119,18 +119,18 @@ imported.  Thus the above example could also be written as::
 File system or zip file
 =======================
 
-In general you never have to worry whether your package is on the file system
-or in a zip file, as the ``importlib_resources`` APIs hide those details from
-you.  Sometimes though, you need a path to an actual file on the file system.
+A consumer need not worry whether any given package is on the file system
+or in a zip file, as the ``importlib_resources`` APIs abstracts those details.
+Sometimes though, the user needs a path to an actual file on the file system.
 For example, some SSL APIs require a certificate file to be specified by a
 real file system path, and C's ``dlopen()`` function also requires a real file
 system path.
 
-To support this, ``importlib_resources`` provides an API that will extract the
-resource from a zip file to a temporary file, and return the file system path
-to this temporary file as a :py:class:`pathlib.Path` object.  In order to
-properly clean up this temporary file, what's actually returned is a context
-manager that you can use in a ``with``-statement::
+To support this need, ``importlib_resources`` provides an API to extract the
+resource from a zip file to a temporary file or folder and return the file
+system path to this materialized resource as a :py:class:`pathlib.Path`
+object. In order to properly clean up this temporary file, what's actually
+returned is a context manager for use in a ``with``-statement::
 
     from importlib_resources import files, as_file
 
@@ -138,8 +138,7 @@ manager that you can use in a ``with``-statement::
     with as_file(source) as eml:
         third_party_api_requiring_file_system_path(eml)
 
-You can use all the standard :py:mod:`contextlib` APIs to manage this context
-manager.
+Use all the standard :py:mod:`contextlib` APIs to manage this context manager.
 
 .. attention::
 
