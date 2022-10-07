@@ -19,6 +19,15 @@ Anchor = Package
 def package_to_anchor(func):
     """
     Replace 'package' parameter as 'anchor' and warn about the change.
+
+    Other errors should fall through.
+
+    >>> files()
+    Traceback (most recent call last):
+    TypeError: files() missing 1 required positional argument: 'anchor'
+    >>> files('a', 'b')
+    Traceback (most recent call last):
+    TypeError: files() takes 1 positional argument but 2 were given
     """
     undefined = object()
 
