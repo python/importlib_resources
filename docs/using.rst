@@ -5,11 +5,11 @@
 ===========================
 
 ``importlib_resources`` is a library that leverages Python's import system to
-provide access to *resources* within *packages*.  Given that this library is
-built on top of the import system, it is highly efficient and easy to use.
-This library's philosophy is that, if you can import a package, you can access
-resources within that package.  Resources can be opened or read, in either
-binary or text mode.
+provide access to *resources* within *packages* and alongside *modules*. Given
+that this library is built on top of the import system, it is highly efficient
+and easy to use. This library's philosophy is that, if one can import a
+module, one can access resources associated with that module. Resources can be
+opened or read, in either binary or text mode.
 
 What exactly do we mean by "a resource"?  It's easiest to think about the
 metaphor of files and directories on the file system, though it's important to
@@ -23,11 +23,14 @@ If you have a file system layout such as::
         one/
             __init__.py
             resource1.txt
+            module1.py
             resources1/
                 resource1.1.txt
         two/
             __init__.py
             resource2.txt
+    standalone.py
+    resource3.txt
 
 then the directories are ``data``, ``data/one``, and ``data/two``.  Each of
 these are also Python packages by virtue of the fact that they all contain
@@ -48,11 +51,14 @@ package directory, so
 ``data/one/resource1.txt`` and ``data/two/resource2.txt`` are both resources,
 as are the ``__init__.py`` files in all the directories.
 
-Resources are always accessed relative to the package that they live in.
-``resource1.txt`` and ``resources1/resource1.1.txt`` are resources within
-the ``data.one`` package, and
-``two/resource2.txt`` is a resource within the
-``data`` package.
+Resources in packages are always accessed relative to the package that they
+live in. ``resource1.txt`` and ``resources1/resource1.1.txt`` are resources
+within the ``data.one`` package, and ``two/resource2.txt`` is a resource
+within the ``data`` package.
+
+Resources may also be referenced relative to another *anchor*, a module in a
+package (``data.one.module1``) or a standalone module (``standalone``). In
+this case, resources are loaded from the same loader that loaded that module.
 
 
 Example
@@ -103,14 +109,14 @@ using ``importlib_resources`` would look like::
     eml = files('email.tests.data').joinpath('message.eml').read_text()
 
 
-Packages or package names
-=========================
+Anchors
+=======
 
-All of the ``importlib_resources`` APIs take a *package* as their first
-parameter, but this can either be a package name (as a ``str``) or an actual
-module object, though the module *must* be a package.  If a string is
-passed in, it must name an importable Python package, and this is first
-imported.  Thus the above example could also be written as::
+The ``importlib_resources`` ``files`` API takes an *anchor* as its first
+parameter, which can either be a package name (as a ``str``) or an actual
+module object.  If a string is passed in, it must name an importable Python
+module, which is imported prior to loading any resources. Thus the above
+example could also be written as::
 
     import email.tests.data
     eml = files(email.tests.data).joinpath('message.eml').read_text()

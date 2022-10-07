@@ -6,8 +6,8 @@ in Python packages.  It provides functionality similar to ``pkg_resources``
 `Basic Resource Access`_ API, but without all of the overhead and performance
 problems of ``pkg_resources``.
 
-In our terminology, a *resource* is a file tree that is located within an
-importable `Python package`_.  Resources can live on the file system or in a
+In our terminology, a *resource* is a file tree that is located alongside an
+importable `Python module`_.  Resources can live on the file system or in a
 zip file, with support for other loader_ classes that implement the appropriate
 API for reading resources.
 
@@ -43,5 +43,5 @@ Indices and tables
 
 
 .. _`Basic Resource Access`: http://setuptools.readthedocs.io/en/latest/pkg_resources.html#basic-resource-access
-.. _`Python package`: https://docs.python.org/3/reference/import.html#packages
+.. _`Python module`: https://docs.python.org/3/glossary.html#term-module
 .. _loader: https://docs.python.org/3/reference/import.html#finders-and-loaders

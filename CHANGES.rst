@@ -1,3 +1,15 @@
+v5.10.0
+=======
+
+* #203: Lifted restriction on modules passed to ``files``.
+  Now modules need not be a package and if a non-package
+  module is passed, resources will be resolved adjacent to
+  those modules, even for modules not found in any package.
+  For example, ``files(import_module('mod.py'))`` will
+  resolve resources found at the root. The parameter to
+  files was renamed from 'package' to 'anchor', with a
+  compatibility shim for those passing by keyword.
+
 v5.9.0
 ======
 

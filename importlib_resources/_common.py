@@ -5,20 +5,56 @@ import functools
 import contextlib
 import types
 import importlib
+import warnings
 
-from typing import Union, Optional
+from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
 
 from ._compat import wrap_spec
 
 Package = Union[types.ModuleType, str]
+Anchor = Package
 
 
-def files(package: Package) -> Traversable:
+def package_to_anchor(func):
     """
-    Get a Traversable resource from a package
+    Replace 'package' parameter as 'anchor' and warn about the change.
+
+    Other errors should fall through.
+
+    >>> files()
+    Traceback (most recent call last):
+    TypeError: files() missing 1 required positional argument: 'anchor'
+    >>> files('a', 'b')
+    Traceback (most recent call last):
+    TypeError: files() takes 1 positional argument but 2 were given
     """
-    return from_package(get_package(package))
+    undefined = object()
+
+    @functools.wraps(func)
+    def wrapper(anchor=undefined, package=undefined):
+        if package is not undefined:
+            if anchor is not undefined:
+                return func(anchor, package)
+            warnings.warn(
+                "First parameter to files is renamed to 'anchor'",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return func(package)
+        elif anchor is undefined:
+            return func()
+        return func(anchor)
+
+    return wrapper
+
+
+@package_to_anchor
+def files(anchor: Anchor) -> Traversable:
+    """
+    Get a Traversable resource for an anchor.
+    """
+    return from_package(resolve(anchor))
 
 
 def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
@@ -38,27 +74,16 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
 
 
 @functools.singledispatch
-def resolve(cand: Package):
-    return cand
+def resolve(cand: Anchor) -> types.ModuleType:
+    return cast(types.ModuleType, cand)
 
 
 @resolve.register
-def _(cand: str):
+def _(cand: str) -> types.ModuleType:
     return importlib.import_module(cand)
 
 
-def get_package(package: Package) -> types.ModuleType:
-    """Take a package name or module object and return the module.
-
-    Raise an exception if the resolved module is not a package.
-    """
-    resolved = resolve(package)
-    if wrap_spec(resolved).submodule_search_locations is None:
-        raise TypeError(f'{package!r} is not a package')
-    return resolved
-
-
-def from_package(package):
+def from_package(package: types.ModuleType):
     """
     Return a Traversable object for the given package.
 

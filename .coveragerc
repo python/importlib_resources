@@ -6,6 +6,7 @@ omit =
 	*/_itertools.py
 	*/_legacy.py
 	*/simple.py
+	*/_path.py
 
 [report]
 show_missing = True
