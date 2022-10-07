@@ -5,6 +5,7 @@ import functools
 import contextlib
 import types
 import importlib
+import warnings
 
 from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
@@ -15,11 +16,36 @@ Package = Union[types.ModuleType, str]
 Anchor = Package
 
 
-def files(package: Anchor) -> Traversable:
+def package_to_anchor(func):
+    """
+    Replace 'package' parameter as 'anchor' and warn about the change.
+    """
+    undefined = object()
+
+    @functools.wraps(func)
+    def wrapper(anchor=undefined, package=undefined):
+        if package is not undefined:
+            if anchor is not undefined:
+                return func(anchor, package)
+            warnings.warn(
+                "First parameter to files is renamed to 'anchor'",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return func(package)
+        elif anchor is undefined:
+            return func()
+        return func(anchor)
+
+    return wrapper
+
+
+@package_to_anchor
+def files(anchor: Anchor) -> Traversable:
     """
     Get a Traversable resource for an anchor.
     """
-    return from_package(resolve(package))
+    return from_package(resolve(anchor))
 
 
 def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:

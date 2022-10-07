@@ -6,7 +6,9 @@ v5.10.0
   module is passed, resources will be resolved adjacent to
   those modules, even for modules not found in any package.
   For example, ``files(import_module('mod.py'))`` will
-  resolve resources found at the root.
+  resolve resources found at the root. The parameter to
+  files was renamed from 'package' to 'anchor', with a
+  compatibility shim for those passing by keyword.
 
 v5.9.0
 ======

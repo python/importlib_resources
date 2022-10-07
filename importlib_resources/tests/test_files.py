@@ -1,5 +1,6 @@
 import typing
 import unittest
+import warnings
 import contextlib
 
 import importlib_resources as resources
@@ -8,6 +9,13 @@ from . import data01
 from . import util
 from . import _path
 from ._compat import os_helper, import_helper
+
+
+@contextlib.contextmanager
+def suppress_known_deprecation():
+    with warnings.catch_warnings(record=True) as ctx:
+        warnings.simplefilter('default', category=DeprecationWarning)
+        yield ctx
 
 
 class FilesTests:
@@ -27,6 +35,14 @@ class FilesTests:
     )
     def test_traversable(self):
         assert isinstance(resources.files(self.data), Traversable)
+
+    def test_old_parameter(self):
+        """
+        Files used to take a 'package' parameter. Make sure anyone
+        passing by name is still supported.
+        """
+        with suppress_known_deprecation():
+            resources.files(package=self.data)
 
 
 class OpenDiskTests(FilesTests, unittest.TestCase):
