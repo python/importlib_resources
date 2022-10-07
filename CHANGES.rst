@@ -1,7 +1,7 @@
 v5.10.0
 =======
 
-* #203: Lifted restriction on modules passed to ``as_file``.
+* #203: Lifted restriction on modules passed to ``files``.
   Now modules need not be a package and if a non-package
   module is passed, resources will be resolved adjacent to
   those modules, even for modules not found in any package.
