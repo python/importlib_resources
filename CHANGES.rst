@@ -10,6 +10,10 @@ v5.10.0
   files was renamed from 'package' to 'anchor', with a
   compatibility shim for those passing by keyword.
 
+* #259: ``files`` no longer requires the anchor to be
+  specified and can infer the anchor from the caller's scope
+  (defaults to the caller's module).
+
 v5.9.0
 ======
 
