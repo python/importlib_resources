@@ -1,6 +1,8 @@
 import typing
+import textwrap
 import unittest
 import warnings
+import importlib
 import contextlib
 
 import importlib_resources as resources
@@ -61,7 +63,7 @@ class OpenNamespaceTests(FilesTests, unittest.TestCase):
         self.data = namespacedata01
 
 
-class ModulesFilesTests(unittest.TestCase):
+class SiteDir:
     def setUp(self):
         self.fixtures = contextlib.ExitStack()
         self.addCleanup(self.fixtures.close)
@@ -69,6 +71,8 @@ class ModulesFilesTests(unittest.TestCase):
         self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
         self.fixtures.enter_context(import_helper.CleanImport())
 
+
+class ModulesFilesTests(SiteDir, unittest.TestCase):
     def test_module_resources(self):
         """
         A module can have resources found adjacent to the module.
@@ -82,6 +86,26 @@ class ModulesFilesTests(unittest.TestCase):
 
         actual = resources.files(mod).joinpath('res.txt').read_text()
         assert actual == spec['res.txt']
+
+
+class ImplicitContextFilesTests(SiteDir, unittest.TestCase):
+    def test_implicit_files(self):
+        """
+        Without any parameter, files() will infer the location as the caller.
+        """
+        spec = {
+            'somepkg': {
+                '__init__.py': textwrap.dedent(
+                    """
+                    import importlib_resources as res
+                    val = res.files().joinpath('res.txt').read_text()
+                    """
+                ),
+                'res.txt': 'resources are the best',
+            },
+        }
+        _path.build(spec, self.site_dir)
+        assert importlib.import_module('somepkg').val == 'resources are the best'
 
 
 if __name__ == '__main__':
