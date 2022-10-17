@@ -46,7 +46,7 @@ were contributed to different versions in the standard library:
 
    * - importlib_resources
      - stdlib
-   * - 5.8
+   * - 5.9
      - 3.12
    * - 5.7
      - 3.11
