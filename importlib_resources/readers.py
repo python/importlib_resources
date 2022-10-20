@@ -87,7 +87,7 @@ class MultiplexedPath(abc.Traversable):
         paths = []
         if not descendants:
             return self
-        
+
         for path in (p.joinpath(*descendants) for p in self._paths):
             if path.exists():
                 if path.is_dir():
@@ -98,8 +98,13 @@ class MultiplexedPath(abc.Traversable):
                     return path
 
         # if it does not exist, construct it with the first path
-        return MultiplexedPath(*paths) if len(paths) > 1 else \
-            paths[0] if len(paths) == 1 else self._paths[0].joinpath(*descendants)
+        return (
+            MultiplexedPath(*paths)
+            if len(paths) > 1
+            else paths[0]
+            if len(paths) == 1
+            else self._paths[0].joinpath(*descendants)
+        )
 
     def open(self, *args, **kwargs):
         raise FileNotFoundError(f'{self} is not a file')

@@ -89,7 +89,7 @@ class MultiplexedPathTest(unittest.TestCase):
         self.assertIsInstance(path.joinpath('subdirectory'), MultiplexedPath)
         self.assertEqual(
             str(path.joinpath('subdirectory', 'subsubdir'))[len(prefix) + 1 :],
-            os.path.join('data02', 'subdirectory', 'subsubdir')
+            os.path.join('data02', 'subdirectory', 'subsubdir'),
         )
 
     def test_repr(self):
