@@ -1,10 +1,7 @@
 .. image:: https://img.shields.io/pypi/v/importlib_resources.svg
-   :target: `PyPI link`_
+   :target: https://pypi.org/project/importlib_resources
 
 .. image:: https://img.shields.io/pypi/pyversions/importlib_resources.svg
-   :target: `PyPI link`_
-
-.. _PyPI link: https://pypi.org/project/importlib_resources
 
 .. image:: https://github.com/python/importlib_resources/workflows/tests/badge.svg
    :target: https://github.com/python/importlib_resources/actions?query=workflow%3A%22tests%22
