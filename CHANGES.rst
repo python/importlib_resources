@@ -1,3 +1,8 @@
+v5.10.1
+=======
+
+* #274: Fixed ``ResourceWarning`` in ``_common``.
+
 v5.10.0
 =======
 
