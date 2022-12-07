@@ -97,12 +97,15 @@ class MultiplexedPath(abc.Traversable):
                     # If it's a file, immediately return it
                     return path
 
-        # if it does not exist, construct it with the first path
         return (
+            # Return a new Multiplexed path if multiple valid candidates are found,
             MultiplexedPath(*paths)
             if len(paths) > 1
+            # A single path if only one valid candidate is found,
             else paths[0]
             if len(paths) == 1
+            # or return a non-existing path based on our first path if the path
+            # didn't resolve at all.
             else self._paths[0].joinpath(*descendants)
         )
 
