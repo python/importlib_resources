@@ -1,3 +1,9 @@
+v5.10.2
+=======
+
+* #274: Prefer ``write_bytes`` to context manager as
+  proposed in gh-100586.
+
 v5.10.1
 =======
 
