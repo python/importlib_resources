@@ -39,7 +39,9 @@ class OpenTests:
         self.assertEqual(result, 'Hello, UTF-16 world!\n')
 
     def test_open_text_with_errors(self):
-        # Raises UnicodeError without the 'errors' argument.
+        """
+        Raises UnicodeError without the 'errors' argument.
+        """
         target = resources.files(self.data) / 'utf-16.file'
         with target.open(encoding='utf-8', errors='strict') as fp:
             self.assertRaises(UnicodeError, fp.read)

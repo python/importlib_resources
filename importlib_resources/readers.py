@@ -41,8 +41,10 @@ class ZipReader(abc.TraversableResources):
             raise FileNotFoundError(exc.args[0])
 
     def is_resource(self, path):
-        # workaround for `zipfile.Path.is_file` returning true
-        # for non-existent paths.
+        """
+        Workaround for `zipfile.Path.is_file` returning true
+        for non-existent paths.
+        """
         target = self.files().joinpath(path)
         return target.is_file() and target.exists()
 

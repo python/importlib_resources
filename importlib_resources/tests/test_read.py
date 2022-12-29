@@ -34,7 +34,9 @@ class ReadTests:
         self.assertEqual(result, 'Hello, UTF-16 world!\n')
 
     def test_read_text_with_errors(self):
-        # Raises UnicodeError without the 'errors' argument.
+        """
+        Raises UnicodeError without the 'errors' argument.
+        """
         target = resources.files(self.data) / 'utf-16.file'
         self.assertRaises(UnicodeError, target.read_text, encoding='utf-8')
         result = target.read_text(encoding='utf-8', errors='ignore')

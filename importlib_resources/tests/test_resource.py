@@ -69,10 +69,12 @@ class ResourceLoaderTests(unittest.TestCase):
 
 class ResourceCornerCaseTests(unittest.TestCase):
     def test_package_has_no_reader_fallback(self):
-        # Test odd ball packages which:
+        """
+        Test odd ball packages which:
         # 1. Do not have a ResourceReader as a loader
         # 2. Are not on the file system
         # 3. Are not in a zip file
+        """
         module = util.create_package(
             file=data01, path=data01.__file__, contents=['A', 'B', 'C']
         )
@@ -197,8 +199,10 @@ class DeletingZipsTest(unittest.TestCase):
         del c
 
     def test_entered_path_does_not_keep_open(self):
-        # This is what certifi does on import to make its bundle
-        # available for the process duration.
+        """
+        Mimic what certifi does on import to make its bundle
+        available for the process duration.
+        """
         c = resources.as_file(
             resources.files('ziptestdata') / 'binary.file'
         ).__enter__()
