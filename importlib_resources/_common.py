@@ -17,6 +17,10 @@ from ._compat import wrap_spec
 Package = Union[types.ModuleType, str]
 Anchor = Package
 
+try:
+  NoneType = types.NoneType
+except AttributeError: # Python < 3.10
+  NoneType = type(None)
 
 def package_to_anchor(func):
     """
@@ -83,7 +87,7 @@ def _(cand: str) -> types.ModuleType:
 
 
 @resolve.register
-def _(cand: None) -> types.ModuleType:
+def _(cand: NoneType) -> types.ModuleType:
     return resolve(_infer_caller().f_globals['__name__'])
 
 
