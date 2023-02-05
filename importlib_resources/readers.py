@@ -1,10 +1,12 @@
 import collections
+import contextlib
 import pathlib
 import operator
 
 from . import abc
 
 from ._itertools import unique_everseen
+from ._pathlib import by_type
 from ._compat import ZipPath
 
 
@@ -83,31 +85,45 @@ class MultiplexedPath(abc.Traversable):
         return False
 
     def joinpath(self, *descendants):
-        # first try to find child in current paths
-        paths = []
         if not descendants:
             return self
 
-        for path in (p.joinpath(*descendants) for p in self._paths):
-            if path.exists():
-                if path.is_dir():
-                    # If it's a dir, try to combine it with others
-                    paths.append(path)
-                else:
-                    # If it's a file, immediately return it
-                    return path
+        children = (
+            joined
+            for joined in (p.joinpath(*descendants) for p in self._paths)
+            if joined.exists()
+        )
+
+        files, subdirs = by_type(children)
 
         return (
-            # Return a new Multiplexed path if multiple valid candidates are found,
-            MultiplexedPath(*paths)
-            if len(paths) > 1
-            # A single path if only one valid candidate is found,
-            else paths[0]
-            if len(paths) == 1
-            # or return a non-existing path based on our first path if the path
-            # didn't resolve at all.
-            else self._paths[0].joinpath(*descendants)
+            # If a file matches, use it.
+            next(files, None)
+            # Attempt to construct a MultiplexedPath from subdirs.
+            or self._maybe(subdirs)
+            # No children matched, so return a non-existing path based on
+            # the first path in self.
+            or self._paths[0].joinpath(*descendants)
         )
+
+    @classmethod
+    def _maybe(cls, subdirs):
+        """
+        Construct a MultiplexedPath if needed.
+
+        If the subdirs is empty, return None.
+        If subdirs contains a sole element, return it.
+        Otherwise, return a MultiplexedPath of the items.
+        """
+        try:
+            result = cls(*subdirs)
+        except FileNotFoundError:
+            return
+
+        with contextlib.suppress(ValueError):
+            (result,) = result._paths
+
+        return result
 
     def open(self, *args, **kwargs):
         raise FileNotFoundError(f'{self} is not a file')
