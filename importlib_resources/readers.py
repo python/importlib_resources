@@ -1,11 +1,11 @@
 import collections
-import contextlib
 import itertools
 import pathlib
 import operator
 
 from . import abc
 
+from ._itertools import only
 from ._compat import ZipPath
 
 
@@ -73,7 +73,7 @@ class MultiplexedPath(abc.Traversable):
         children = (child for path in self._paths for child in path.iterdir())
         by_name = operator.attrgetter('name')
         groups = itertools.groupby(sorted(children, key=by_name), key=by_name)
-        return map(self._maybe, (locs for name, locs in groups))
+        return map(self._follow, (locs for name, locs in groups))
 
     def read_bytes(self):
         raise FileNotFoundError(f'{self} is not a file')
@@ -96,24 +96,23 @@ class MultiplexedPath(abc.Traversable):
             return self._paths[0].joinpath(*descendants)
 
     @classmethod
-    def _maybe(cls, subdirs):
+    def _follow(cls, children):
         """
         Construct a MultiplexedPath if needed.
 
-        If subdirs contains a sole element, return it.
+        If children contains a sole element, return it.
         Otherwise, return a MultiplexedPath of the items.
+        Unless one of the items is not a Directory, then return the first.
         """
-        saved = list(subdirs)
+        subdirs, one_dir, one_file = itertools.tee(children, 3)
 
         try:
-            result = cls(*saved)
-        except NotADirectoryError:
-            return saved[0]
-
-        with contextlib.suppress(ValueError):
-            (result,) = result._paths
-
-        return result
+            return only(one_dir)
+        except ValueError:
+            try:
+                return cls(*subdirs)
+            except NotADirectoryError:
+                return next(one_file)
 
     def open(self, *args, **kwargs):
         raise FileNotFoundError(f'{self} is not a file')
