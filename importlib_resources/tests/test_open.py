@@ -15,7 +15,7 @@ class CommonBinaryTests(util.CommonTests, unittest.TestCase):
 class CommonTextTests(util.CommonTests, unittest.TestCase):
     def execute(self, package, path):
         target = resources.files(package).joinpath(path)
-        with target.open():
+        with target.open(encoding='utf-8'):
             pass
 
 
@@ -28,7 +28,7 @@ class OpenTests:
 
     def test_open_text_default_encoding(self):
         target = resources.files(self.data) / 'utf-8.file'
-        with target.open() as fp:
+        with target.open(encoding='utf-8') as fp:
             result = fp.read()
             self.assertEqual(result, 'Hello, UTF-8 world!\n')
 

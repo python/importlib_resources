@@ -122,6 +122,27 @@ example could also be written as::
     eml = files(email.tests.data).joinpath('message.eml').read_text()
 
 
+Namespace Packages
+==================
+
+``importlib_resources`` supports namespace packages as anchors just like
+any other package. Similar to modules in a namespace package,
+resources in a namespace package are not allowed to collide by name.
+For example, if two packages both expose ``nspkg/data/foo.txt``, those
+resources are unsupported by this library. The package will also likely
+experience problems due to the collision with installers.
+
+It's perfectly valid, however, for two packages to present different resources
+in the same namespace package, regular package, or subdirectory.
+For example, one package could expose ``nspkg/data/foo.txt`` and another
+expose ``nspkg/data/bar.txt`` and those two packages could be installed
+into separate paths, and the resources should be queryable::
+
+    data = importlib_resources.files('nspkg').joinpath('data')
+    data.joinpath('foo.txt').read_text()
+    data.joinpath('bar.txt').read_text()
+
+
 File system or zip file
 =======================
 
