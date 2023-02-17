@@ -1,3 +1,11 @@
+v5.12.0
+=======
+
+* #257: ``importlib_resources`` (backport) now gives
+  precedence to built-in readers (file system, zip,
+  namespace packages), providing forward-compatibility
+  of behaviors like ``MultiplexedPath``.
+
 v5.10.1
 =======
 
