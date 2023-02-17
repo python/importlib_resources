@@ -18,9 +18,10 @@ Package = Union[types.ModuleType, str]
 Anchor = Package
 
 try:
-  NoneType = types.NoneType
-except AttributeError: # Python < 3.10
-  NoneType = type(None)
+    NoneType = types.NoneType
+except AttributeError:  # Python < 3.10
+    NoneType = type(None)
+
 
 def package_to_anchor(func):
     """
