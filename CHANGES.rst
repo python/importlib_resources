@@ -1,3 +1,8 @@
+v5.10.4
+=======
+
+* #280: Fixed one more ``EncodingWarning`` in test suite.
+
 v5.10.3
 =======
 
