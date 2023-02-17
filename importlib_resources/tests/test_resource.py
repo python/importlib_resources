@@ -153,22 +153,15 @@ def zip_on_path(dir):
     try:
         yield
     finally:
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(zip_path))
-        except ValueError:
-            pass
 
-        try:
+        with contextlib.suppress(KeyError):
             del sys.path_importer_cache[str(zip_path)]
             del sys.modules['ziptestdata']
-        except KeyError:
-            pass
 
-        try:
+        with contextlib.suppress(OSError):
             unlink(zip_path)
-        except OSError:
-            # If the test fails, this will probably fail too
-            pass
 
 
 class DeletingZipsTest(unittest.TestCase):
