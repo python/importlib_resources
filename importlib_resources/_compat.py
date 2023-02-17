@@ -80,8 +80,12 @@ class TraversableResourcesLoader:
             or
             # local FileReader
             _file_reader(self.spec)
+            or
+            # native reader if it supplies 'files'
+            _native_reader(self.spec)
+            or
             # fallback - adapt the spec ResourceReader to TraversableReader
-            or _adapters.CompatibilityFiles(self.spec)
+            _adapters.CompatibilityFiles(self.spec)
         )
 
 
