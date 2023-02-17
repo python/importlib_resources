@@ -203,7 +203,9 @@ class DeletingZipsTest(unittest.TestCase):
         resources.files('ziptestdata').joinpath('binary.file').read_bytes()
 
     def test_read_text_does_not_keep_open(self):
-        resources.files('ziptestdata').joinpath('utf-8.file').read_text()
+        resources.files('ziptestdata').joinpath('utf-8.file').read_text(
+            encoding='utf-8'
+        )
 
 
 class ResourceFromNamespaceTest01(unittest.TestCase):
