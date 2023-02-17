@@ -4,6 +4,11 @@ v5.11.0
 * #265: ``MultiplexedPath`` now honors multiple subdirectories
   in ``iterdir`` and ``joinpath``.
 
+v5.10.4
+=======
+
+* #280: Fixed one more ``EncodingWarning`` in test suite.
+
 v5.10.3
 =======
 

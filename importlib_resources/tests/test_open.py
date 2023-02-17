@@ -56,11 +56,13 @@ class OpenTests:
 
     def test_open_binary_FileNotFoundError(self):
         target = resources.files(self.data) / 'does-not-exist'
-        self.assertRaises(FileNotFoundError, target.open, 'rb')
+        with self.assertRaises(FileNotFoundError):
+            target.open('rb')
 
     def test_open_text_FileNotFoundError(self):
         target = resources.files(self.data) / 'does-not-exist'
-        self.assertRaises(FileNotFoundError, target.open)
+        with self.assertRaises(FileNotFoundError):
+            target.open(encoding='utf-8')
 
 
 class OpenDiskTests(OpenTests, unittest.TestCase):
