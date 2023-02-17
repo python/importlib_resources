@@ -1,3 +1,9 @@
+v5.10.3
+=======
+
+* Packaging refresh, including fixing EncodingWarnings
+  and some tests cleanup.
+
 v5.10.2
 =======
 
