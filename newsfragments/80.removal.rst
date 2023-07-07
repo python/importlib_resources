@@ -1,1 +1,0 @@
-Removed legacy functions deprecated in 5.3.

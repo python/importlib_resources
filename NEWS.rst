@@ -1,3 +1,12 @@
+v6.0.0
+======
+
+Deprecations and Removals
+-------------------------
+
+- Removed legacy functions deprecated in 5.3. (#80)
+
+
 v5.13.0
 =======
 
