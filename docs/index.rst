@@ -1,6 +1,10 @@
 Welcome to |project| documentation!
 ===================================
 
+.. sidebar-links::
+   :home:
+   :pypi:
+
 ``importlib_resources`` is a library which provides for access to *resources*
 in Python packages.  It provides functionality similar to ``pkg_resources``
 `Basic Resource Access`_ API, but without all of the overhead and performance
