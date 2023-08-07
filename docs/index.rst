@@ -31,9 +31,10 @@ The documentation here includes a general :ref:`usage <using>` guide and a
    :maxdepth: 2
    :caption: Contents:
 
-   using.rst
-   migration.rst
-   history.rst
+   using
+   api
+   migration
+   history
 
 .. tidelift-referral-banner::
 
