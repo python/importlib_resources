@@ -1,3 +1,12 @@
+v6.0.1
+======
+
+Bugfixes
+--------
+
+- Restored Apache license. (#285)
+
+
 v6.0.0
 ======
 
