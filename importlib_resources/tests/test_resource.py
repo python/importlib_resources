@@ -167,17 +167,7 @@ class DeletingZipsTest(util.ZipSetupBase, unittest.TestCase):
         resources.files('data01').joinpath('utf-8.file').read_text(encoding='utf-8')
 
 
-class ResourceFromNamespaceTest01(unittest.TestCase):
-    site_dir = str(pathlib.Path(__file__).parent)
-
-    @classmethod
-    def setUpClass(cls):
-        sys.path.append(cls.site_dir)
-
-    @classmethod
-    def tearDownClass(cls):
-        sys.path.remove(cls.site_dir)
-
+class ResourceFromNamespaceTests:
     def test_is_submodule_resource(self):
         self.assertTrue(
             resources.files(import_module('namespacedata01'))
@@ -205,6 +195,18 @@ class ResourceFromNamespaceTest01(unittest.TestCase):
         except KeyError:
             pass
         self.assertEqual(contents, {'binary.file', 'utf-8.file', 'utf-16.file'})
+
+
+class ResourceFromNamespaceDiskTests(ResourceFromNamespaceTests, unittest.TestCase):
+    site_dir = str(pathlib.Path(__file__).parent)
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.append(cls.site_dir)
+
+    @classmethod
+    def tearDownClass(cls):
+        sys.path.remove(cls.site_dir)
 
 
 if __name__ == '__main__':
