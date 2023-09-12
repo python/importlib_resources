@@ -1,15 +1,11 @@
-import contextlib
 import sys
 import unittest
 import importlib_resources as resources
-import uuid
 import pathlib
 
 from . import data01
-from . import zipdata01, zipdata02
 from . import util
 from importlib import import_module
-from ._compat import import_helper, os_helper, unlink
 
 
 class ResourceTests:
@@ -89,34 +85,32 @@ class ResourceCornerCaseTests(unittest.TestCase):
 
 
 class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
-    ZIP_MODULE = zipdata01  # type: ignore
+    ZIP_MODULE = 'data01'
 
     def test_is_submodule_resource(self):
-        submodule = import_module('ziptestdata.subdirectory')
+        submodule = import_module('data01.subdirectory')
         self.assertTrue(resources.files(submodule).joinpath('binary.file').is_file())
 
     def test_read_submodule_resource_by_name(self):
         self.assertTrue(
-            resources.files('ziptestdata.subdirectory')
-            .joinpath('binary.file')
-            .is_file()
+            resources.files('data01.subdirectory').joinpath('binary.file').is_file()
         )
 
     def test_submodule_contents(self):
-        submodule = import_module('ziptestdata.subdirectory')
+        submodule = import_module('data01.subdirectory')
         self.assertEqual(
             names(resources.files(submodule)), {'__init__.py', 'binary.file'}
         )
 
     def test_submodule_contents_by_name(self):
         self.assertEqual(
-            names(resources.files('ziptestdata.subdirectory')),
+            names(resources.files('data01.subdirectory')),
             {'__init__.py', 'binary.file'},
         )
 
     def test_as_file_directory(self):
-        with resources.as_file(resources.files('ziptestdata')) as data:
-            assert data.name == 'ziptestdata'
+        with resources.as_file(resources.files('data01')) as data:
+            assert data.name == 'data01'
             assert data.is_dir()
             assert data.joinpath('subdirectory').is_dir()
             assert len(list(data.iterdir()))
@@ -124,7 +118,7 @@ class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
 
 
 class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
-    ZIP_MODULE = zipdata02  # type: ignore
+    ZIP_MODULE = 'data02'
 
     def test_unrelated_contents(self):
         """
@@ -132,80 +126,45 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
         distinct resources. Ref python/importlib_resources#44.
         """
         self.assertEqual(
-            names(resources.files('ziptestdata.one')),
+            names(resources.files('data02.one')),
             {'__init__.py', 'resource1.txt'},
         )
         self.assertEqual(
-            names(resources.files('ziptestdata.two')),
+            names(resources.files('data02.two')),
             {'__init__.py', 'resource2.txt'},
         )
 
 
-@contextlib.contextmanager
-def zip_on_path(dir):
-    data_path = pathlib.Path(zipdata01.__file__)
-    source_zip_path = data_path.parent.joinpath('ziptestdata.zip')
-    zip_path = pathlib.Path(dir) / f'{uuid.uuid4()}.zip'
-    zip_path.write_bytes(source_zip_path.read_bytes())
-    sys.path.append(str(zip_path))
-    import_module('ziptestdata')
-
-    try:
-        yield
-    finally:
-        with contextlib.suppress(ValueError):
-            sys.path.remove(str(zip_path))
-
-        with contextlib.suppress(KeyError):
-            del sys.path_importer_cache[str(zip_path)]
-            del sys.modules['ziptestdata']
-
-        with contextlib.suppress(OSError):
-            unlink(zip_path)
-
-
-class DeletingZipsTest(unittest.TestCase):
+class DeletingZipsTest(util.ZipSetupBase, unittest.TestCase):
     """Having accessed resources in a zip file should not keep an open
     reference to the zip.
     """
 
-    def setUp(self):
-        self.fixtures = contextlib.ExitStack()
-        self.addCleanup(self.fixtures.close)
-
-        modules = import_helper.modules_setup()
-        self.addCleanup(import_helper.modules_cleanup, *modules)
-
-        temp_dir = self.fixtures.enter_context(os_helper.temp_dir())
-        self.fixtures.enter_context(zip_on_path(temp_dir))
-
     def test_iterdir_does_not_keep_open(self):
-        [item.name for item in resources.files('ziptestdata').iterdir()]
+        [item.name for item in resources.files('data01').iterdir()]
 
     def test_is_file_does_not_keep_open(self):
-        resources.files('ziptestdata').joinpath('binary.file').is_file()
+        resources.files('data01').joinpath('binary.file').is_file()
 
     def test_is_file_failure_does_not_keep_open(self):
-        resources.files('ziptestdata').joinpath('not-present').is_file()
+        resources.files('data01').joinpath('not-present').is_file()
 
     @unittest.skip("Desired but not supported.")
     def test_as_file_does_not_keep_open(self):  # pragma: no cover
-        resources.as_file(resources.files('ziptestdata') / 'binary.file')
+        resources.as_file(resources.files('data01') / 'binary.file')
 
     def test_entered_path_does_not_keep_open(self):
         """
         Mimic what certifi does on import to make its bundle
         available for the process duration.
         """
-        resources.as_file(resources.files('ziptestdata') / 'binary.file').__enter__()
+        resources.as_file(resources.files('data01') / 'binary.file').__enter__()
 
     def test_read_binary_does_not_keep_open(self):
-        resources.files('ziptestdata').joinpath('binary.file').read_bytes()
+        resources.files('data01').joinpath('binary.file').read_bytes()
 
     def test_read_text_does_not_keep_open(self):
-        resources.files('ziptestdata').joinpath('utf-8.file').read_text(
-            encoding='utf-8'
-        )
+        resources.files('data01').joinpath('utf-8.file').read_text(encoding='utf-8')
 
 
 class ResourceFromNamespaceTest01(unittest.TestCase):
