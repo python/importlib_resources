@@ -7,6 +7,8 @@ import os
 import pathlib
 import zipfile
 
+import zipp
+
 
 def make_zip_file(src, dst):
     """
@@ -16,6 +18,7 @@ def make_zip_file(src, dst):
         for src_path, rel in walk(src):
             dst_name = src.name / pathlib.PurePosixPath(rel.as_posix())
             zf.write(src_path, dst_name)
+        zipp.CompleteDirs.inject(zf)
     return dst
 
 
