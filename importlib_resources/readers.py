@@ -1,7 +1,9 @@
 import collections
+import contextlib
 import itertools
 import pathlib
 import operator
+import re
 
 from . import abc
 
@@ -130,7 +132,31 @@ class NamespaceReader(abc.TraversableResources):
     def __init__(self, namespace_path):
         if 'NamespacePath' not in str(namespace_path):
             raise ValueError('Invalid path')
-        self.path = MultiplexedPath(*list(namespace_path))
+        self.path = MultiplexedPath(*map(self._resolve, namespace_path))
+
+    @classmethod
+    def _resolve(cls, path_str) -> abc.Traversable:
+        """
+        Given an item from a namespace path, resolve it to a Traversable.
+
+        path_str might be a directory on the filesystem or a path to a
+        zipfile plus the path within the zipfile, e.g. ``/foo/bar`` or
+        ``/foo/baz.zip/inner_dir``.
+        """
+        (dir,) = (cand for cand in cls._candidate_paths(path_str) if cand.is_dir())
+        return dir
+
+    @classmethod
+    def _candidate_paths(cls, path_str):
+        yield pathlib.Path(path_str)
+        yield from cls._resolve_zip_path(path_str)
+
+    @staticmethod
+    def _resolve_zip_path(path_str):
+        for match in reversed(list(re.finditer('/', path_str))):
+            with contextlib.suppress(FileNotFoundError, IsADirectoryError):
+                inner = path_str[match.end() :]
+                yield ZipPath(path_str[: match.start()], inner + '/' * len(inner))
 
     def resource_path(self, resource):
         """
