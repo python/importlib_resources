@@ -6,7 +6,7 @@ import operator
 from . import abc
 
 from ._itertools import only
-from ._compat import ZipPath
+from ._compat import ZipPath, ensure_traversable
 
 
 def remove_duplicates(items):
@@ -62,7 +62,7 @@ class MultiplexedPath(abc.Traversable):
     """
 
     def __init__(self, *paths):
-        self._paths = list(map(pathlib.Path, remove_duplicates(paths)))
+        self._paths = list(map(ensure_traversable, remove_duplicates(paths)))
         if not self._paths:
             message = 'MultiplexedPath must contain at least one path'
             raise FileNotFoundError(message)
