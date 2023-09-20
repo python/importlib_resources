@@ -3,8 +3,6 @@ import unittest
 import importlib_resources as resources
 import pathlib
 
-import pytest
-
 from . import data01
 from . import util
 from importlib import import_module
@@ -211,7 +209,6 @@ class ResourceFromNamespaceDiskTests(ResourceFromNamespaceTests, unittest.TestCa
         sys.path.remove(cls.site_dir)
 
 
-@pytest.mark.xfail
 class ResourceFromNamespaceZipTests(
     util.ZipSetupBase,
     ResourceFromNamespaceTests,

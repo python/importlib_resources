@@ -1,0 +1,1 @@
+Enabled support for resources in namespace packages in zip files.
