@@ -136,12 +136,12 @@ class NamespaceReader(abc.TraversableResources):
 
     @classmethod
     def _resolve(cls, path_str) -> abc.Traversable:
-        """
+        r"""
         Given an item from a namespace path, resolve it to a Traversable.
 
         path_str might be a directory on the filesystem or a path to a
         zipfile plus the path within the zipfile, e.g. ``/foo/bar`` or
-        ``/foo/baz.zip/inner_dir``.
+        ``/foo/baz.zip/inner_dir`` or ``foo\baz.zip\inner_dir\sub``.
         """
         (dir,) = (cand for cand in cls._candidate_paths(path_str) if cand.is_dir())
         return dir
@@ -153,10 +153,12 @@ class NamespaceReader(abc.TraversableResources):
 
     @staticmethod
     def _resolve_zip_path(path_str):
-        for match in reversed(list(re.finditer('/', path_str))):
-            with contextlib.suppress(FileNotFoundError, IsADirectoryError):
-                inner = path_str[match.end() :]
-                yield ZipPath(path_str[: match.start()], inner + '/' * len(inner))
+        for match in reversed(list(re.finditer(r'[\\/]', path_str))):
+            with contextlib.suppress(
+                FileNotFoundError, IsADirectoryError, PermissionError
+            ):
+                inner = path_str[match.end() :].replace('\\', '/') + '/'
+                yield ZipPath(path_str[: match.start()], inner.lstrip('/'))
 
     def resource_path(self, resource):
         """
