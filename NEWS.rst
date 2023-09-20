@@ -1,3 +1,18 @@
+v6.1.0
+======
+
+Features
+--------
+
+- MultiplexedPath now expects Traversable paths. String arguments to MultiplexedPath are now deprecated.
+
+
+Bugfixes
+--------
+
+- Enabled support for resources in namespace packages in zip files. (#287)
+
+
 v6.0.1
 ======
 
