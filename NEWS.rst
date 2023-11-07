@@ -1,3 +1,12 @@
+v6.1.1
+======
+
+Bugfixes
+--------
+
+- Added missed stream argument in simple.ResourceHandle. Ref python/cpython#111775.
+
+
 v6.1.0
 ======
 
