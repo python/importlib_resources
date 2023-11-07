@@ -1,0 +1,1 @@
+Added missed stream argument in simple.ResourceHandle. Ref python/cpython#111775.
