@@ -4,6 +4,7 @@ from contextlib import suppress
 from io import TextIOWrapper
 
 from . import abc
+from . import _common
 
 
 class SpecLoaderAdapter:
@@ -174,9 +175,7 @@ class Enterable:
     __slots__ = ()
 
     def __enter__(self):
-        from ._common import as_file
-
-        self.__ctx = as_file(self)
+        self.__ctx = _common.as_file(self)
         return self.__ctx.__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
