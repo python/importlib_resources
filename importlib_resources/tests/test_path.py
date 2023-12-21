@@ -2,6 +2,8 @@ import io
 import pathlib
 import unittest
 
+import pytest
+
 import importlib_resources as resources
 from . import data01
 from . import util
@@ -31,6 +33,17 @@ class PathTests:
         target = resources.files(self.data)
         with target as path:
             self.assertIsInstance(path, pathlib.Path)
+
+    @pytest.mark.xfail(reason="Traversable child loses Enterable")
+    def test_enterable_child(self):
+        """
+        Child Path should be readable and a pathlib.Path instance.
+        """
+        target = resources.files(self.data) / 'utf-8.file'
+        with target as path:
+            self.assertIsInstance(path, pathlib.Path)
+            self.assertTrue(path.name.endswith("utf-8.file"), repr(path))
+            self.assertEqual('Hello, UTF-8 world!\n', path.read_text(encoding='utf-8'))
 
 
 class PathDiskTests(PathTests, unittest.TestCase):
