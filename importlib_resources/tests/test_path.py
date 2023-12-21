@@ -23,10 +23,7 @@ class PathTests:
         target = resources.files(self.data) / 'utf-8.file'
         with resources.as_file(target) as path:
             self.assertTrue(path.name.endswith("utf-8.file"), repr(path))
-            # pathlib.Path.read_text() was introduced in Python 3.5.
-            with path.open('r', encoding='utf-8') as file:
-                text = file.read()
-            self.assertEqual('Hello, UTF-8 world!\n', text)
+            self.assertEqual('Hello, UTF-8 world!\n', path.read_text(encoding='utf-8'))
 
 
 class PathDiskTests(PathTests, unittest.TestCase):
