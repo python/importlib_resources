@@ -3,7 +3,7 @@
 
 .. image:: https://img.shields.io/pypi/pyversions/importlib_resources.svg
 
-.. image:: https://github.com/python/importlib_resources/workflows/tests/badge.svg
+.. image:: https://github.com/python/importlib_resources/actions/workflows/main.yml/badge.svg
    :target: https://github.com/python/importlib_resources/actions?query=workflow%3A%22tests%22
    :alt: tests
 
