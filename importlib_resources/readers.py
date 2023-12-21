@@ -1,6 +1,7 @@
 import collections
 import contextlib
 import itertools
+import functools
 import pathlib
 import operator
 import re
@@ -186,10 +187,14 @@ class Enterable:
 
     @classmethod
     def adapt(cls, orig: abc.Traversable):
-        enterable = type(
-            f'Enterable{orig.__class__.__name__}',  # name
-            (orig.__class__, cls),  # bases
+        orig.__class__ = cls.make_enterable(orig.__class__)
+        return orig
+
+    @staticmethod
+    @functools.lru_cache()
+    def make_enterable(orig):
+        return type(
+            f'Enterable{orig.__name__}',  # name
+            (orig, Enterable),  # bases
             {'__slots__': ()},  # dict
         )
-        orig.__class__ = enterable
-        return orig
