@@ -13,7 +13,7 @@ from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
 
 from ._compat import wrap_spec
-from .readers import Enterable
+from ._adapters import Enterable
 
 Package = Union[types.ModuleType, str]
 Anchor = Package

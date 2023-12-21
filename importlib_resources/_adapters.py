@@ -1,3 +1,5 @@
+import functools
+
 from contextlib import suppress
 from io import TextIOWrapper
 
@@ -166,3 +168,30 @@ def wrap_spec(package):
     on the spec/loader/reader.
     """
     return SpecLoaderAdapter(package.__spec__, TraversableResourcesLoader)
+
+
+class Enterable:
+    __slots__ = ()
+
+    def __enter__(self):
+        from ._common import as_file
+
+        self.__ctx = as_file(self)
+        return self.__ctx.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.__ctx.__exit__(exc_type, exc_value, traceback)
+
+    @classmethod
+    def adapt(cls, orig: abc.Traversable):
+        orig.__class__ = cls.make_enterable(orig.__class__)
+        return orig
+
+    @staticmethod
+    @functools.lru_cache()
+    def make_enterable(orig):
+        return type(
+            f'Enterable{orig.__name__}',  # name
+            (orig, Enterable),  # bases
+            {'__slots__': ()},  # dict
+        )

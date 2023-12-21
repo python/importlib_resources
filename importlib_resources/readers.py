@@ -1,7 +1,6 @@
 import collections
 import contextlib
 import itertools
-import functools
 import pathlib
 import operator
 import re
@@ -171,30 +170,3 @@ class NamespaceReader(abc.TraversableResources):
 
     def files(self):
         return self.path
-
-
-class Enterable:
-    __slots__ = ()
-
-    def __enter__(self):
-        from ._common import as_file
-
-        self.__ctx = as_file(self)
-        return self.__ctx.__enter__()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.__ctx.__exit__(exc_type, exc_value, traceback)
-
-    @classmethod
-    def adapt(cls, orig: abc.Traversable):
-        orig.__class__ = cls.make_enterable(orig.__class__)
-        return orig
-
-    @staticmethod
-    @functools.lru_cache()
-    def make_enterable(orig):
-        return type(
-            f'Enterable{orig.__name__}',  # name
-            (orig, Enterable),  # bases
-            {'__slots__': ()},  # dict
-        )
