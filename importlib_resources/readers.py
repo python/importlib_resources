@@ -172,18 +172,24 @@ class NamespaceReader(abc.TraversableResources):
         return self.path
 
 
-class EnterablePath(pathlib.Path):
-    def __enter__(self):
-        return self
+class Enterable:
+    __slots__ = ()
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        pass
-
-class EnterableZip(ZipPath):
     def __enter__(self):
         from ._common import as_file
+
         self._as_file = as_file(self)
         return self._as_file.__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._as_file.__exit__(exc_type, exc_value, traceback)
+
+    @classmethod
+    def adapt(cls, orig: abc.Traversable):
+        enterable = type(
+            f'Enterable{orig.__class__.__name__}',  # name
+            (orig.__class__, cls),  # bases
+            {'__slots__': ()},  # dict
+        )
+        orig.__class__ = enterable
+        return orig

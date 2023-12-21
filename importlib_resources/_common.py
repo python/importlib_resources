@@ -12,8 +12,8 @@ import itertools
 from typing import Union, Optional, cast
 from .abc import ResourceReader, Traversable
 
-from ._compat import ZipPath, wrap_spec
-from .readers import EnterablePath, EnterableZip
+from ._compat import wrap_spec
+from .readers import Enterable
 
 Package = Union[types.ModuleType, str]
 Anchor = Package
@@ -50,18 +50,11 @@ def package_to_anchor(func):
 
 
 @package_to_anchor
-def files(anchor: Optional[Anchor] = None) -> Traversable:
+def files(anchor: Optional[Anchor] = None) -> Enterable:
     """
-    Get a Traversable resource for an anchor.
+    Get an Enterable resource for an anchor.
     """
-    f = from_package(resolve(anchor))
-    if isinstance(f, ZipPath):
-        return EnterableZip(f.root, f.at)
-    elif isinstance(f, pathlib.Path):
-        return EnterablePath(f)
-    else:
-        # `with f as g:` will fail for MultiplexedPath
-        return f
+    return Enterable.adapt(from_package(resolve(anchor)))
 
 
 def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
