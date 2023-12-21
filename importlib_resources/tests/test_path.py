@@ -14,7 +14,7 @@ class CommonTests(util.CommonTests, unittest.TestCase):
 
 
 class PathTests:
-    def test_reading(self):
+    def test_reading_as_file(self):
         """
         Path should be readable and a pathlib.Path instance.
         """
@@ -23,6 +23,14 @@ class PathTests:
             self.assertIsInstance(path, pathlib.Path)
             self.assertTrue(path.name.endswith("utf-8.file"), repr(path))
             self.assertEqual('Hello, UTF-8 world!\n', path.read_text(encoding='utf-8'))
+
+    def test_enterable_simple(self):
+        """
+        Path should be a pathlib.Path instance.
+        """
+        target = resources.files(self.data)
+        with target as path:
+            self.assertIsInstance(path, pathlib.Path)
 
 
 class PathDiskTests(PathTests, unittest.TestCase):
