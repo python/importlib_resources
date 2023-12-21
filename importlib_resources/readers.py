@@ -179,11 +179,11 @@ class Enterable:
     def __enter__(self):
         from ._common import as_file
 
-        self._as_file = as_file(self)
-        return self._as_file.__enter__()
+        self.__ctx = as_file(self)
+        return self.__ctx.__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._as_file.__exit__(exc_type, exc_value, traceback)
+        self.__ctx.__exit__(exc_type, exc_value, traceback)
 
     @classmethod
     def adapt(cls, orig: abc.Traversable):
