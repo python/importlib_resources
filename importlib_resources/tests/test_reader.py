@@ -26,7 +26,7 @@ class MultiplexedPathTest(unittest.TestCase):
             contents.remove('__pycache__')
         except (KeyError, ValueError):
             pass
-        self.assertEqual(contents, {'binary.file', 'utf-16.file', 'utf-8.file'})
+        self.assertEqual(contents, {'subdirectory', 'binary.file', 'utf-16.file', 'utf-8.file'})
 
     def test_iterdir_duplicate(self):
         data01 = pathlib.Path(__file__).parent.joinpath('data01')
@@ -67,7 +67,11 @@ class MultiplexedPathTest(unittest.TestCase):
             os.path.join('namespacedata01', 'binary.file'),
         )
         self.assertEqual(
-            str(path.joinpath('subdirectory'))[len(prefix) + 1 :],
+            str(path.joinpath('subdirectory')._paths[0])[len(prefix) + 1 :],
+            os.path.join('namespacedata01', 'subdirectory'),
+        )
+        self.assertEqual(
+            str(path.joinpath('subdirectory')._paths[1])[len(prefix) + 1 :],
             os.path.join('data01', 'subdirectory'),
         )
         self.assertEqual(

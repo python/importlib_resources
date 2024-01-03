@@ -81,5 +81,9 @@ class OpenZipTests(OpenTests, util.ZipSetup, unittest.TestCase):
     pass
 
 
+class OpenNamespaceZipTests(OpenTests, util.ZipSetup, unittest.TestCase):
+    ZIP_MODULE = 'namespacedata01'
+
+
 if __name__ == '__main__':
     unittest.main()

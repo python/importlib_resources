@@ -76,5 +76,20 @@ class ReadNamespaceTests(ReadTests, unittest.TestCase):
         self.data = namespacedata01
 
 
+class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
+    ZIP_MODULE = 'namespacedata01'
+
+    def test_read_submodule_resource(self):
+        submodule = import_module('namespacedata01.subdirectory')
+        result = resources.files(submodule).joinpath('binary.file').read_bytes()
+        self.assertEqual(result, b'\0\1\2\3')
+
+    def test_read_submodule_resource_by_name(self):
+        result = (
+            resources.files('namespacedata01.subdirectory').joinpath('binary.file').read_bytes()
+        )
+        self.assertEqual(result, b'\0\1\2\3')
+
+
 if __name__ == '__main__':
     unittest.main()

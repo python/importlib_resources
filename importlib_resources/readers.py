@@ -156,7 +156,7 @@ class NamespaceReader(abc.TraversableResources):
     def _resolve_zip_path(path_str):
         for match in reversed(list(re.finditer(r'[\\/]', path_str))):
             with contextlib.suppress(
-                FileNotFoundError, IsADirectoryError, PermissionError
+                FileNotFoundError, IsADirectoryError, NotADirectoryError, PermissionError
             ):
                 inner = path_str[match.end() :].replace('\\', '/') + '/'
                 yield ZipPath(path_str[: match.start()], inner.lstrip('/'))
