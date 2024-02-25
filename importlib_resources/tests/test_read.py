@@ -86,7 +86,9 @@ class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
 
     def test_read_submodule_resource_by_name(self):
         result = (
-            resources.files('namespacedata01.subdirectory').joinpath('binary.file').read_bytes()
+            resources.files('namespacedata01.subdirectory')
+            .joinpath('binary.file')
+            .read_bytes()
         )
         self.assertEqual(result, b'\0\1\2\3')
 
