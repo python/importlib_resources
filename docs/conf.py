@@ -48,9 +48,7 @@ autodoc_preserve_defaults = True
 
 extensions += ['jaraco.tidelift']
 
-nitpick_ignore.extend(
-    [
-        ('py:class', 'module'),
-        ('py:class', '_io.BufferedReader'),
-    ]
-)
+nitpick_ignore.extend([
+    ('py:class', 'module'),
+    ('py:class', '_io.BufferedReader'),
+])
