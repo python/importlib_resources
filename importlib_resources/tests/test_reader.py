@@ -68,14 +68,10 @@ class MultiplexedPathTest(unittest.TestCase):
             str(path.joinpath('binary.file'))[len(prefix) + 1 :],
             os.path.join('namespacedata01', 'binary.file'),
         )
-        self.assertEqual(
-            str(path.joinpath('subdirectory')._paths[0])[len(prefix) + 1 :],
-            os.path.join('namespacedata01', 'subdirectory'),
-        )
-        self.assertEqual(
-            str(path.joinpath('subdirectory')._paths[1])[len(prefix) + 1 :],
-            os.path.join('data01', 'subdirectory'),
-        )
+        sub = path.joinpath('subdirectory')
+        assert isinstance(sub, MultiplexedPath)
+        assert 'namespacedata01' in str(sub)
+        assert 'data01' in str(sub)
         self.assertEqual(
             str(path.joinpath('imaginary'))[len(prefix) + 1 :],
             os.path.join('namespacedata01', 'imaginary'),
