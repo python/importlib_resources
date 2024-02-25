@@ -24,7 +24,7 @@ class OpenTests:
         target = resources.files(self.data) / 'binary.file'
         with target.open('rb') as fp:
             result = fp.read()
-            self.assertEqual(result, b'\x00\x01\x02\x03')
+            self.assertEqual(result, bytes(range(4)))
 
     def test_open_text_default_encoding(self):
         target = resources.files(self.data) / 'utf-8.file'
