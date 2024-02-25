@@ -9,7 +9,7 @@ import warnings
 from . import abc
 
 from ._itertools import only
-from ._compat import ZipPath
+from .compat.py39 import ZipPath
 
 
 def remove_duplicates(items):

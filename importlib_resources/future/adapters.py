@@ -8,25 +8,7 @@ import warnings
 from contextlib import suppress
 from typing import Union
 
-
-if sys.version_info >= (3, 10):
-    from zipfile import Path as ZipPath  # type: ignore
-else:
-    from zipp import Path as ZipPath  # type: ignore
-
-
-try:
-    from typing import runtime_checkable  # type: ignore
-except ImportError:
-
-    def runtime_checkable(cls):  # type: ignore
-        return cls
-
-
-try:
-    from typing import Protocol  # type: ignore
-except ImportError:
-    Protocol = abc.ABC  # type: ignore
+from .. import readers, _adapters
 
 
 class TraversableResourcesLoader:
@@ -46,8 +28,6 @@ class TraversableResourcesLoader:
         return self.spec.origin
 
     def get_resource_reader(self, name):
-        from . import readers, _adapters
-
         def _zip_reader(spec):
             with suppress(AttributeError):
                 return readers.ZipReader(spec.loader, spec.name)
@@ -98,13 +78,4 @@ def wrap_spec(package):
     Supersedes _adapters.wrap_spec to use TraversableResourcesLoader
     from above for older Python compatibility (<3.10).
     """
-    from . import _adapters
-
     return _adapters.SpecLoaderAdapter(package.__spec__, TraversableResourcesLoader)
-
-
-if sys.version_info >= (3, 9):
-    StrPath = Union[str, os.PathLike[str]]
-else:
-    # PathLike is only subscriptable at runtime in 3.9+
-    StrPath = Union[str, "os.PathLike[str]"]
