@@ -1,0 +1,1 @@
+Fixed NotADirectoryError when calling files on a subdirectory of a namespace package.
