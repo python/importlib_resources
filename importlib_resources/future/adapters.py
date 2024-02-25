@@ -6,6 +6,7 @@ import sys
 import pathlib
 import warnings
 from contextlib import suppress
+from types import SimpleNamespace
 from typing import Union
 
 from .. import readers, _adapters
@@ -35,10 +36,6 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
             super().get_resource_reader(name)
         )
 
-    @property
-    def path(self):
-        return self.spec.origin
-
     def _zip_reader(self):
         with suppress(AttributeError):
             return readers.ZipReader(self.spec.loader, self.spec.name)
@@ -49,11 +46,11 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
 
     def _file_reader(self):
         try:
-            path = pathlib.Path(self.path)
+            path = pathlib.Path(self.spec.origin)
         except TypeError:
             return None
         if path.exists():
-            return readers.FileReader(self)
+            return readers.FileReader(SimpleNamespace(path=path))
 
 
 def wrap_spec(package):
