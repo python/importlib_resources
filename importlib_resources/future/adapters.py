@@ -20,40 +20,40 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     over stdlib readers.
     """
 
-    @property
-    def path(self):
-        return self.spec.origin
-
     def get_resource_reader(self, name):
-        def _zip_reader(spec):
-            with suppress(AttributeError):
-                return readers.ZipReader(spec.loader, spec.name)
-
-        def _namespace_reader(spec):
-            with suppress(AttributeError, ValueError):
-                return readers.NamespaceReader(spec.submodule_search_locations)
-
-        def _file_reader(spec):
-            try:
-                path = pathlib.Path(self.path)
-            except TypeError:
-                return None
-            if path.exists():
-                return readers.FileReader(self)
-
         return (
             # local ZipReader if a zip module
-            _zip_reader(self.spec)
+            self._zip_reader()
             or
             # local NamespaceReader if a namespace module
-            _namespace_reader(self.spec)
+            self._namespace_reader()
             or
             # local FileReader
-            _file_reader(self.spec)
+            self._file_reader()
             or
             # fallback
             super().get_resource_reader(name)
         )
+
+    @property
+    def path(self):
+        return self.spec.origin
+
+    def _zip_reader(self):
+        with suppress(AttributeError):
+            return readers.ZipReader(self.spec.loader, self.spec.name)
+
+    def _namespace_reader(self):
+        with suppress(AttributeError, ValueError):
+            return readers.NamespaceReader(self.spec.submodule_search_locations)
+
+    def _file_reader(self):
+        try:
+            path = pathlib.Path(self.path)
+        except TypeError:
+            return None
+        if path.exists():
+            return readers.FileReader(self)
 
 
 def wrap_spec(package):
