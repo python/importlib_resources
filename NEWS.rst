@@ -1,3 +1,12 @@
+v6.1.2
+======
+
+Bugfixes
+--------
+
+- Fixed NotADirectoryError when calling files on a subdirectory of a namespace package. (#293)
+
+
 v6.1.1
 ======
 
