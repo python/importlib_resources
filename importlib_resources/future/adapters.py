@@ -22,19 +22,10 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     """
 
     def get_resource_reader(self, name):
-        return (
-            # local ZipReader if a zip module
-            self._zip_reader()
-            or
-            # local NamespaceReader if a namespace module
-            self._namespace_reader()
-            or
-            # local FileReader
-            self._file_reader()
-            or
-            # fallback
-            super().get_resource_reader(name)
-        )
+        return self._standard_reader() or super().get_resource_reader(name)
+
+    def _standard_reader(self):
+        return self._zip_reader() or self._namespace_reader() or self._file_reader()
 
     def _zip_reader(self):
         with suppress(AttributeError):
