@@ -16,8 +16,8 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     Adapt loaders to provide TraversableResources and other
     compatibility.
 
-    Used primarily for Python 3.9 and earlier where the native
-    loaders do not yet implement TraversableResources.
+    Ensures the readers from importlib_resources are preferred
+    over stdlib readers.
     """
 
     @property
@@ -58,10 +58,8 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
 
 def wrap_spec(package):
     """
-    Construct a package spec with traversable compatibility
-    on the spec/loader/reader.
-
-    Supersedes _adapters.wrap_spec to use TraversableResourcesLoader
-    from above for older Python compatibility (<3.10).
+    Override _adapters.wrap_spec to use TraversableResourcesLoader
+    from above. Ensures that future behavior is always available on older
+    Pythons.
     """
     return _adapters.SpecLoaderAdapter(package.__spec__, TraversableResourcesLoader)
