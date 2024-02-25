@@ -58,6 +58,10 @@ class OpenNamespaceTests(FilesTests, unittest.TestCase):
         self.data = namespacedata01
 
 
+class OpenNamespaceZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
+    ZIP_MODULE = 'namespacedata01'
+
+
 class SiteDir:
     def setUp(self):
         self.fixtures = contextlib.ExitStack()
