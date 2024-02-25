@@ -11,7 +11,7 @@ from typing import Union
 from .. import readers, _adapters
 
 
-class TraversableResourcesLoader:
+class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     """
     Adapt loaders to provide TraversableResources and other
     compatibility.
@@ -19,9 +19,6 @@ class TraversableResourcesLoader:
     Used primarily for Python 3.9 and earlier where the native
     loaders do not yet implement TraversableResources.
     """
-
-    def __init__(self, spec):
-        self.spec = spec
 
     @property
     def path(self):
@@ -35,14 +32,6 @@ class TraversableResourcesLoader:
         def _namespace_reader(spec):
             with suppress(AttributeError, ValueError):
                 return readers.NamespaceReader(spec.submodule_search_locations)
-
-        def _available_reader(spec):
-            with suppress(AttributeError):
-                return spec.loader.get_resource_reader(spec.name)
-
-        def _native_reader(spec):
-            reader = _available_reader(spec)
-            return reader if hasattr(reader, 'files') else None
 
         def _file_reader(spec):
             try:
@@ -62,11 +51,8 @@ class TraversableResourcesLoader:
             # local FileReader
             _file_reader(self.spec)
             or
-            # native reader if it supplies 'files'
-            _native_reader(self.spec)
-            or
-            # fallback - adapt the spec ResourceReader to TraversableReader
-            _adapters.CompatibilityFiles(self.spec)
+            # fallback
+            super().get_resource_reader(name)
         )
 
 
