@@ -1,3 +1,4 @@
+import contextlib
 import pathlib
 from contextlib import suppress
 from types import SimpleNamespace
@@ -15,7 +16,18 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     """
 
     def get_resource_reader(self, name):
-        return self._standard_reader() or super().get_resource_reader(name)
+        with contextlib.suppress(Exception):
+            return self._block_standard(super().get_resource_reader(name))
+        return self._standard_reader()
+
+    def _block_standard(self, reader):
+        """
+        If the reader is from the standard library, raise an exception to
+        allow likely newer implementations in this library to take precedence.
+        """
+        if reader.__class__.__module__.startswith('importlib.resources.'):
+            raise RuntimeError("Reader blocked to be superseded.")
+        return reader
 
     def _standard_reader(self):
         return self._zip_reader() or self._namespace_reader() or self._file_reader()
