@@ -60,13 +60,13 @@ class ReadZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
     def test_read_submodule_resource(self):
         submodule = import_module('data01.subdirectory')
         result = resources.files(submodule).joinpath('binary.file').read_bytes()
-        self.assertEqual(result, b'\0\1\2\3')
+        self.assertEqual(result, b'\4\5\6\x07')
 
     def test_read_submodule_resource_by_name(self):
         result = (
             resources.files('data01.subdirectory').joinpath('binary.file').read_bytes()
         )
-        self.assertEqual(result, b'\0\1\2\3')
+        self.assertEqual(result, b'\4\5\6\x07')
 
 
 class ReadNamespaceTests(ReadTests, unittest.TestCase):
@@ -82,7 +82,7 @@ class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
     def test_read_submodule_resource(self):
         submodule = import_module('namespacedata01.subdirectory')
         result = resources.files(submodule).joinpath('binary.file').read_bytes()
-        self.assertEqual(result, b'\0\1\2\3')
+        self.assertEqual(result, b'\x0c\x0d\x0e\x0f')
 
     def test_read_submodule_resource_by_name(self):
         result = (
@@ -90,7 +90,7 @@ class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
             .joinpath('binary.file')
             .read_bytes()
         )
-        self.assertEqual(result, b'\0\1\2\3')
+        self.assertEqual(result, b'\x0c\x0d\x0e\x0f')
 
 
 if __name__ == '__main__':
