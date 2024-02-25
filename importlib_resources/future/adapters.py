@@ -1,13 +1,6 @@
-# flake8: noqa
-
-import abc
-import os
-import sys
 import pathlib
-import warnings
 from contextlib import suppress
 from types import SimpleNamespace
-from typing import Union
 
 from .. import readers, _adapters
 
