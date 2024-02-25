@@ -27,7 +27,7 @@ class MultiplexedPathTest(unittest.TestCase):
         except (KeyError, ValueError):
             pass
         self.assertEqual(
-            contents, {'subdirectory', 'binary.file', 'utf-16.file', 'utf-8.file'}
+            contents, {'submodule', 'binary.file', 'utf-16.file', 'utf-8.file'}
         )
 
     def test_iterdir_duplicate(self):
@@ -42,7 +42,14 @@ class MultiplexedPathTest(unittest.TestCase):
                 pass
         self.assertEqual(
             contents,
-            {'__init__.py', 'binary.file', 'subdirectory', 'utf-16.file', 'utf-8.file'},
+            {
+                '__init__.py',
+                'binary.file',
+                'subdirectory',
+                'submodule',
+                'utf-16.file',
+                'utf-8.file',
+            },
         )
 
     def test_is_dir(self):
@@ -69,12 +76,12 @@ class MultiplexedPathTest(unittest.TestCase):
             os.path.join('namespacedata01', 'binary.file'),
         )
         self.assertEqual(
-            str(path.joinpath('subdirectory')._paths[0])[len(prefix) + 1 :],
-            os.path.join('namespacedata01', 'subdirectory'),
+            str(path.joinpath('subdirectory'))[len(prefix) + 1 :],
+            os.path.join('data01', 'subdirectory'),
         )
         self.assertEqual(
-            str(path.joinpath('subdirectory')._paths[1])[len(prefix) + 1 :],
-            os.path.join('data01', 'subdirectory'),
+            str(path.joinpath('submodule'))[len(prefix) + 1 :],
+            os.path.join('namespacedata01', 'submodule'),
         )
         self.assertEqual(
             str(path.joinpath('imaginary'))[len(prefix) + 1 :],

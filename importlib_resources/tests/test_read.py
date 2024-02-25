@@ -80,17 +80,17 @@ class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
     ZIP_MODULE = 'namespacedata01'
 
     def test_read_submodule_resource(self):
-        submodule = import_module('namespacedata01.subdirectory')
-        result = resources.files(submodule).joinpath('binary.file').read_bytes()
-        self.assertEqual(result, b'\0\1\2\3')
+        submodule = import_module('namespacedata01.submodule')
+        result = resources.files(submodule).joinpath('inner.txt').read_text()
+        self.assertEqual(result, 'ns resource\n')
 
     def test_read_submodule_resource_by_name(self):
         result = (
-            resources.files('namespacedata01.subdirectory')
-            .joinpath('binary.file')
-            .read_bytes()
+            resources.files('namespacedata01.submodule')
+            .joinpath('inner.txt')
+            .read_text()
         )
-        self.assertEqual(result, b'\0\1\2\3')
+        self.assertEqual(result, 'ns resource\n')
 
 
 if __name__ == '__main__':

@@ -32,7 +32,7 @@ class ContentsNamespaceTests(ContentsTests, unittest.TestCase):
     expected = {
         # no __init__ because of namespace design
         'binary.file',
-        'subdirectory',
+        'submodule',
         'utf-16.file',
         'utf-8.file',
     }
