@@ -3,18 +3,18 @@ Backward-compatability shims to support Python 3.9 and earlier.
 """
 
 import os
+import types
+
+from jaraco.collections import Projection
 
 
 try:
     from test.support import import_helper  # type: ignore
 except ImportError:
+    import test.support
 
-    class import_helper:  # type: ignore
-        from test.support import (
-            modules_setup,
-            modules_cleanup,
-            DirsOnSysPath,
-        )
+    names = 'modules_setup', 'modules_cleanup', 'DirsOnSysPath'
+    import_helper = types.SimpleNamespace(**Projection(names, vars(test.support)))
 
 
 try:
