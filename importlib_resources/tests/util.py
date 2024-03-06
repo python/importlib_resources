@@ -8,7 +8,7 @@ import contextlib
 
 from . import data01
 from ..abc import ResourceReader
-from ._compat import import_helper, os_helper
+from .compat.py39 import import_helper, os_helper
 from . import zip as zip_
 
 

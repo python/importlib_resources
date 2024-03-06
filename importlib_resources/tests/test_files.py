@@ -9,7 +9,7 @@ from ..abc import Traversable
 from . import data01
 from . import util
 from . import _path
-from ._compat import os_helper, import_helper
+from .compat.py39 import os_helper, import_helper
 
 
 @contextlib.contextmanager
