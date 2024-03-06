@@ -8,21 +8,27 @@ import types
 from jaraco.collections import Projection
 
 
+def from_test_support(*names):
+    """
+    Return a SimpleNamespace of names from test.support.
+    """
+    import test.support
+
+    return types.SimpleNamespace(**Projection(names, vars(test.support)))
+
+
 try:
     from test.support import import_helper  # type: ignore
 except ImportError:
-    import test.support
-
-    names = 'modules_setup', 'modules_cleanup', 'DirsOnSysPath'
-    import_helper = types.SimpleNamespace(**Projection(names, vars(test.support)))
+    import_helper = from_test_support(
+        'modules_setup', 'modules_cleanup', 'DirsOnSysPath'
+    )
 
 
 try:
     from test.support import os_helper  # type: ignore
 except ImportError:
-
-    class os_helper:  # type:ignore
-        from test.support import temp_dir
+    os_helper = from_test_support('temp_dir')
 
 
 try:
