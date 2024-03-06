@@ -1,0 +1,1 @@
+Future compatibility adapters now ensure that standard library readers are replaced without overriding non-standard readers.
