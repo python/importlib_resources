@@ -14,7 +14,6 @@ except ImportError:
             modules_setup,
             modules_cleanup,
             DirsOnSysPath,
-            CleanImport,
         )
 
 

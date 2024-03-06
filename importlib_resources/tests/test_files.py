@@ -9,7 +9,8 @@ from ..abc import Traversable
 from . import data01
 from . import util
 from . import _path
-from .compat.py39 import os_helper, import_helper
+from .compat.py39 import os_helper
+from .compat.py312 import import_helper
 
 
 @contextlib.contextmanager
@@ -68,7 +69,7 @@ class SiteDir:
         self.addCleanup(self.fixtures.close)
         self.site_dir = self.fixtures.enter_context(os_helper.temp_dir())
         self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
-        self.fixtures.enter_context(import_helper.CleanImport())
+        self.fixtures.enter_context(import_helper.isolated_modules())
 
 
 class ModulesFilesTests(SiteDir, unittest.TestCase):
