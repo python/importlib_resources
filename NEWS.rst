@@ -1,3 +1,12 @@
+v6.3.0
+======
+
+Features
+--------
+
+- Add ``Anchor`` to ``importlib.resources`` (in order for the code to comply with the documentation)
+
+
 v6.2.0
 ======
 
