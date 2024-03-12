@@ -1,3 +1,12 @@
+v6.2.0
+======
+
+Features
+--------
+
+- Future compatibility adapters now ensure that standard library readers are replaced without overriding non-standard readers. (#295)
+
+
 v6.1.3
 ======
 
