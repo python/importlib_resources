@@ -24,7 +24,8 @@ def _block_standard(reader_getter):
             # MultiplexedPath may fail on zip subdirectory
             return
         # Python 3.10+
-        if reader.__class__.__module__.startswith('importlib.resources.'):
+        mod_name = reader.__class__.__module__
+        if mod_name.startswith('importlib.') and mod_name.endswith('readers'):
             return
         # Python 3.8, 3.9
         if isinstance(reader, _adapters.CompatibilityFiles) and (
