@@ -34,6 +34,11 @@ class FilesTests:
     def test_traversable(self):
         assert isinstance(resources.files(self.data), Traversable)
 
+    def test_joinpath_with_multiple_args(self):
+        files = resources.files(self.data)
+        binfile = files.joinpath('subdirectory', 'binary.file')
+        self.assertTrue(binfile.is_file())
+
     def test_old_parameter(self):
         """
         Files used to take a 'package' parameter. Make sure anyone
