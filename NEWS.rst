@@ -1,3 +1,12 @@
+v6.3.1
+======
+
+Bugfixes
+--------
+
+- Restored expectation that stdlib readers are suppressed on Python 3.10. (#257)
+
+
 v6.3.0
 ======
 

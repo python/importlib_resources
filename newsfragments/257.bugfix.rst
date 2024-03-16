@@ -1,1 +1,0 @@
-Restored expectation that stdlib readers are suppressed on Python 3.10.
