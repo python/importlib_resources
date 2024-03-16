@@ -4,6 +4,8 @@ import warnings
 import importlib
 import contextlib
 
+import pytest
+
 import importlib_resources as resources
 from ..abc import Traversable
 from . import data01
@@ -34,6 +36,7 @@ class FilesTests:
     def test_traversable(self):
         assert isinstance(resources.files(self.data), Traversable)
 
+    @pytest.mark.xfail("sys.version_info[:2] == (3, 10)", reason="#257")
     def test_joinpath_with_multiple_args(self):
         files = resources.files(self.data)
         binfile = files.joinpath('subdirectory', 'binary.file')
