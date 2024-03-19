@@ -42,7 +42,7 @@ def _block_standard(reader_getter):
 
 def _skip_degenerate(reader):
     """
-    Mask any degenerate reader.
+    Mask any degenerate reader. Ref #298.
     """
     is_degenerate = (
         isinstance(reader, _adapters.CompatibilityFiles) and not reader._reader
