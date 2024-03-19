@@ -40,6 +40,16 @@ def _block_standard(reader_getter):
     return wrapper
 
 
+def _skip_degenerate(reader):
+    """
+    Mask any degenerate reader. Ref #298.
+    """
+    is_degenerate = (
+        isinstance(reader, _adapters.CompatibilityFiles) and not reader._reader
+    )
+    return reader if not is_degenerate else None
+
+
 class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
     """
     Adapt loaders to provide TraversableResources and other
@@ -51,8 +61,9 @@ class TraversableResourcesLoader(_adapters.TraversableResourcesLoader):
 
     def get_resource_reader(self, name):
         return (
-            _block_standard(super().get_resource_reader)(name)
+            _skip_degenerate(_block_standard(super().get_resource_reader)(name))
             or self._standard_reader()
+            or super().get_resource_reader(name)
         )
 
     def _standard_reader(self):
