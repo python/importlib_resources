@@ -1,3 +1,12 @@
+v6.3.2
+======
+
+Bugfixes
+--------
+
+- Restored expectation that local standard readers are preferred over degenerate readers. (#298)
+
+
 v6.3.1
 ======
 
