@@ -25,7 +25,7 @@ link_files = {
                 url='https://peps.python.org/pep-{pep_number:0>4}/',
             ),
             dict(
-                pattern=r'(Python #|bpo-)(?P<python>\d+)',
+                pattern=r'(python/cpython#|Python #|bpo-)(?P<python>\d+)',
                 url='http://bugs.python.org/issue{python}',
             ),
         ],
