@@ -27,8 +27,7 @@ class ModuleAnchorMixin:
 
 class FunctionalAPIBase:
     def _gen_resourcetxt_path_parts(self):
-        """Yield various names of a text file in anchor02, each in a subTest
-        """
+        """Yield various names of a text file in anchor02, each in a subTest"""
         for path_parts in (
             ('subdirectory', 'subsubdir', 'resource.txt'),
             ('subdirectory/subsubdir/resource.txt',),
@@ -44,7 +43,10 @@ class FunctionalAPIBase:
         )
         self.assertEqual(
             resources.read_text(
-                self.anchor02, 'subdirectory', 'subsubdir', 'resource.txt',
+                self.anchor02,
+                'subdirectory',
+                'subsubdir',
+                'resource.txt',
                 encoding='utf-8',
             ),
             'a resource',
@@ -52,7 +54,9 @@ class FunctionalAPIBase:
         for path_parts in self._gen_resourcetxt_path_parts():
             self.assertEqual(
                 resources.read_text(
-                    self.anchor02, *path_parts, encoding='utf-8',
+                    self.anchor02,
+                    *path_parts,
+                    encoding='utf-8',
                 ),
                 'a resource',
             )
@@ -99,7 +103,8 @@ class FunctionalAPIBase:
             self.assertEqual(f.read(), 'Hello, UTF-8 world!\n')
         for path_parts in self._gen_resourcetxt_path_parts():
             with resources.open_text(
-                self.anchor02, *path_parts,
+                self.anchor02,
+                *path_parts,
                 encoding='utf-8',
             ) as f:
                 self.assertEqual(f.read(), 'a resource')
@@ -135,7 +140,8 @@ class FunctionalAPIBase:
             self.assertEqual(f.read(), b'Hello, UTF-8 world!\n')
         for path_parts in self._gen_resourcetxt_path_parts():
             with resources.open_binary(
-                self.anchor02, *path_parts,
+                self.anchor02,
+                *path_parts,
             ) as f:
                 self.assertEqual(f.read(), b'a resource')
 
@@ -213,18 +219,24 @@ class FunctionalAPIBase:
                 # Multiple path arguments need explicit encoding argument.
                 with self.assertRaises(TypeError):
                     func(
-                        self.anchor02, 'subdirectory',
-                        'subsubdir', 'resource.txt',
+                        self.anchor02,
+                        'subdirectory',
+                        'subsubdir',
+                        'resource.txt',
                     )
 
 
 class FunctionalAPITest_StringAnchor(
-    unittest.TestCase, FunctionalAPIBase, StringAnchorMixin,
+    unittest.TestCase,
+    FunctionalAPIBase,
+    StringAnchorMixin,
 ):
     pass
 
 
 class FunctionalAPITest_ModuleAnchor(
-    unittest.TestCase, FunctionalAPIBase, ModuleAnchorMixin,
+    unittest.TestCase,
+    FunctionalAPIBase,
+    ModuleAnchorMixin,
 ):
     pass
