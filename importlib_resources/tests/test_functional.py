@@ -1,7 +1,12 @@
 import unittest
 import os
+import contextlib
 
-from test.support.warnings_helper import ignore_warnings, check_warnings
+try:
+    from test.support.warnings_helper import ignore_warnings, check_warnings
+except ImportError:
+    # older Python versions
+    from test.support import ignore_warnings, check_warnings
 
 import importlib_resources as resources
 
@@ -158,16 +163,17 @@ class FunctionalAPIBase:
             set(c),
             {'utf-8.file', 'utf-16.file', 'binary.file', 'subdirectory'},
         )
-        with (
-            self.assertRaises(OSError),
-            check_warnings((".*contents.*", DeprecationWarning)),
-        ):
+        with contextlib.ExitStack() as cm:
+            cm.enter_context(self.assertRaises(OSError))
+            cm.enter_context(check_warnings((".*contents.*", DeprecationWarning)))
+
             list(resources.contents(self.anchor01, 'utf-8.file'))
+
         for path_parts in self._gen_resourcetxt_path_parts():
-            with (
-                self.assertRaises(OSError),
-                check_warnings((".*contents.*", DeprecationWarning)),
-            ):
+            with contextlib.ExitStack() as cm:
+                cm.enter_context(self.assertRaises(OSError))
+                cm.enter_context(check_warnings((".*contents.*", DeprecationWarning)))
+
                 list(resources.contents(self.anchor01, *path_parts))
         with check_warnings((".*contents.*", DeprecationWarning)):
             c = resources.contents(self.anchor01, 'subdirectory')
