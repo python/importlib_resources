@@ -20,7 +20,7 @@ class ModuleAnchorMixin:
     from . import data02 as anchor02
 
 
-class FunctionalAPIBase():
+class FunctionalAPIBase:
     def _gen_resourcetxt_path_parts(self):
         """Yield various names of a text file in anchor02, each in a subTest
         """
@@ -61,18 +61,21 @@ class FunctionalAPIBase():
             resources.read_text(self.anchor01, 'utf-16.file')
         self.assertEqual(
             resources.read_text(
-                self.anchor01, 'binary.file', encoding='latin1',
+                self.anchor01,
+                'binary.file',
+                encoding='latin1',
             ),
             '\x00\x01\x02\x03',
         )
         self.assertEqual(
             resources.read_text(
-                self.anchor01, 'utf-16.file',
+                self.anchor01,
+                'utf-16.file',
                 errors='backslashreplace',
             ),
             'Hello, UTF-16 world!\n'.encode('utf-16').decode(
                 errors='backslashreplace',
-            )
+            ),
         )
 
     def test_read_binary(self):
@@ -105,18 +108,21 @@ class FunctionalAPIBase():
             with self.assertRaises(UnicodeDecodeError):
                 f.read()
         with resources.open_text(
-            self.anchor01, 'binary.file', encoding='latin1',
+            self.anchor01,
+            'binary.file',
+            encoding='latin1',
         ) as f:
             self.assertEqual(f.read(), '\x00\x01\x02\x03')
         with resources.open_text(
-            self.anchor01, 'utf-16.file',
+            self.anchor01,
+            'utf-16.file',
             errors='backslashreplace',
         ) as f:
             self.assertEqual(
                 f.read(),
                 'Hello, UTF-16 world!\n'.encode('utf-16').decode(
                     errors='backslashreplace',
-                )
+                ),
             )
 
     def test_open_binary(self):
