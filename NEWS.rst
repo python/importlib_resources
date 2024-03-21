@@ -1,3 +1,22 @@
+v6.4.0
+======
+
+Features
+--------
+
+- The functions
+  ``is_resource()``,
+  ``open_binary()``,
+  ``open_text()``,
+  ``path()``,
+  ``read_binary()``, and
+  ``read_text()`` are un-deprecated, and support
+  subdirectories via multiple positional arguments.
+  The ``contents()`` function also allows subdirectories,
+  but remains deprecated. (#303)
+- Deferred select imports in for a speedup (python/cpython#109829).
+
+
 v6.3.2
 ======
 

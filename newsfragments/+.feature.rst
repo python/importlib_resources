@@ -1,1 +1,0 @@
-Deferred select imports in for a speedup (python/cpython#109829).
