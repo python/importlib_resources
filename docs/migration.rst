@@ -109,7 +109,7 @@ following example is often written for clarity as::
 This can be easily rewritten like so::
 
     ref = importlib_resources.files('my.package').joinpath('resource.dat')
-    contents = f.read_bytes()
+    contents = ref.read_bytes()
 
 
 pkg_resources.resource_listdir()
