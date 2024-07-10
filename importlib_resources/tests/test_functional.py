@@ -82,7 +82,7 @@ class FunctionalAPIBase:
                 'utf-16.file',
                 errors='backslashreplace',
             ),
-            'Hello, UTF-16 world!\n'.encode('utf-16').decode(
+            '\ufeffHello, UTF-16 world!\n'.encode('utf-16-le').decode(
                 errors='backslashreplace',
             ),
         )
@@ -130,7 +130,7 @@ class FunctionalAPIBase:
         ) as f:
             self.assertEqual(
                 f.read(),
-                'Hello, UTF-16 world!\n'.encode('utf-16').decode(
+                '\ufeffHello, UTF-16 world!\n'.encode('utf-16-le').decode(
                     errors='backslashreplace',
                 ),
             )
