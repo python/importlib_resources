@@ -84,7 +84,7 @@ class ResourceCornerCaseTests(unittest.TestCase):
         self.assertFalse(resources.files(module).joinpath('A').is_file())
 
 
-class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
+class ResourceFromZipsTest01(util.ZipSetup, unittest.TestCase):
     ZIP_MODULE = 'data01'
 
     def test_is_submodule_resource(self):
@@ -117,7 +117,7 @@ class ResourceFromZipsTest01(util.ZipSetupBase, unittest.TestCase):
         assert not data.parent.exists()
 
 
-class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
+class ResourceFromZipsTest02(util.ZipSetup, unittest.TestCase):
     ZIP_MODULE = 'data02'
 
     def test_unrelated_contents(self):
@@ -135,7 +135,7 @@ class ResourceFromZipsTest02(util.ZipSetupBase, unittest.TestCase):
         )
 
 
-class DeletingZipsTest(util.ZipSetupBase, unittest.TestCase):
+class DeletingZipsTest(util.ZipSetup, unittest.TestCase):
     """Having accessed resources in a zip file should not keep an open
     reference to the zip.
     """
@@ -230,7 +230,7 @@ class ResourceFromNamespaceDiskTests(ResourceFromNamespaceTests, unittest.TestCa
 
 
 class ResourceFromNamespaceZipTests(
-    util.ZipSetupBase,
+    util.ZipSetup,
     ResourceFromNamespaceTests,
     unittest.TestCase,
 ):

@@ -141,7 +141,7 @@ class CommonTests(metaclass=abc.ABCMeta):
             self.execute(package, 'utf-8.file')
 
 
-class ZipSetupBase:
+class ZipSetup:
     ZIP_MODULE = 'data01'
 
     def setUp(self):
@@ -158,7 +158,3 @@ class ZipSetupBase:
         )
 
         self.data = importlib.import_module(self.ZIP_MODULE)
-
-
-class ZipSetup(ZipSetupBase):
-    pass
