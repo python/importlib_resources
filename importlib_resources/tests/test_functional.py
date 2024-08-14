@@ -40,7 +40,7 @@ class FunctionalAPIBase:
         """Assert that `string` ends with `suffix`.
 
         Used to ignore an architecture-specific UTF-16 byte-order mark."""
-        self.assertEqual(string[-len(suffix):], suffix)
+        self.assertEqual(string[-len(suffix) :], suffix)
 
     def test_read_text(self):
         self.assertEqual(
