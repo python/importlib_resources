@@ -99,23 +99,32 @@ class ModuleFilesZipTests(DirectSpec, util.ZipSetup, ModulesFiles, unittest.Test
 
 
 class ImplicitContextFiles:
+    set_val = textwrap.dedent(
+        """
+        import importlib_resources as res
+        val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
+        """
+    )
     spec = {
         'somepkg': {
-            '__init__.py': textwrap.dedent(
-                """
-                import importlib_resources as res
-                val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
-                """
-            ),
+            '__init__.py': set_val,
+            'submod.py': set_val,
             'res.txt': 'resources are the best',
         },
     }
 
-    def test_implicit_files(self):
+    def test_implicit_files_package(self):
         """
         Without any parameter, files() will infer the location as the caller.
         """
         assert importlib.import_module('somepkg').val == 'resources are the best'
+
+    @pytest.mark.xfail(reason="python/cpython#121735")
+    def test_implicit_files_submodule(self):
+        """
+        Without any parameter, files() will infer the location as the caller.
+        """
+        assert importlib.import_module('somepkg.submod').val == 'resources are the best'
 
 
 class ImplicitContextFilesDiskTests(
