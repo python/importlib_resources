@@ -1,3 +1,12 @@
+v6.4.2
+======
+
+Bugfixes
+--------
+
+- Merged fix for UTF-16 BOM handling in functional tests. (#312)
+
+
 v6.4.1
 ======
 
