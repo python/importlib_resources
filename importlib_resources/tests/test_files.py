@@ -4,8 +4,6 @@ import warnings
 import importlib
 import contextlib
 
-import pytest
-
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
@@ -93,7 +91,6 @@ class ModuleFilesDiskTests(DirectSpec, util.DiskSetup, ModulesFiles, unittest.Te
     pass
 
 
-@pytest.mark.xfail(reason="python/cpython#121735")
 class ModuleFilesZipTests(DirectSpec, util.ZipSetup, ModulesFiles, unittest.TestCase):
     pass
 
@@ -119,7 +116,6 @@ class ImplicitContextFiles:
         """
         assert importlib.import_module('somepkg').val == 'resources are the best'
 
-    @pytest.mark.xfail(reason="python/cpython#121735")
     def test_implicit_files_submodule(self):
         """
         Without any parameter, files() will infer the location as the caller.
