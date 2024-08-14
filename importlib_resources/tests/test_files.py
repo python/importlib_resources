@@ -4,6 +4,8 @@ import warnings
 import importlib
 import contextlib
 
+import pytest
+
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
@@ -91,6 +93,11 @@ class ModuleFilesDiskTests(DirectSpec, util.DiskSetup, ModulesFiles, unittest.Te
     pass
 
 
+@pytest.mark.xfail(reason="python/cpython#121735")
+class ModuleFilesZipTests(DirectSpec, util.ZipSetup, ModulesFiles, unittest.TestCase):
+    pass
+
+
 class ImplicitContextFiles:
     spec = {
         'somepkg': {
@@ -113,6 +120,12 @@ class ImplicitContextFiles:
 
 class ImplicitContextFilesDiskTests(
     DirectSpec, util.DiskSetup, ImplicitContextFiles, unittest.TestCase
+):
+    pass
+
+
+class ImplicitContextFilesZipTests(
+    DirectSpec, util.ZipSetup, ImplicitContextFiles, unittest.TestCase
 ):
     pass
 
