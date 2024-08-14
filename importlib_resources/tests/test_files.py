@@ -6,7 +6,6 @@ import contextlib
 
 import importlib_resources as resources
 from ..abc import Traversable
-from . import data01
 from . import util
 from . import _path
 from .compat.py39 import os_helper
@@ -48,20 +47,16 @@ class FilesTests:
             resources.files(package=self.data)
 
 
-class OpenDiskTests(FilesTests, unittest.TestCase):
-    def setUp(self):
-        self.data = data01
+class OpenDiskTests(FilesTests, util.DiskSetup, unittest.TestCase):
+    pass
 
 
 class OpenZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
     pass
 
 
-class OpenNamespaceTests(FilesTests, unittest.TestCase):
-    def setUp(self):
-        from . import namespacedata01
-
-        self.data = namespacedata01
+class OpenNamespaceTests(FilesTests, util.DiskSetup, unittest.TestCase):
+    MODULE = 'namespacedata01'
 
 
 class OpenNamespaceZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
