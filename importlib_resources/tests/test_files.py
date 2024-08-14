@@ -72,20 +72,28 @@ class SiteDir:
         self.fixtures.enter_context(import_helper.isolated_modules())
 
 
-class ModulesFilesTests(SiteDir, unittest.TestCase):
+class ModulesFiles:
+    spec = {
+        'mod.py': '',
+        'res.txt': 'resources are the best',
+    }
+    MODULE = 'unused'
+
     def test_module_resources(self):
         """
         A module can have resources found adjacent to the module.
         """
-        spec = {
-            'mod.py': '',
-            'res.txt': 'resources are the best',
-        }
-        _path.build(spec, self.site_dir)
         import mod
 
         actual = resources.files(mod).joinpath('res.txt').read_text(encoding='utf-8')
-        assert actual == spec['res.txt']
+        assert actual == self.spec['res.txt']
+
+    def load_fixture(self, name):
+        self.tree_on_path(self.spec)
+
+
+class ModuleFilesDiskTests(ModulesFiles, util.DiskSetup, unittest.TestCase):
+    pass
 
 
 class ImplicitContextFilesTests(SiteDir, unittest.TestCase):
