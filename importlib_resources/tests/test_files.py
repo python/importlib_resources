@@ -7,8 +7,6 @@ import contextlib
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
-from .compat.py39 import os_helper
-from .compat.py312 import import_helper
 
 
 @contextlib.contextmanager
@@ -60,15 +58,6 @@ class OpenNamespaceTests(FilesTests, util.DiskSetup, unittest.TestCase):
 
 class OpenNamespaceZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
     ZIP_MODULE = 'namespacedata01'
-
-
-class SiteDir:
-    def setUp(self):
-        self.fixtures = contextlib.ExitStack()
-        self.addCleanup(self.fixtures.close)
-        self.site_dir = self.fixtures.enter_context(os_helper.temp_dir())
-        self.fixtures.enter_context(import_helper.DirsOnSysPath(self.site_dir))
-        self.fixtures.enter_context(import_helper.isolated_modules())
 
 
 class DirectSpec:
