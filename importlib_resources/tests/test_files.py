@@ -7,7 +7,6 @@ import contextlib
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
-from . import _path
 from .compat.py39 import os_helper
 from .compat.py312 import import_helper
 
@@ -72,12 +71,22 @@ class SiteDir:
         self.fixtures.enter_context(import_helper.isolated_modules())
 
 
+class DirectSpec:
+    """
+    Override behavior of ModuleSetup to write a full spec directly.
+    """
+
+    MODULE = 'unused'
+
+    def load_fixture(self, name):
+        self.tree_on_path(self.spec)
+
+
 class ModulesFiles:
     spec = {
         'mod.py': '',
         'res.txt': 'resources are the best',
     }
-    MODULE = 'unused'
 
     def test_module_resources(self):
         """
@@ -88,32 +97,35 @@ class ModulesFiles:
         actual = resources.files(mod).joinpath('res.txt').read_text(encoding='utf-8')
         assert actual == self.spec['res.txt']
 
-    def load_fixture(self, name):
-        self.tree_on_path(self.spec)
 
-
-class ModuleFilesDiskTests(ModulesFiles, util.DiskSetup, unittest.TestCase):
+class ModuleFilesDiskTests(DirectSpec, util.DiskSetup, ModulesFiles, unittest.TestCase):
     pass
 
 
-class ImplicitContextFilesTests(SiteDir, unittest.TestCase):
+class ImplicitContextFiles:
+    spec = {
+        'somepkg': {
+            '__init__.py': textwrap.dedent(
+                """
+                import importlib_resources as res
+                val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
+                """
+            ),
+            'res.txt': 'resources are the best',
+        },
+    }
+
     def test_implicit_files(self):
         """
         Without any parameter, files() will infer the location as the caller.
         """
-        spec = {
-            'somepkg': {
-                '__init__.py': textwrap.dedent(
-                    """
-                    import importlib_resources as res
-                    val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
-                    """
-                ),
-                'res.txt': 'resources are the best',
-            },
-        }
-        _path.build(spec, self.site_dir)
         assert importlib.import_module('somepkg').val == 'resources are the best'
+
+
+class ImplicitContextFilesDiskTests(
+    DirectSpec, util.DiskSetup, ImplicitContextFiles, unittest.TestCase
+):
+    pass
 
 
 if __name__ == '__main__':
