@@ -177,31 +177,29 @@ class ModuleSetup:
         self.fixtures.enter_context(import_helper.isolated_modules())
         self.data = self.load_fixture(self.MODULE)
 
+    def load_fixture(self, module):
+        self.tree_on_path({module: fixtures[module]})
+        return importlib.import_module(module)
+
 
 class ZipSetup(ModuleSetup):
     MODULE = 'data01'
 
-    def load_fixture(self, module):
+    def tree_on_path(self, spec):
         temp_dir = self.fixtures.enter_context(os_helper.temp_dir())
         modules = pathlib.Path(temp_dir) / 'zipped modules.zip'
         self.fixtures.enter_context(
-            import_helper.DirsOnSysPath(
-                str(zip_.make_zip_file({module: fixtures[module]}, modules))
-            )
+            import_helper.DirsOnSysPath(str(zip_.make_zip_file(spec, modules)))
         )
-
-        return importlib.import_module(module)
 
 
 class DiskSetup(ModuleSetup):
     MODULE = 'data01'
 
-    def load_fixture(self, module):
+    def tree_on_path(self, spec):
         temp_dir = self.fixtures.enter_context(os_helper.temp_dir())
-        _path.build({module: fixtures[module]}, pathlib.Path(temp_dir))
+        _path.build(spec, pathlib.Path(temp_dir))
         self.fixtures.enter_context(import_helper.DirsOnSysPath(temp_dir))
-
-        return importlib.import_module(module)
 
 
 class CommonTests(DiskSetup, CommonTestsBase):
