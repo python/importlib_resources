@@ -1,0 +1,1 @@
+When constructing ZipReader, only append the name if the indicated module is a package. (python/cpython#121735)
