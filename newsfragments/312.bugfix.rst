@@ -1,0 +1,1 @@
+Merged fix for UTF-16 BOM handling in functional tests.
