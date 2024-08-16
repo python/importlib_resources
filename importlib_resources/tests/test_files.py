@@ -1,3 +1,7 @@
+import os
+import pathlib
+import py_compile
+import shutil
 import textwrap
 import unittest
 import warnings
@@ -121,6 +125,33 @@ class ImplicitContextFiles:
         Without any parameter, files() will infer the location as the caller.
         """
         assert importlib.import_module('somepkg.submod').val == 'resources are the best'
+
+    def _compile_importlib(self, target_dir):
+        importlib_dir = pathlib.Path(importlib.__file__).parent
+        shutil.copytree(importlib_dir, target_dir, ignore=lambda *_: ['__pycache__'])
+
+        for dirpath, _, filenames in os.walk(target_dir):
+            for filename in filenames:
+                source_path = pathlib.Path(dirpath) / filename
+                cfile = source_path.with_suffix('.pyc')
+                py_compile.compile(source_path, cfile)
+                pathlib.Path.unlink(source_path)
+
+    def test_implicit_files_with_compiled_importlib(self):
+        self._compile_importlib(pathlib.Path(self.site_dir) / 'cimportlib')
+        spec = {
+            'somepkg': {
+                '__init__.py': textwrap.dedent(
+                    """
+                    import cimportlib.resources as res
+                    val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
+                    """
+                ),
+                'res.txt': 'resources are the best',
+            },
+        }
+        _path.build(spec, self.site_dir)
+        assert importlib.import_module('somepkg').val == 'resources are the best'
 
 
 class ImplicitContextFilesDiskTests(

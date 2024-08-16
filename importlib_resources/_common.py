@@ -91,9 +91,14 @@ def _infer_caller():
     """
     Walk the stack and find the frame of the first caller not in this module.
     """
+    this_frame = inspect.currentframe()
+    if this_frame is None:
+        this_file = __file__
+    else:
+        this_file = inspect.getframeinfo(this_frame).filename
 
     def is_this_file(frame_info):
-        return frame_info.filename == __file__
+        return frame_info.filename == this_file
 
     def is_wrapper(frame_info):
         return frame_info.function == 'wrapper'
