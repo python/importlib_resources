@@ -1,3 +1,12 @@
+v6.4.3
+======
+
+Bugfixes
+--------
+
+- When inferring the caller in ``files()`` correctly detect one's own module even when the resources package source is not present. (python/cpython#123085)
+
+
 v6.4.2
 ======
 
