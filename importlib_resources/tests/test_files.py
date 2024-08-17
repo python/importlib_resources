@@ -149,6 +149,11 @@ class ImplicitContextFiles:
         self.fixtures.enter_context(import_helper.DirsOnSysPath(bin_site))
 
     def test_implicit_files_with_compiled_importlib(self):
+        """
+        Caller detection works for compiled-only resources module.
+
+        python/cpython#123085
+        """
         self._compile_importlib()
         assert importlib.import_module('frozenpkg').val == 'resources are the best'
 
