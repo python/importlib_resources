@@ -11,6 +11,7 @@ import contextlib
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
+from .compat.py39 import os_helper, import_helper
 
 
 @contextlib.contextmanager
@@ -112,6 +113,10 @@ class ImplicitContextFiles:
             'submod.py': set_val,
             'res.txt': 'resources are the best',
         },
+        'frozenpkg': {
+            '__init__.py': set_val.replace('importlib_resources', 'c_resources'),
+            'res.txt': 'resources are the best',
+        },
     }
 
     def test_implicit_files_package(self):
@@ -126,32 +131,26 @@ class ImplicitContextFiles:
         """
         assert importlib.import_module('somepkg.submod').val == 'resources are the best'
 
-    def _compile_importlib(self, target_dir):
-        importlib_dir = pathlib.Path(importlib.__file__).parent
-        shutil.copytree(importlib_dir, target_dir, ignore=lambda *_: ['__pycache__'])
+    def _compile_importlib(self):
+        """
+        Make a compiled-only copy of the importlib resources package.
+        """
+        bin_site = self.fixtures.enter_context(os_helper.temp_dir())
+        c_resources = pathlib.Path(bin_site, 'c_resources')
+        sources = pathlib.Path(resources.__file__).parent
+        shutil.copytree(sources, c_resources, ignore=lambda *_: ['__pycache__'])
 
-        for dirpath, _, filenames in os.walk(target_dir):
+        for dirpath, _, filenames in os.walk(c_resources):
             for filename in filenames:
                 source_path = pathlib.Path(dirpath) / filename
                 cfile = source_path.with_suffix('.pyc')
                 py_compile.compile(source_path, cfile)
                 pathlib.Path.unlink(source_path)
+        self.fixtures.enter_context(import_helper.DirsOnSysPath(bin_site))
 
     def test_implicit_files_with_compiled_importlib(self):
-        self._compile_importlib(pathlib.Path(self.site_dir) / 'cimportlib')
-        spec = {
-            'somepkg': {
-                '__init__.py': textwrap.dedent(
-                    """
-                    import cimportlib.resources as res
-                    val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
-                    """
-                ),
-                'res.txt': 'resources are the best',
-            },
-        }
-        _path.build(spec, self.site_dir)
-        assert importlib.import_module('somepkg').val == 'resources are the best'
+        self._compile_importlib()
+        assert importlib.import_module('frozenpkg').val == 'resources are the best'
 
 
 class ImplicitContextFilesDiskTests(
