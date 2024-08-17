@@ -102,8 +102,8 @@ class ModuleFilesZipTests(DirectSpec, util.ZipSetup, ModulesFiles, unittest.Test
 
 class ImplicitContextFiles:
     set_val = textwrap.dedent(
-        """
-        import importlib_resources as res
+        f"""
+        import {resources.__name__} as res
         val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
         """
     )
@@ -114,7 +114,7 @@ class ImplicitContextFiles:
             'res.txt': 'resources are the best',
         },
         'frozenpkg': {
-            '__init__.py': set_val.replace('importlib_resources', 'c_resources'),
+            '__init__.py': set_val.replace(resources.__name__, 'c_resources'),
             'res.txt': 'resources are the best',
         },
     }
