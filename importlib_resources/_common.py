@@ -87,24 +87,19 @@ def _(cand: None) -> types.ModuleType:
     return resolve(_infer_caller().f_globals['__name__'])
 
 
-@functools.lru_cache
-def _this_filename():
-    frame = inspect.currentframe()
-    return __file__ if frame is None else inspect.getframeinfo(frame).filename
-
-
 def _infer_caller():
     """
     Walk the stack and find the frame of the first caller not in this module.
     """
 
     def is_this_file(frame_info):
-        return frame_info.filename == _this_filename()
+        return frame_info.filename == stack[0].filename
 
     def is_wrapper(frame_info):
         return frame_info.function == 'wrapper'
 
-    not_this_file = itertools.filterfalse(is_this_file, inspect.stack())
+    stack = inspect.stack()
+    not_this_file = itertools.filterfalse(is_this_file, stack)
     # also exclude 'wrapper' due to singledispatch in the call stack
     callers = itertools.filterfalse(is_wrapper, not_this_file)
     return next(callers).frame
