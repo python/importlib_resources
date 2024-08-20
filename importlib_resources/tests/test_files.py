@@ -8,8 +8,6 @@ import warnings
 import importlib
 import contextlib
 
-import pytest
-
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
@@ -62,7 +60,6 @@ class OpenZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
 class OpenNamespaceTests(FilesTests, util.DiskSetup, unittest.TestCase):
     MODULE = 'namespacedata01'
 
-    @pytest.mark.xfail(reason="#311")
     def test_non_paths_in_dunder_path(self):
         """
         Non-path items in a namespace package's ``__path__`` are ignored.

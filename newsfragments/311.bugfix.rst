@@ -1,0 +1,1 @@
+Omit sentinel values from a namespace path.
