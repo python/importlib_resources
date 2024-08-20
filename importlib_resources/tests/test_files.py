@@ -8,6 +8,8 @@ import warnings
 import importlib
 import contextlib
 
+import pytest
+
 import importlib_resources as resources
 from ..abc import Traversable
 from . import util
@@ -59,6 +61,27 @@ class OpenZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
 
 class OpenNamespaceTests(FilesTests, util.DiskSetup, unittest.TestCase):
     MODULE = 'namespacedata01'
+
+    @pytest.mark.xfail(reason="#311")
+    def test_non_paths_in_dunder_path(self):
+        """
+        Non-path items in a namespace package's ``__path__`` are ignored.
+
+        As reported in python/importlib_resources#311, some tools
+        like Setuptools, when creating editable packages, will inject
+        non-paths into a namespace package's ``__path__``, a
+        sentinel like
+        ``__editable__.sample_namespace-1.0.finder.__path_hook__``
+        to cause the ``PathEntryFinder`` to be called when searching
+        for packages. In that case, resources should still be loadable.
+        """
+        import namespacedata01
+
+        namespacedata01.__path__.append(
+            '__editable__.sample_namespace-1.0.finder.__path_hook__'
+        )
+
+        resources.files(namespacedata01)
 
 
 class OpenNamespaceZipTests(FilesTests, util.ZipSetup, unittest.TestCase):
