@@ -86,7 +86,7 @@ class ModulesFiles:
         """
         A module can have resources found adjacent to the module.
         """
-        import mod
+        import mod  # type: ignore[import-not-found]
 
         actual = resources.files(mod).joinpath('res.txt').read_text(encoding='utf-8')
         assert actual == self.spec['res.txt']
