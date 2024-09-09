@@ -1,3 +1,12 @@
+v6.4.5
+======
+
+Bugfixes
+--------
+
+- Omit sentinel values from a namespace path. (#311)
+
+
 v6.4.4
 ======
 
