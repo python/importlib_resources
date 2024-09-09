@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import contextlib
 import itertools
@@ -5,6 +7,7 @@ import pathlib
 import operator
 import re
 import warnings
+from collections.abc import Iterator
 
 from . import abc
 
@@ -150,12 +153,12 @@ class NamespaceReader(abc.TraversableResources):
         return dir
 
     @classmethod
-    def _candidate_paths(cls, path_str):
+    def _candidate_paths(cls, path_str: str) -> Iterator[abc.Traversable]:
         yield pathlib.Path(path_str)
         yield from cls._resolve_zip_path(path_str)
 
     @staticmethod
-    def _resolve_zip_path(path_str):
+    def _resolve_zip_path(path_str: str):
         for match in reversed(list(re.finditer(r'[\\/]', path_str))):
             with contextlib.suppress(
                 FileNotFoundError,
