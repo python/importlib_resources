@@ -163,7 +163,9 @@ class ImplicitContextFiles:
         sources = pathlib.Path(resources.__file__).parent
 
         for source_path in sources.glob('**/*.py'):
-            c_path = c_resources.joinpath(source_path.relative_to(sources)).with_suffix('.pyc')
+            c_path = c_resources.joinpath(source_path.relative_to(sources)).with_suffix(
+                '.pyc'
+            )
             py_compile.compile(source_path, c_path)
         self.fixtures.enter_context(import_helper.DirsOnSysPath(bin_site))
 
