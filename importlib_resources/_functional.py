@@ -3,6 +3,7 @@
 import warnings
 
 from ._common import as_file, files
+from .abc import TraversalError
 
 _MISSING = object()
 
@@ -41,7 +42,10 @@ def is_resource(anchor, *path_names):
 
     Otherwise returns ``False``.
     """
-    return _get_resource(anchor, path_names).is_file()
+    try:
+        return _get_resource(anchor, path_names).is_file()
+    except TraversalError:
+        return False
 
 
 def contents(anchor, *path_names):
