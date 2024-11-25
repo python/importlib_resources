@@ -73,7 +73,7 @@ class FunctionalAPIBase:
         # fail with PermissionError rather than IsADirectoryError
         with self.assertRaises(OSError):
             resources.read_text(self.anchor01)
-        with self.assertRaises(OSError):
+        with self.assertRaises((OSError, resources.abc.TraversalError)):
             resources.read_text(self.anchor01, 'no-such-file')
         with self.assertRaises(UnicodeDecodeError):
             resources.read_text(self.anchor01, 'utf-16.file')
@@ -121,7 +121,7 @@ class FunctionalAPIBase:
         # fail with PermissionError rather than IsADirectoryError
         with self.assertRaises(OSError):
             resources.open_text(self.anchor01)
-        with self.assertRaises(OSError):
+        with self.assertRaises((OSError, resources.abc.TraversalError)):
             resources.open_text(self.anchor01, 'no-such-file')
         with resources.open_text(self.anchor01, 'utf-16.file') as f:
             with self.assertRaises(UnicodeDecodeError):
@@ -189,7 +189,7 @@ class FunctionalAPIBase:
 
         for path_parts in self._gen_resourcetxt_path_parts():
             with (
-                self.assertRaises(OSError),
+                self.assertRaises((OSError, resources.abc.TraversalError)),
                 warnings_helper.check_warnings((
                     ".*contents.*",
                     DeprecationWarning,
