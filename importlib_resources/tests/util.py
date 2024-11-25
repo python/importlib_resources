@@ -1,5 +1,6 @@
 import abc
 import contextlib
+import functools
 import importlib
 import io
 import pathlib
@@ -7,7 +8,7 @@ import sys
 import types
 from importlib.machinery import ModuleSpec
 
-from ..abc import ResourceReader
+from ..abc import ResourceReader, Traversable, TraversableResources
 from . import _path
 from . import zip as zip_
 from .compat.py39 import import_helper, os_helper
@@ -198,6 +199,108 @@ class DiskSetup(ModuleSetup):
         temp_dir = self.fixtures.enter_context(os_helper.temp_dir())
         _path.build(spec, pathlib.Path(temp_dir))
         self.fixtures.enter_context(import_helper.DirsOnSysPath(temp_dir))
+
+
+class MemorySetup(ModuleSetup):
+    """Support loading a module in memory."""
+
+    MODULE = 'data01'
+
+    def load_fixture(self, module):
+        self.fixtures.enter_context(self.augment_sys_metapath(module))
+        return importlib.import_module(module)
+
+    @contextlib.contextmanager
+    def augment_sys_metapath(self, module):
+        finder_instance = self.MemoryFinder(module)
+        sys.meta_path.append(finder_instance)
+        yield
+        sys.meta_path.remove(finder_instance)
+
+    class MemoryFinder(importlib.abc.MetaPathFinder):
+        def __init__(self, module):
+            self._module = module
+
+        def find_spec(self, fullname, path, target=None):
+            if fullname != self._module:
+                return None
+
+            return importlib.machinery.ModuleSpec(
+                name=fullname,
+                loader=MemorySetup.MemoryLoader(self._module),
+                is_package=True,
+            )
+
+    class MemoryLoader(importlib.abc.Loader):
+        def __init__(self, module):
+            self._module = module
+
+        def exec_module(self, module):
+            pass
+
+        def get_resource_reader(self, fullname):
+            return MemorySetup.MemoryTraversableResources(self._module, fullname)
+
+    class MemoryTraversableResources(TraversableResources):
+        def __init__(self, module, fullname):
+            self._module = module
+            self._fullname = fullname
+
+        def files(self):
+            return MemorySetup.MemoryTraversable(self._module, self._fullname)
+
+    class MemoryTraversable(Traversable):
+        """Implement only the abstract methods of `Traversable`.
+
+        Besides `.__init__()`, no other methods may be implemented or overridden.
+        This is critical for validating the concrete `Traversable` implementations.
+        """
+
+        def __init__(self, module, fullname):
+            self._module = module
+            self._fullname = fullname
+
+        def iterdir(self):
+            path = pathlib.PurePosixPath(self._fullname)
+            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            if not isinstance(directory, dict):
+                # Filesystem openers raise OSError, and that exception is mirrored here.
+                raise OSError(f"{self._fullname} is not a directory")
+            for path in directory:
+                yield MemorySetup.MemoryTraversable(
+                    self._module, f"{self._fullname}/{path}"
+                )
+
+        def is_dir(self) -> bool:
+            path = pathlib.PurePosixPath(self._fullname)
+            # Fully traverse the `fixtures` dictionary.
+            # This should be wrapped in a `try/except KeyError`
+            # but it is not currently needed, and lowers the code coverage numbers.
+            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            return isinstance(directory, dict)
+
+        def is_file(self) -> bool:
+            path = pathlib.PurePosixPath(self._fullname)
+            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            return not isinstance(directory, dict)
+
+        def open(self, mode='r', encoding=None, errors=None, *_, **__):
+            path = pathlib.PurePosixPath(self._fullname)
+            contents = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            if isinstance(contents, dict):
+                # Filesystem openers raise OSError when attempting to open a directory,
+                # and that exception is mirrored here.
+                raise OSError(f"{self._fullname} is a directory")
+            if isinstance(contents, str):
+                contents = contents.encode("utf-8")
+            result = io.BytesIO(contents)
+            if "b" in mode:
+                return result
+            return io.TextIOWrapper(result, encoding=encoding, errors=errors)
+
+        @property
+        def name(self):
+            return pathlib.PurePosixPath(self._fullname).name
 
 
 class CommonTests(DiskSetup, CommonTestsBase):
