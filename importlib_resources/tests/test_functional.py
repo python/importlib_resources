@@ -182,17 +182,23 @@ class FunctionalAPIBase(util.DiskSetup):
             set(c),
             {'utf-8.file', 'utf-16.file', 'binary.file', 'subdirectory'},
         )
-        with self.assertRaises(OSError), warnings_helper.check_warnings((
-            ".*contents.*",
-            DeprecationWarning,
-        )):
+        with (
+            self.assertRaises(OSError),
+            warnings_helper.check_warnings((
+                ".*contents.*",
+                DeprecationWarning,
+            )),
+        ):
             list(resources.contents(self.anchor01, 'utf-8.file'))
 
         for path_parts in self._gen_resourcetxt_path_parts():
-            with self.assertRaises(OSError), warnings_helper.check_warnings((
-                ".*contents.*",
-                DeprecationWarning,
-            )):
+            with (
+                self.assertRaises(OSError),
+                warnings_helper.check_warnings((
+                    ".*contents.*",
+                    DeprecationWarning,
+                )),
+            ):
                 list(resources.contents(self.anchor01, *path_parts))
         with warnings_helper.check_warnings((".*contents.*", DeprecationWarning)):
             c = resources.contents(self.anchor01, 'subdirectory')
