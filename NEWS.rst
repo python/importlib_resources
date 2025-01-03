@@ -1,3 +1,12 @@
+v6.5.2
+======
+
+Bugfixes
+--------
+
+- Replaced reference to typing_extensions with stdlib Literal. (#323)
+
+
 v6.5.1
 ======
 

@@ -1,1 +1,0 @@
-Replaced reference to typing_extensions with stdlib Literal.
