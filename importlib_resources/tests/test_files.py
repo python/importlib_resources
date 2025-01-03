@@ -70,7 +70,7 @@ class OpenNamespaceTests(FilesTests, util.DiskSetup, unittest.TestCase):
         to cause the ``PathEntryFinder`` to be called when searching
         for packages. In that case, resources should still be loadable.
         """
-        import namespacedata01
+        import namespacedata01  # type: ignore[import-not-found]
 
         namespacedata01.__path__.append(
             '__editable__.sample_namespace-1.0.finder.__path_hook__'
