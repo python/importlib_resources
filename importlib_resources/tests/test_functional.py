@@ -7,10 +7,6 @@ import importlib_resources as resources
 from . import util
 from .compat.py39 import warnings_helper
 
-# Since the functional API forwards to Traversable, we only test
-# filesystem resources here -- not zip files, namespace packages etc.
-# We do test for two kinds of Anchor, though.
-
 
 class StringAnchorMixin:
     anchor01 = 'data01'
@@ -27,7 +23,7 @@ class ModuleAnchorMixin:
         return importlib.import_module('data02')
 
 
-class FunctionalAPIBase(util.DiskSetup):
+class FunctionalAPIBase:
     def setUp(self):
         super().setUp()
         self.load_fixture('data02')
@@ -76,7 +72,7 @@ class FunctionalAPIBase(util.DiskSetup):
         # fail with PermissionError rather than IsADirectoryError
         with self.assertRaises(OSError):
             resources.read_text(self.anchor01)
-        with self.assertRaises(OSError):
+        with self.assertRaises((OSError, resources.abc.TraversalError)):
             resources.read_text(self.anchor01, 'no-such-file')
         with self.assertRaises(UnicodeDecodeError):
             resources.read_text(self.anchor01, 'utf-16.file')
@@ -124,7 +120,7 @@ class FunctionalAPIBase(util.DiskSetup):
         # fail with PermissionError rather than IsADirectoryError
         with self.assertRaises(OSError):
             resources.open_text(self.anchor01)
-        with self.assertRaises(OSError):
+        with self.assertRaises((OSError, resources.abc.TraversalError)):
             resources.open_text(self.anchor01, 'no-such-file')
         with resources.open_text(self.anchor01, 'utf-16.file') as f:
             with self.assertRaises(UnicodeDecodeError):
@@ -192,7 +188,7 @@ class FunctionalAPIBase(util.DiskSetup):
 
         for path_parts in self._gen_resourcetxt_path_parts():
             with (
-                self.assertRaises(OSError),
+                self.assertRaises((OSError, resources.abc.TraversalError)),
                 warnings_helper.check_warnings((
                     ".*contents.*",
                     DeprecationWarning,
@@ -244,17 +240,28 @@ class FunctionalAPIBase(util.DiskSetup):
                     )
 
 
-class FunctionalAPITest_StringAnchor(
+class FunctionalAPITest_StringAnchor_Disk(
     StringAnchorMixin,
     FunctionalAPIBase,
+    util.DiskSetup,
     unittest.TestCase,
 ):
     pass
 
 
-class FunctionalAPITest_ModuleAnchor(
+class FunctionalAPITest_ModuleAnchor_Disk(
     ModuleAnchorMixin,
     FunctionalAPIBase,
+    util.DiskSetup,
+    unittest.TestCase,
+):
+    pass
+
+
+class FunctionalAPITest_StringAnchor_Memory(
+    StringAnchorMixin,
+    FunctionalAPIBase,
+    util.MemorySetup,
     unittest.TestCase,
 ):
     pass

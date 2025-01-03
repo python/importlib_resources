@@ -1,0 +1,1 @@
+Updated ``Traversable.read_text()`` to reflect the ``errors`` parameter (python/cpython#127012).
