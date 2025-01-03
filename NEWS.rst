@@ -1,3 +1,12 @@
+v6.5.1
+======
+
+Bugfixes
+--------
+
+- Updated ``Traversable.read_text()`` to reflect the ``errors`` parameter (python/cpython#127012). (#321)
+
+
 v6.5.0
 ======
 
