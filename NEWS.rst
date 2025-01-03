@@ -1,3 +1,13 @@
+v6.5.0
+======
+
+Features
+--------
+
+- Add type annotations for Traversable.open. (#317)
+- Require Python 3.9 or later.
+
+
 v6.4.5
 ======
 
