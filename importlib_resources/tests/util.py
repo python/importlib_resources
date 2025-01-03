@@ -260,9 +260,18 @@ class MemorySetup(ModuleSetup):
             self._module = module
             self._fullname = fullname
 
-        def iterdir(self):
+        def _resolve(self):
+            """
+            Fully traverse the `fixtures` dictionary.
+
+            This should be wrapped in a `try/except KeyError`
+            but it is not currently needed and lowers the code coverage numbers.
+            """
             path = pathlib.PurePosixPath(self._fullname)
-            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            return functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+
+        def iterdir(self):
+            directory = self._resolve()
             if not isinstance(directory, dict):
                 # Filesystem openers raise OSError, and that exception is mirrored here.
                 raise OSError(f"{self._fullname} is not a directory")
@@ -272,21 +281,13 @@ class MemorySetup(ModuleSetup):
                 )
 
         def is_dir(self) -> bool:
-            path = pathlib.PurePosixPath(self._fullname)
-            # Fully traverse the `fixtures` dictionary.
-            # This should be wrapped in a `try/except KeyError`
-            # but it is not currently needed, and lowers the code coverage numbers.
-            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
-            return isinstance(directory, dict)
+            return isinstance(self._resolve(), dict)
 
         def is_file(self) -> bool:
-            path = pathlib.PurePosixPath(self._fullname)
-            directory = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
-            return not isinstance(directory, dict)
+            return not self.is_dir()
 
         def open(self, mode='r', encoding=None, errors=None, *_, **__):
-            path = pathlib.PurePosixPath(self._fullname)
-            contents = functools.reduce(lambda d, p: d[p], path.parts, fixtures)
+            contents = self._resolve()
             if isinstance(contents, dict):
                 # Filesystem openers raise OSError when attempting to open a directory,
                 # and that exception is mirrored here.
