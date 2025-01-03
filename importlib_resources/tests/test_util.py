@@ -26,10 +26,4 @@ class TestMemoryTraversableImplementation(unittest.TestCase):
             memory_traversable_concrete_methods & traversable_concrete_methods
         )
 
-        if overridden_methods:
-            raise AssertionError(
-                "MemorySetup.MemoryTraversable overrides Traversable concrete methods, "
-                "which may mask problems in the Traversable protocol. "
-                "Please remove the following methods in MemoryTraversable: "
-                + ", ".join(overridden_methods)
-            )
+        assert not overridden_methods
