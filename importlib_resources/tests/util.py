@@ -1,18 +1,16 @@
 import abc
+import contextlib
 import importlib
 import io
+import pathlib
 import sys
 import types
-import pathlib
-import contextlib
+from importlib.machinery import ModuleSpec
 
 from ..abc import ResourceReader
-from .compat.py39 import import_helper, os_helper
-from . import zip as zip_
 from . import _path
-
-
-from importlib.machinery import ModuleSpec
+from . import zip as zip_
+from .compat.py39 import import_helper, os_helper
 
 
 class Reader(ResourceReader):

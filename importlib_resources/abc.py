@@ -2,11 +2,19 @@ import abc
 import io
 import itertools
 import pathlib
-from typing import Any, BinaryIO, Iterable, Iterator, NoReturn, Text, Optional
-from typing import runtime_checkable, Protocol
+from typing import (
+    Any,
+    BinaryIO,
+    Iterable,
+    Iterator,
+    NoReturn,
+    Optional,
+    Protocol,
+    Text,
+    runtime_checkable,
+)
 
 from .compat.py38 import StrPath
-
 
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
 

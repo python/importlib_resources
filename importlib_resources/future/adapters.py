@@ -3,7 +3,7 @@ import pathlib
 from contextlib import suppress
 from types import SimpleNamespace
 
-from .. import readers, _adapters
+from .. import _adapters, readers
 
 
 def _block_standard(reader_getter):

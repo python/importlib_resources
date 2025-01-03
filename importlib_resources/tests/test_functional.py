@@ -1,12 +1,11 @@
-import unittest
-import os
 import importlib
-
-from .compat.py39 import warnings_helper
+import os
+import unittest
 
 import importlib_resources as resources
 
 from . import util
+from .compat.py39 import warnings_helper
 
 # Since the functional API forwards to Traversable, we only test
 # filesystem resources here -- not zip files, namespace packages etc.

@@ -1,15 +1,16 @@
+import contextlib
+import importlib
 import pathlib
 import py_compile
 import textwrap
 import unittest
 import warnings
-import importlib
-import contextlib
 
 import importlib_resources as resources
+
 from ..abc import Traversable
 from . import util
-from .compat.py39 import os_helper, import_helper
+from .compat.py39 import import_helper, os_helper
 
 
 @contextlib.contextmanager
