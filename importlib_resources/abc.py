@@ -1,5 +1,6 @@
 import abc
 import itertools
+import os
 import pathlib
 from typing import (
     Any,
@@ -18,7 +19,7 @@ from typing import (
 
 from typing_extensions import Literal
 
-from .compat.py38 import StrPath
+StrPath = Union[str, os.PathLike[str]]
 
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
 
