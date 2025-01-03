@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     Iterator,
     NoReturn,
+    Literal,
     Optional,
     Protocol,
     Text,
@@ -16,8 +17,6 @@ from typing import (
     overload,
     runtime_checkable,
 )
-
-from typing_extensions import Literal
 
 StrPath = Union[str, os.PathLike[str]]
 
