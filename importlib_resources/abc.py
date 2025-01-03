@@ -1,5 +1,4 @@
 import abc
-import io
 import itertools
 import pathlib
 from typing import (
@@ -11,8 +10,13 @@ from typing import (
     Optional,
     Protocol,
     Text,
+    TextIO,
+    Union,
+    overload,
     runtime_checkable,
 )
+
+from typing_extensions import Literal
 
 from .compat.py38 import StrPath
 
@@ -138,8 +142,16 @@ class Traversable(Protocol):
         """
         return self.joinpath(child)
 
+    @overload
+    def open(self, mode: Literal['r'] = 'r', *args: Any, **kwargs: Any) -> TextIO: ...
+
+    @overload
+    def open(self, mode: Literal['rb'], *args: Any, **kwargs: Any) -> BinaryIO: ...
+
     @abc.abstractmethod
-    def open(self, mode='r', *args, **kwargs):
+    def open(
+        self, mode: str = 'r', *args: Any, **kwargs: Any
+    ) -> Union[TextIO, BinaryIO]:
         """
         mode may be 'r' or 'rb' to open as text or binary. Return a handle
         suitable for reading (same as pathlib.Path.open).
@@ -166,7 +178,7 @@ class TraversableResources(ResourceReader):
     def files(self) -> "Traversable":
         """Return a Traversable object for the loaded package."""
 
-    def open_resource(self, resource: StrPath) -> io.BufferedReader:
+    def open_resource(self, resource: StrPath) -> BinaryIO:
         return self.files().joinpath(resource).open('rb')
 
     def resource_path(self, resource: Any) -> NoReturn:
