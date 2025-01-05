@@ -1,12 +1,10 @@
-import unittest
 import contextlib
+import importlib.resources as resources
 import pathlib
-
-from test.support import os_helper
-
-from importlib import resources
+import unittest
 from importlib.resources import abc
-from importlib.resources.abc import TraversableResources, ResourceReader
+from importlib.resources.abc import ResourceReader, TraversableResources
+
 from . import util
 
 

@@ -1,8 +1,8 @@
+import importlib.resources as resources
 import io
 import pathlib
 import unittest
 
-from importlib import resources
 from . import util
 
 
