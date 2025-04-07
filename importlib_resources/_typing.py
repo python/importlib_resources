@@ -47,7 +47,7 @@ __all__ = (
 TYPE_CHECKING = False
 
 
-# Type checkers needs this block to understand what __getattr__() does currently.
+# Type checkers needs this block to understand what __getattr__() exports currently.
 if TYPE_CHECKING:
     import os
     import types
@@ -89,7 +89,7 @@ def __getattr__(name: str) -> object:
         import os
         from typing import Union
 
-        obj = Union[str, "os.PathLike[str]"]
+        obj = Union[str, os.PathLike[str]]
 
     else:
         msg = f"module {__name__!r} has no attribute {name!r}"

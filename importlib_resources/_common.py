@@ -8,12 +8,28 @@ import pathlib
 import tempfile
 import types
 import warnings
-from typing import Optional, Union
 
+from . import _typing as _t
 from . import abc
+from ._typing import TYPE_CHECKING
 
-Package = Union[types.ModuleType, str]
-Anchor = Package
+# Type checkers needs this block to understand what __getattr__() exports currently.
+if TYPE_CHECKING:
+    from ._typing import Anchor as Anchor
+    from ._typing import Package as Package
+
+
+def __getattr__(name: str) -> object:
+    # Defer import to avoid an import dependency on typing, since Package and Anchor
+    # are type aliases that use symbols from typing.
+    if name in {"Package", "Anchor"}:
+        obj = getattr(_t, name)
+    else:
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg)
+
+    globals()[name] = obj
+    return obj
 
 
 def package_to_anchor(func):
@@ -49,14 +65,14 @@ def package_to_anchor(func):
 
 
 @package_to_anchor
-def files(anchor: Optional[Anchor] = None) -> "abc.Traversable":
+def files(anchor: "_t.Optional[_t.Anchor]" = None) -> "abc.Traversable":
     """
     Get a Traversable resource for an anchor.
     """
     return from_package(resolve(anchor))
 
 
-def get_resource_reader(package: types.ModuleType) -> Optional["abc.ResourceReader"]:
+def get_resource_reader(package: types.ModuleType) -> "_t.Optional[abc.ResourceReader]":
     """
     Return the package's loader if it's a ResourceReader.
     """
@@ -73,7 +89,7 @@ def get_resource_reader(package: types.ModuleType) -> Optional["abc.ResourceRead
 
 
 @functools.singledispatch
-def resolve(cand: Optional[Anchor]) -> types.ModuleType:
+def resolve(cand: "_t.Optional[_t.Anchor]") -> types.ModuleType:
     return cand  # type: ignore[return-value] # Guarded by usage in from_package.
 
 
