@@ -87,7 +87,7 @@ class TraversableResources(ResourceReader):
     """
 
     @abc.abstractmethod
-    def files(self) -> "_self_mod.Traversable":
+    def files(self) -> _self_mod.Traversable:
         """Return a Traversable object for the loaded package."""
 
     def open_resource(self, resource: _t.StrPath) -> _t.BinaryIO:
