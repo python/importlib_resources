@@ -8,9 +8,9 @@ import pathlib
 import tempfile
 import types
 import warnings
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
-from .abc import ResourceReader, Traversable
+from . import abc
 
 Package = Union[types.ModuleType, str]
 Anchor = Package
@@ -49,14 +49,14 @@ def package_to_anchor(func):
 
 
 @package_to_anchor
-def files(anchor: Optional[Anchor] = None) -> Traversable:
+def files(anchor: Optional[Anchor] = None) -> "abc.Traversable":
     """
     Get a Traversable resource for an anchor.
     """
     return from_package(resolve(anchor))
 
 
-def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
+def get_resource_reader(package: types.ModuleType) -> Optional["abc.ResourceReader"]:
     """
     Return the package's loader if it's a ResourceReader.
     """
@@ -74,7 +74,7 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
 
 @functools.singledispatch
 def resolve(cand: Optional[Anchor]) -> types.ModuleType:
-    return cast(types.ModuleType, cand)
+    return cand  # type: ignore[return-value] # Guarded by usage in from_package.
 
 
 @resolve.register
@@ -149,7 +149,7 @@ def _temp_file(path):
     return _tempfile(path.read_bytes, suffix=path.name)
 
 
-def _is_present_dir(path: Traversable) -> bool:
+def _is_present_dir(path: "abc.Traversable") -> bool:
     """
     Some Traversables implement ``is_dir()`` to raise an
     exception (i.e. ``FileNotFoundError``) when the
