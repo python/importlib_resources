@@ -5,7 +5,6 @@ import inspect
 import itertools
 import os
 import pathlib
-import tempfile
 import types
 import warnings
 from typing import Optional, Union, cast
@@ -127,6 +126,9 @@ def _tempfile(
     *,
     _os_remove=os.remove,
 ):
+    # Deferred for performance.
+    import tempfile
+
     # Not using tempfile.NamedTemporaryFile as it leads to deeper 'try'
     # blocks due to the need to close the temporary file to work on Windows
     # properly.
@@ -186,6 +188,9 @@ def _temp_dir(path):
     Given a traversable dir, recursively replicate the whole tree
     to the file system in a context manager.
     """
+    # Deferred for performance.
+    import tempfile
+
     assert path.is_dir()
     with tempfile.TemporaryDirectory() as temp_dir:
         yield _write_contents(pathlib.Path(temp_dir), path)
