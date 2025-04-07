@@ -23,15 +23,20 @@ else:
 
 
 def __getattr__(name: str) -> object:
-    # Defer import to avoid an import dependency on typing, since Traversable subclasses
-    # typing.Protocol.
+    # Defer import to avoid an import-time dependency on typing, since Traversable
+    # subclasses typing.Protocol.
     if name == "Traversable":
-        from ._traversable import Traversable
+        from ._traversable import Traversable as obj
+    else:
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg)
 
-        return Traversable
+    globals()[name] = obj
+    return obj
 
-    msg = f"module {__name__!r} has no attribute {name!r}"
-    raise AttributeError(msg)
+
+def __dir__() -> list[str]:
+    return sorted(globals().keys() | {"Traversable"})
 
 
 class ResourceReader(metaclass=abc.ABCMeta):

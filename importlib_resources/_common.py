@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 
 
 def __getattr__(name: str) -> object:
-    # Defer import to avoid an import dependency on typing, since Package and Anchor
-    # are type aliases that use symbols from typing.
+    # Defer import to avoid an import-time dependency on typing, since Package and
+    # Anchor are type aliases that use symbols from typing.
     if name in {"Package", "Anchor"}:
         obj = getattr(_t, name)
     else:
@@ -30,6 +30,10 @@ def __getattr__(name: str) -> object:
 
     globals()[name] = obj
     return obj
+
+
+def __dir__() -> list[str]:
+    return sorted(globals().keys() | {"Package", "Anchor"})
 
 
 def package_to_anchor(func):
