@@ -39,6 +39,7 @@ __all__ = (
     # Other
     "Package",
     "Anchor",
+    "StrPath",
 
 )  # fmt: skip
 
@@ -48,6 +49,7 @@ TYPE_CHECKING = False
 
 # Type checkers needs this block to understand what __getattr__() does currently.
 if TYPE_CHECKING:
+    import os
     import types
     from collections.abc import Iterable, Iterator
     from typing import (
@@ -63,6 +65,7 @@ if TYPE_CHECKING:
 
     Package: TypeAlias = Union[types.ModuleType, str]
     Anchor = Package
+    StrPath: TypeAlias = Union[str, os.PathLike[str]]
 
 
 def __getattr__(name: str) -> object:
@@ -81,6 +84,12 @@ def __getattr__(name: str) -> object:
         from typing import Union
 
         obj = Union[types.ModuleType, str]
+
+    elif name == "StrPath":
+        import os
+        from typing import Union
+
+        obj = Union[str, "os.PathLike[str]"]
 
     else:
         msg = f"module {__name__!r} has no attribute {name!r}"

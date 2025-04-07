@@ -1,18 +1,9 @@
+from __future__ import annotations
+
 import abc
-import os
-from typing import (
-    Any,
-    BinaryIO,
-    Iterable,
-    Iterator,
-    NoReturn,
-    Text,
-    Union,
-)
 
+from . import _typing as _t
 from ._typing import TYPE_CHECKING
-
-StrPath = Union[str, os.PathLike[str]]
 
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
 
@@ -47,7 +38,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
     """Abstract base class for loaders to provide resource reading support."""
 
     @abc.abstractmethod
-    def open_resource(self, resource: Text) -> BinaryIO:
+    def open_resource(self, resource: _t.Text) -> _t.BinaryIO:
         """Return an opened, file-like object for binary reading.
 
         The 'resource' argument is expected to represent only a file name.
@@ -59,7 +50,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def resource_path(self, resource: Text) -> Text:
+    def resource_path(self, resource: _t.Text) -> _t.Text:
         """Return the file system path to the specified resource.
 
         The 'resource' argument is expected to represent only a file name.
@@ -72,7 +63,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def is_resource(self, path: Text) -> bool:
+    def is_resource(self, path: _t.Text) -> bool:
         """Return True if the named 'path' is a resource.
 
         Files are resources, directories are not.
@@ -80,7 +71,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def contents(self) -> Iterable[str]:
+    def contents(self) -> _t.Iterable[str]:
         """Return an iterable of entries in `package`."""
         raise FileNotFoundError
 
@@ -99,14 +90,14 @@ class TraversableResources(ResourceReader):
     def files(self) -> "_self_mod.Traversable":
         """Return a Traversable object for the loaded package."""
 
-    def open_resource(self, resource: StrPath) -> BinaryIO:
+    def open_resource(self, resource: _t.StrPath) -> _t.BinaryIO:
         return self.files().joinpath(resource).open('rb')
 
-    def resource_path(self, resource: Any) -> NoReturn:
+    def resource_path(self, resource: _t.Any) -> _t.NoReturn:
         raise FileNotFoundError(resource)
 
-    def is_resource(self, path: StrPath) -> bool:
+    def is_resource(self, path: _t.StrPath) -> bool:
         return self.files().joinpath(path).is_file()
 
-    def contents(self) -> Iterator[str]:
+    def contents(self) -> _t.Iterator[str]:
         return (item.name for item in self.files().iterdir())
