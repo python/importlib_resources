@@ -11,29 +11,6 @@ import warnings
 
 from . import _typing as _t
 from . import abc
-from ._typing import TYPE_CHECKING
-
-# Type checkers needs this block to understand what __getattr__() exports currently.
-if TYPE_CHECKING:
-    from ._typing import Anchor as Anchor
-    from ._typing import Package as Package
-
-
-def __getattr__(name: str) -> object:
-    # Defer import to avoid an import-time dependency on typing, since Package and
-    # Anchor are type aliases that use symbols from typing.
-    if name in {"Package", "Anchor"}:
-        obj = getattr(_t, name)
-    else:
-        msg = f"module {__name__!r} has no attribute {name!r}"
-        raise AttributeError(msg)
-
-    globals()[name] = obj
-    return obj
-
-
-def __dir__() -> list[str]:
-    return sorted(globals().keys() | {"Package", "Anchor"})
 
 
 def package_to_anchor(func):
