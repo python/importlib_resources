@@ -69,19 +69,14 @@ def get_resource_reader(package: types.ModuleType) -> "_t.Optional[abc.ResourceR
     return reader(spec.name)  # type: ignore[union-attr]
 
 
-@functools.singledispatch
 def resolve(cand: "_t.Optional[_t.Anchor]") -> types.ModuleType:
-    return cand  # type: ignore[return-value] # Guarded by usage in from_package.
+    if cand is None:
+        cand = _infer_caller().f_globals['__name__']
 
-
-@resolve.register
-def _(cand: str) -> types.ModuleType:
-    return importlib.import_module(cand)
-
-
-@resolve.register
-def _(cand: None) -> types.ModuleType:
-    return resolve(_infer_caller().f_globals['__name__'])
+    if isinstance(cand, str):
+        return importlib.import_module(cand)
+    else:
+        return cand  # type: ignore[return-value] # Guarded by usage in from_package.
 
 
 def _infer_caller():
@@ -159,18 +154,18 @@ def _is_present_dir(path: "abc.Traversable") -> bool:
     return False
 
 
-@functools.singledispatch
 def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
+    if isinstance(path, pathlib.Path):
+        return _as_file_Path(path)
     return _temp_dir(path) if _is_present_dir(path) else _temp_file(path)
 
 
-@as_file.register(pathlib.Path)
 @contextlib.contextmanager
-def _(path):
+def _as_file_Path(path):
     """
     Degenerate behavior for pathlib.Path objects.
     """
