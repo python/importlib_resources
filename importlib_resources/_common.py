@@ -1,10 +1,9 @@
 import contextlib
 import functools
 import importlib
-import inspect
-import itertools
 import os
 import pathlib
+import sys
 import tempfile
 import types
 import warnings
@@ -84,25 +83,80 @@ def _(cand: str) -> types.ModuleType:
 
 @resolve.register
 def _(cand: None) -> types.ModuleType:
-    return resolve(_infer_caller().f_globals['__name__'])
+    # PYUPDATE: 3.15 - Update depth & explanation for package_to_anchor()'s removal.
+    # Expected parent stack frames for depth=4:
+    # 0) resolve()'s singledispatch dispatch
+    # 1) resolve()'s singledispatch wrapper
+    # 2) files()
+    # 3) package_to_anchor()
+    # 4) <caller>()
+    return resolve(_get_caller_module_name(depth=4))
 
 
-def _infer_caller():
-    """
-    Walk the stack and find the frame of the first caller not in this module.
-    """
+# An expanded version of a CPython stdlib pattern to avoid using the expensive inspect.
+def _get_caller_module_name(depth: int = 1, default: str = "__main__") -> str:
+    """Find the module name of the frame one level beyond the depth given."""
 
-    def is_this_file(frame_info):
-        return frame_info.filename == stack[0].filename
+    try:
+        return sys._getframemodulename(depth + 1) or default  # type: ignore[attr-defined] # Guarded.
+    except AttributeError:  # For platforms without sys._getframemodulename.
+        global _get_caller_module_name
 
-    def is_wrapper(frame_info):
-        return frame_info.function == 'wrapper'
+        def _get_caller_module_name(depth: int = 1, default: str = "__main__") -> str:
+            """Find the module name of the frame one level beyond the depth given."""
 
-    stack = inspect.stack()
-    not_this_file = itertools.filterfalse(is_this_file, stack)
-    # also exclude 'wrapper' due to singledispatch in the call stack
-    callers = itertools.filterfalse(is_wrapper, not_this_file)
-    return next(callers).frame
+            try:
+                return _get_frame(depth + 1).f_globals.get("__name__", default)  # type: ignore[union-attr] # Guarded.
+            except (AttributeError, ValueError):  # For platforms without frames.
+                global _get_caller_module_name
+
+                def _get_caller_module_name(
+                    depth: int = 1,
+                    default: str = "__main__",
+                ) -> str:
+                    """Find the module name of the frame one level beyond the depth given."""
+
+                    msg = "Cannot get the caller's module's name."
+                    raise RuntimeError(msg)
+
+                return _get_caller_module_name(depth, default)
+
+        return _get_caller_module_name(depth, default)
+
+
+# This attempts to support Python implementations that either don't have sys._getframe
+# (e.g. Jython) or don't support sys._getframe(x) where x >= 1 (e.g. IronPython).
+# We avoid inspect.stack because of how expensive inspect is to import.
+def _get_frame(depth: int = 1, /) -> Optional[types.FrameType]:
+    """Return the frame object for one of the caller's parent stack frames."""
+
+    try:
+        return sys._getframe(depth + 1)
+    except (AttributeError, ValueError):  # For platforms without full sys._getframe.
+        global _get_frame
+
+        def _get_frame(depth: int = 1, /) -> Optional[types.FrameType]:
+            """Return the frame object for one of the caller's parent stack frames."""
+
+            try:
+                raise TypeError
+            except TypeError:
+                try:
+                    frame = sys.exc_info()[2].tb_frame  # type: ignore[union-attr] # Guarded.
+                    for _ in range(depth + 1):
+                        frame = frame.f_back
+                    return frame
+                except Exception:
+                    global _get_frame
+
+                    def _get_frame(depth: int = 1, /) -> Optional[types.FrameType]:
+                        """Return the frame object for one of the caller's parent stack frames."""
+
+                        return None
+
+                    return _get_frame()
+
+        return _get_frame()
 
 
 def from_package(package: types.ModuleType):
