@@ -1,33 +1,49 @@
-import abc
-import itertools
-import os
-import pathlib
-from typing import (
-    Any,
-    BinaryIO,
-    Iterable,
-    Iterator,
-    NoReturn,
-    Literal,
-    Optional,
-    Protocol,
-    Text,
-    TextIO,
-    Union,
-    overload,
-    runtime_checkable,
-)
+from __future__ import annotations
 
-StrPath = Union[str, os.PathLike[str]]
+import abc
+
+from . import _typing as _t
+from ._typing import TYPE_CHECKING
 
 __all__ = ["ResourceReader", "Traversable", "TraversableResources"]
+
+
+# A hack for the following targets:
+# a) Type checkers, so they can understand what __getattr__() exports.
+# b) Internal annotations, so that Traversable can be used in deferred annotations via
+#    _self_mod.Traversable.
+if TYPE_CHECKING:
+    from ._traversable import Traversable
+
+    class _self_mod:
+        from ._traversable import Traversable
+
+else:
+    _self_mod = __import__("sys").modules[__name__]
+
+
+def __getattr__(name: str) -> object:
+    # Defer import to avoid an import-time dependency on typing, since Traversable
+    # subclasses typing.Protocol.
+    if name == "Traversable":
+        from ._traversable import Traversable as obj
+    else:
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg)
+
+    globals()[name] = obj
+    return obj
+
+
+def __dir__() -> list[str]:
+    return sorted(globals().keys() | {"Traversable"})
 
 
 class ResourceReader(metaclass=abc.ABCMeta):
     """Abstract base class for loaders to provide resource reading support."""
 
     @abc.abstractmethod
-    def open_resource(self, resource: Text) -> BinaryIO:
+    def open_resource(self, resource: _t.Text) -> _t.BinaryIO:
         """Return an opened, file-like object for binary reading.
 
         The 'resource' argument is expected to represent only a file name.
@@ -39,7 +55,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def resource_path(self, resource: Text) -> Text:
+    def resource_path(self, resource: _t.Text) -> _t.Text:
         """Return the file system path to the specified resource.
 
         The 'resource' argument is expected to represent only a file name.
@@ -52,7 +68,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def is_resource(self, path: Text) -> bool:
+    def is_resource(self, path: _t.Text) -> bool:
         """Return True if the named 'path' is a resource.
 
         Files are resources, directories are not.
@@ -60,114 +76,13 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def contents(self) -> Iterable[str]:
+    def contents(self) -> _t.Iterable[str]:
         """Return an iterable of entries in `package`."""
         raise FileNotFoundError
 
 
 class TraversalError(Exception):
     pass
-
-
-@runtime_checkable
-class Traversable(Protocol):
-    """
-    An object with a subset of pathlib.Path methods suitable for
-    traversing directories and opening files.
-
-    Any exceptions that occur when accessing the backing resource
-    may propagate unaltered.
-    """
-
-    @abc.abstractmethod
-    def iterdir(self) -> Iterator["Traversable"]:
-        """
-        Yield Traversable objects in self
-        """
-
-    def read_bytes(self) -> bytes:
-        """
-        Read contents of self as bytes
-        """
-        with self.open('rb') as strm:
-            return strm.read()
-
-    def read_text(
-        self, encoding: Optional[str] = None, errors: Optional[str] = None
-    ) -> str:
-        """
-        Read contents of self as text
-        """
-        with self.open(encoding=encoding, errors=errors) as strm:
-            return strm.read()
-
-    @abc.abstractmethod
-    def is_dir(self) -> bool:
-        """
-        Return True if self is a directory
-        """
-
-    @abc.abstractmethod
-    def is_file(self) -> bool:
-        """
-        Return True if self is a file
-        """
-
-    def joinpath(self, *descendants: StrPath) -> "Traversable":
-        """
-        Return Traversable resolved with any descendants applied.
-
-        Each descendant should be a path segment relative to self
-        and each may contain multiple levels separated by
-        ``posixpath.sep`` (``/``).
-        """
-        if not descendants:
-            return self
-        names = itertools.chain.from_iterable(
-            path.parts for path in map(pathlib.PurePosixPath, descendants)
-        )
-        target = next(names)
-        matches = (
-            traversable for traversable in self.iterdir() if traversable.name == target
-        )
-        try:
-            match = next(matches)
-        except StopIteration:
-            raise TraversalError(
-                "Target not found during traversal.", target, list(names)
-            )
-        return match.joinpath(*names)
-
-    def __truediv__(self, child: StrPath) -> "Traversable":
-        """
-        Return Traversable child in self
-        """
-        return self.joinpath(child)
-
-    @overload
-    def open(self, mode: Literal['r'] = 'r', *args: Any, **kwargs: Any) -> TextIO: ...
-
-    @overload
-    def open(self, mode: Literal['rb'], *args: Any, **kwargs: Any) -> BinaryIO: ...
-
-    @abc.abstractmethod
-    def open(
-        self, mode: str = 'r', *args: Any, **kwargs: Any
-    ) -> Union[TextIO, BinaryIO]:
-        """
-        mode may be 'r' or 'rb' to open as text or binary. Return a handle
-        suitable for reading (same as pathlib.Path.open).
-
-        When opening as text, accepts encoding parameters such as those
-        accepted by io.TextIOWrapper.
-        """
-
-    @property
-    @abc.abstractmethod
-    def name(self) -> str:
-        """
-        The base name of this object without any parent references.
-        """
 
 
 class TraversableResources(ResourceReader):
@@ -177,17 +92,17 @@ class TraversableResources(ResourceReader):
     """
 
     @abc.abstractmethod
-    def files(self) -> "Traversable":
+    def files(self) -> _self_mod.Traversable:
         """Return a Traversable object for the loaded package."""
 
-    def open_resource(self, resource: StrPath) -> BinaryIO:
+    def open_resource(self, resource: _t.StrPath) -> _t.BinaryIO:
         return self.files().joinpath(resource).open('rb')
 
-    def resource_path(self, resource: Any) -> NoReturn:
+    def resource_path(self, resource: _t.Any) -> _t.NoReturn:
         raise FileNotFoundError(resource)
 
-    def is_resource(self, path: StrPath) -> bool:
+    def is_resource(self, path: _t.StrPath) -> bool:
         return self.files().joinpath(path).is_file()
 
-    def contents(self) -> Iterator[str]:
+    def contents(self) -> _t.Iterator[str]:
         return (item.name for item in self.files().iterdir())

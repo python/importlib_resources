@@ -8,8 +8,6 @@ for more detail.
 """
 
 from ._common import (
-    Anchor,
-    Package,
     as_file,
     files,
 )
@@ -38,3 +36,28 @@ __all__ = [
     'read_binary',
     'read_text',
 ]
+
+TYPE_CHECKING = False
+
+# Type checkers needs this block to understand what __getattr__() exports currently.
+if TYPE_CHECKING:
+    from ._typing import Anchor, Package
+
+
+def __getattr__(name: str) -> object:
+    # Defer import to avoid an import-time dependency on typing, since Package and
+    # Anchor are type aliases that use symbols from typing.
+    if name in {"Anchor", "Package"}:
+        from . import _typing
+
+        obj = getattr(_typing, name)
+
+    else:
+        msg = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(msg)
+
+    globals()[name] = obj
+    return obj
+
+def __dir__() -> list[str]:
+    return sorted(globals().keys() | {"Anchor", "Package"})

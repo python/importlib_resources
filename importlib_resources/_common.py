@@ -8,12 +8,9 @@ import pathlib
 import tempfile
 import types
 import warnings
-from typing import Optional, Union, cast
 
-from .abc import ResourceReader, Traversable
-
-Package = Union[types.ModuleType, str]
-Anchor = Package
+from . import _typing as _t
+from . import abc
 
 
 def package_to_anchor(func):
@@ -49,14 +46,14 @@ def package_to_anchor(func):
 
 
 @package_to_anchor
-def files(anchor: Optional[Anchor] = None) -> Traversable:
+def files(anchor: "_t.Optional[_t.Anchor]" = None) -> "abc.Traversable":
     """
     Get a Traversable resource for an anchor.
     """
     return from_package(resolve(anchor))
 
 
-def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
+def get_resource_reader(package: types.ModuleType) -> "_t.Optional[abc.ResourceReader]":
     """
     Return the package's loader if it's a ResourceReader.
     """
@@ -72,19 +69,14 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
     return reader(spec.name)  # type: ignore[union-attr]
 
 
-@functools.singledispatch
-def resolve(cand: Optional[Anchor]) -> types.ModuleType:
-    return cast(types.ModuleType, cand)
+def resolve(cand: "_t.Optional[_t.Anchor]") -> types.ModuleType:
+    if cand is None:
+        cand = _infer_caller().f_globals['__name__']
 
-
-@resolve.register
-def _(cand: str) -> types.ModuleType:
-    return importlib.import_module(cand)
-
-
-@resolve.register
-def _(cand: None) -> types.ModuleType:
-    return resolve(_infer_caller().f_globals['__name__'])
+    if isinstance(cand, str):
+        return importlib.import_module(cand)
+    else:
+        return cand  # type: ignore[return-value] # Guarded by usage in from_package.
 
 
 def _infer_caller():
@@ -149,7 +141,7 @@ def _temp_file(path):
     return _tempfile(path.read_bytes, suffix=path.name)
 
 
-def _is_present_dir(path: Traversable) -> bool:
+def _is_present_dir(path: "abc.Traversable") -> bool:
     """
     Some Traversables implement ``is_dir()`` to raise an
     exception (i.e. ``FileNotFoundError``) when the
@@ -162,18 +154,18 @@ def _is_present_dir(path: Traversable) -> bool:
     return False
 
 
-@functools.singledispatch
 def as_file(path):
     """
     Given a Traversable object, return that object as a
     path on the local file system in a context manager.
     """
+    if isinstance(path, pathlib.Path):
+        return _as_file_Path(path)
     return _temp_dir(path) if _is_present_dir(path) else _temp_file(path)
 
 
-@as_file.register(pathlib.Path)
 @contextlib.contextmanager
-def _(path):
+def _as_file_Path(path):
     """
     Degenerate behavior for pathlib.Path objects.
     """
