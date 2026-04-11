@@ -8,11 +8,11 @@ import pathlib
 import tempfile
 import types
 import warnings
-from typing import Optional, Union, cast
+from typing import Optional, cast
 
 from .abc import ResourceReader, Traversable
 
-Package = Union[types.ModuleType, str]
+Package = types.ModuleType | str
 Anchor = Package
 
 

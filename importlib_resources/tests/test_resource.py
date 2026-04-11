@@ -171,7 +171,8 @@ class DeletingZipsTest(util.ZipSetup, unittest.TestCase):
 class ResourceFromNamespaceTests:
     def test_is_submodule_resource(self):
         self.assertTrue(
-            resources.files(import_module('namespacedata01'))
+            resources
+            .files(import_module('namespacedata01'))
             .joinpath('binary.file')
             .is_file()
         )

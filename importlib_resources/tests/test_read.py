@@ -23,7 +23,8 @@ class ReadTests:
 
     def test_read_text_default_encoding(self):
         result = (
-            resources.files(self.data)
+            resources
+            .files(self.data)
             .joinpath('utf-8.file')
             .read_text(encoding='utf-8')
         )
@@ -31,7 +32,8 @@ class ReadTests:
 
     def test_read_text_given_encoding(self):
         result = (
-            resources.files(self.data)
+            resources
+            .files(self.data)
             .joinpath('utf-16.file')
             .read_text(encoding='utf-16')
         )
@@ -83,7 +85,8 @@ class ReadNamespaceZipTests(ReadTests, util.ZipSetup, unittest.TestCase):
 
     def test_read_submodule_resource_by_name(self):
         result = (
-            resources.files('namespacedata01.subdirectory')
+            resources
+            .files('namespacedata01.subdirectory')
             .joinpath('binary.file')
             .read_bytes()
         )
