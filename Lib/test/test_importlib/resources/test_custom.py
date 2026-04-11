@@ -5,6 +5,8 @@ import unittest
 from importlib.resources import abc
 from importlib.resources.abc import ResourceReader, TraversableResources
 
+from test.support import os_helper
+
 from . import util
 
 
