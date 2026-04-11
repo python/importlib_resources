@@ -38,11 +38,17 @@ class FunctionalAPIBase:
             with self.subTest(path_parts=path_parts):
                 yield path_parts
 
-    def assertEndsWith(self, string, suffix):
-        """Assert that `string` ends with `suffix`.
+    @staticmethod
+    def remove_utf16_bom(string):
+        """Remove an architecture-specific UTF-16 BOM prefix when present.
 
-        Used to ignore an architecture-specific UTF-16 byte-order mark."""
-        self.assertEqual(string[-len(suffix) :], suffix)
+        Some platforms surface UTF-16 BOM bytes as escaped text when the
+        fixture is intentionally decoded as UTF-8 with ``errors='backslashreplace'``.
+        Strip that prefix so assertions validate content consistently."""
+        for bom in ('\\xff\\xfe', '\\xfe\\xff', '\ufeff'):
+            if string.startswith(bom):
+                return string[len(bom) :]
+        return string
 
     def test_read_text(self):
         self.assertEqual(
@@ -84,11 +90,13 @@ class FunctionalAPIBase:
             ),
             '\x00\x01\x02\x03',
         )
-        self.assertEndsWith(  # ignore the BOM
-            resources.read_text(
-                self.anchor01,
-                'utf-16.file',
-                errors='backslashreplace',
+        self.assertEqual(
+            self.remove_utf16_bom(
+                resources.read_text(
+                    self.anchor01,
+                    'utf-16.file',
+                    errors='backslashreplace',
+                ),
             ),
             'Hello, UTF-16 world!\n'.encode('utf-16-le').decode(
                 errors='backslashreplace',
@@ -136,8 +144,8 @@ class FunctionalAPIBase:
             'utf-16.file',
             errors='backslashreplace',
         ) as f:
-            self.assertEndsWith(  # ignore the BOM
-                f.read(),
+            self.assertEqual(
+                self.remove_utf16_bom(f.read()),
                 'Hello, UTF-16 world!\n'.encode('utf-16-le').decode(
                     errors='backslashreplace',
                 ),
