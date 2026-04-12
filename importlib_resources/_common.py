@@ -119,7 +119,7 @@ def from_package(package: types.ModuleType):
             "as it does not appear to correspond to an importable module (its __spec__ is None)."
         )
 
-    spec = wrap_spec(package.__spec__)
+    spec = wrap_spec(package)
     reader = spec.loader.get_resource_reader(spec.name)
     return reader.files()
 

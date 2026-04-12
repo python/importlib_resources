@@ -160,9 +160,9 @@ class CompatibilityFiles:
         return CompatibilityFiles.SpecPath(self.spec, self._reader)
 
 
-def wrap_spec(spec):
+def wrap_spec(package):
     """
     Construct a package spec with traversable compatibility
     on the spec/loader/reader.
     """
-    return SpecLoaderAdapter(spec, TraversableResourcesLoader)
+    return SpecLoaderAdapter(package.__spec__, TraversableResourcesLoader)
