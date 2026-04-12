@@ -1,3 +1,13 @@
+v7.0.0
+======
+
+Deprecations and Removals
+-------------------------
+
+- Remove compatibility shim for deprecated parameter *package* in
+  :func:`importlib.resources.files`. Patch by Semyon Moroz. (#332)
+
+
 v6.5.2
 ======
 
