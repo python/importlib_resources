@@ -1,3 +1,12 @@
+v7.1.0
+======
+
+Features
+--------
+
+- ``files()`` now provides a nicer error when __main__.__spec__ is None. (#331)
+
+
 v7.0.0
 ======
 

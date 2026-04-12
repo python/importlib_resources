@@ -1,1 +1,0 @@
-``files()`` now provides a nicer error when __main__.__spec__ is None.
