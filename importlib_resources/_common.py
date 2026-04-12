@@ -105,6 +105,19 @@ def _infer_caller():
     return next(callers).frame
 
 
+def _assert_spec(package: types.ModuleType) -> None:
+    """
+    Provide a nicer error message when package is ``__main__``
+    and its ``__spec__`` is ``None``
+    (https://docs.python.org/3/reference/import.html#main-spec).
+    """
+    if package.__spec__ is None:
+        raise TypeError(
+            f"Cannot access resources for '{package.__name__}' "
+            "as it does not appear to correspond to an importable module (its __spec__ is None)."
+        )
+
+
 def from_package(package: types.ModuleType):
     """
     Return a Traversable object for the given package.
@@ -113,12 +126,7 @@ def from_package(package: types.ModuleType):
     # deferred for performance (python/cpython#109829)
     from .future.adapters import wrap_spec
 
-    if package.__spec__ is None:
-        raise TypeError(
-            f"Cannot access resources for '{package.__name__ or package!r}' "
-            "as it does not appear to correspond to an importable module (its __spec__ is None)."
-        )
-
+    _assert_spec(package)
     spec = wrap_spec(package)
     reader = spec.loader.get_resource_reader(spec.name)
     return reader.files()
