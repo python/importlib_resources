@@ -220,13 +220,17 @@ class ResourceFromNamespaceZipTests(
     MODULE = 'namespacedata01'
 
 
-class ResourceFromMainModuleWithNoneSpecTests(unittest.TestCase):
-    # `__main__.__spec__` can be `None` depending on how it is populated.
-    # https://docs.python.org/3/reference/import.html#main-spec
+class MainModuleTests(unittest.TestCase):
     def test_main_module_with_none_spec(self):
+        """
+        __main__ module with no spec should raise TypeError (for clarity).
+
+        See python/cpython#138531 for details.
+        """
+        # construct a __main__ module with no __spec__.
         mainmodule = types.ModuleType("__main__")
 
-        self.assertIsNone(mainmodule.__spec__)
+        assert mainmodule.__spec__ is None
 
         with self.assertRaises(
             TypeError,
