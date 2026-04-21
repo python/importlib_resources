@@ -76,6 +76,10 @@ class MultiplexedPath(abc.Traversable):
         if not all(path.is_dir() for path in self._paths):
             raise NotADirectoryError('MultiplexedPath only supports directories')
 
+    @property
+    def paths(self):
+        return self._paths.copy()
+
     def iterdir(self):
         children = (child for path in self._paths for child in path.iterdir())
         by_name = operator.attrgetter('name')
