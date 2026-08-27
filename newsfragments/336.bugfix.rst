@@ -1,0 +1,1 @@
+Restore an explicit Apache-2.0 license file and avoid downloading license text during package builds.
