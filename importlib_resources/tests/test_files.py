@@ -118,14 +118,24 @@ class ImplicitContextFiles:
         val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
         """
     )
+    wrapper = textwrap.dedent(
+        f"""
+        import {resources.__name__} as res
+
+        def wrapper():
+            return res.files().joinpath('res.txt').read_text(encoding='utf-8')
+        """
+    )
     spec = {
         'somepkg': {
             '__init__.py': set_val,
             'submod.py': set_val,
+            'wrapper.py': wrapper,
             'res.txt': 'resources are the best',
         },
         'frozenpkg': {
             '__init__.py': set_val.replace(resources.__name__, 'c_resources'),
+            'wrapper.py': wrapper.replace(resources.__name__, 'c_resources'),
             'res.txt': 'resources are the best',
         },
     }
@@ -141,6 +151,10 @@ class ImplicitContextFiles:
         Without any parameter, files() will infer the location as the caller.
         """
         assert importlib.import_module('somepkg.submod').val == 'resources are the best'
+
+    def test_implicit_files_function_named_wrapper(self):
+        module = importlib.import_module('somepkg.wrapper')
+        assert module.wrapper() == 'resources are the best'
 
     def _compile_importlib(self):
         """
@@ -168,6 +182,11 @@ class ImplicitContextFiles:
         """
         self._compile_importlib()
         assert importlib.import_module('frozenpkg').val == 'resources are the best'
+
+    def test_implicit_files_function_named_wrapper_with_compiled_importlib(self):
+        self._compile_importlib()
+        module = importlib.import_module('frozenpkg.wrapper')
+        assert module.wrapper() == 'resources are the best'
 
 
 class ImplicitContextFilesDiskTests(
