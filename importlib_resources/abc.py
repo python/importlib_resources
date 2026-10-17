@@ -8,9 +8,7 @@ from typing import (
     BinaryIO,
     Literal,
     NoReturn,
-    Optional,
     Protocol,
-    Text,
     TextIO,
     overload,
     runtime_checkable,
@@ -25,7 +23,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
     """Abstract base class for loaders to provide resource reading support."""
 
     @abc.abstractmethod
-    def open_resource(self, resource: Text) -> BinaryIO:
+    def open_resource(self, resource: str) -> BinaryIO:
         """Return an opened, file-like object for binary reading.
 
         The 'resource' argument is expected to represent only a file name.
@@ -37,7 +35,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def resource_path(self, resource: Text) -> Text:
+    def resource_path(self, resource: str) -> str:
         """Return the file system path to the specified resource.
 
         The 'resource' argument is expected to represent only a file name.
@@ -50,7 +48,7 @@ class ResourceReader(metaclass=abc.ABCMeta):
         raise FileNotFoundError
 
     @abc.abstractmethod
-    def is_resource(self, path: Text) -> bool:
+    def is_resource(self, path: str) -> bool:
         """Return True if the named 'path' is a resource.
 
         Files are resources, directories are not.
@@ -90,9 +88,7 @@ class Traversable(Protocol):
         with self.open('rb') as strm:
             return strm.read()
 
-    def read_text(
-        self, encoding: Optional[str] = None, errors: Optional[str] = None
-    ) -> str:
+    def read_text(self, encoding: str | None = None, errors: str | None = None) -> str:
         """
         Read contents of self as text
         """

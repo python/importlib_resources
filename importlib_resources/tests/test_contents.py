@@ -6,7 +6,7 @@ from . import util
 
 
 class ContentsTests:
-    expected = {
+    expected = {  # noqa: RUF012 (never mutated; overridden by subclasses)
         '__init__.py',
         'binary.file',
         'subdirectory',
@@ -30,7 +30,7 @@ class ContentsZipTests(ContentsTests, util.ZipSetup, unittest.TestCase):
 class ContentsNamespaceTests(ContentsTests, util.DiskSetup, unittest.TestCase):
     MODULE = 'namespacedata01'
 
-    expected = {
+    expected = {  # noqa: RUF012 (never mutated; overridden by subclasses)
         # no __init__ because of namespace design
         'binary.file',
         'subdirectory',

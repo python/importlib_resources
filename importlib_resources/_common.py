@@ -7,7 +7,7 @@ import os
 import pathlib
 import tempfile
 import types
-from typing import Optional, cast
+from typing import cast
 
 from .abc import ResourceReader, Traversable
 
@@ -15,14 +15,14 @@ Package = types.ModuleType | str
 Anchor = Package
 
 
-def files(anchor: Optional[Anchor] = None) -> Traversable:
+def files(anchor: Anchor | None = None) -> Traversable:
     """
     Get a Traversable resource for an anchor.
     """
     return from_package(resolve(anchor))
 
 
-def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
+def get_resource_reader(package: types.ModuleType) -> ResourceReader | None:
     """
     Return the package's loader if it's a ResourceReader.
     """
@@ -39,7 +39,7 @@ def get_resource_reader(package: types.ModuleType) -> Optional[ResourceReader]:
 
 
 @functools.singledispatch
-def resolve(cand: Optional[Anchor]) -> types.ModuleType:
+def resolve(cand: Anchor | None) -> types.ModuleType:
     return cast(types.ModuleType, cand)
 
 

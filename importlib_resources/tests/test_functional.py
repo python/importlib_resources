@@ -123,7 +123,7 @@ class FunctionalAPIBase:
             resources.open_text(self.anchor01)
         with self.assertRaises((OSError, resources.abc.TraversalError)):
             resources.open_text(self.anchor01, 'no-such-file')
-        with resources.open_text(self.anchor01, 'utf-16.file') as f:
+        with resources.open_text(self.anchor01, 'utf-16.file') as f:  # noqa: SIM117 (kept in sync with CPython)
             with self.assertRaises(UnicodeDecodeError):
                 f.read()
         with resources.open_text(
@@ -154,10 +154,10 @@ class FunctionalAPIBase:
                 assert f.read() == b'a resource'
 
     def test_path(self):
-        with resources.path(self.anchor01, 'utf-8.file') as path:
+        with resources.path(self.anchor01, 'utf-8.file') as path:  # noqa: SIM117 (kept in sync with CPython)
             with open(str(path), encoding='utf-8') as f:
                 assert f.read() == 'Hello, UTF-8 world!\n'
-        with resources.path(self.anchor01) as path:
+        with resources.path(self.anchor01) as path:  # noqa: SIM117 (kept in sync with CPython)
             with open(os.path.join(path, 'utf-8.file'), encoding='utf-8') as f:
                 assert f.read() == 'Hello, UTF-8 world!\n'
 
@@ -223,7 +223,7 @@ class FunctionalAPIBase:
             resources.read_text,
             resources.open_text,
         ):
-            with self.subTest(func=func):
+            with self.subTest(func=func):  # noqa: SIM117 (kept in sync with CPython)
                 # Multiple path arguments need explicit encoding argument.
                 with self.assertRaises(TypeError):
                     func(

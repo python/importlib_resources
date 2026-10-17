@@ -88,7 +88,7 @@ class DirectSpec:
 
 
 class ModulesFiles:
-    spec = {
+    spec = {  # noqa: RUF012 (never mutated; overridden by subclasses)
         'mod.py': '',
         'res.txt': 'resources are the best',
     }
@@ -118,7 +118,7 @@ class ImplicitContextFiles:
         val = res.files().joinpath('res.txt').read_text(encoding='utf-8')
         """
     )
-    spec = {
+    spec = {  # noqa: RUF012 (never mutated; overridden by subclasses)
         'somepkg': {
             '__init__.py': set_val,
             'submod.py': set_val,

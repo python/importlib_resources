@@ -25,12 +25,12 @@ from ._functional import (
 from .abc import ResourceReader
 
 __all__ = [
-    'Package',
     'Anchor',
+    'Package',
     'ResourceReader',
     'as_file',
-    'files',
     'contents',
+    'files',
     'is_resource',
     'open_binary',
     'open_text',
