@@ -6,11 +6,12 @@ import textwrap
 import unittest
 import warnings
 
+from test.support import import_helper, os_helper
+
 import importlib_resources as resources
 
 from ..abc import Traversable
 from . import util
-from .compat.py39 import import_helper, os_helper
 
 
 @contextlib.contextmanager

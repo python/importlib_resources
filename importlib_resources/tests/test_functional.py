@@ -2,10 +2,11 @@ import importlib
 import os
 import unittest
 
+from test.support import warnings_helper
+
 import importlib_resources as resources
 
 from . import util
-from .compat.py39 import warnings_helper
 
 
 class StringAnchorMixin:

@@ -8,10 +8,11 @@ import sys
 import types
 from importlib.machinery import ModuleSpec
 
+from test.support import import_helper, os_helper
+
 from ..abc import ResourceReader, Traversable, TraversableResources
 from . import _path
 from . import zip as zip_
-from .compat.py39 import import_helper, os_helper
 
 
 class Reader(ResourceReader):

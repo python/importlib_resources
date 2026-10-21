@@ -7,11 +7,11 @@ import operator
 import pathlib
 import re
 import warnings
+import zipfile
 from collections.abc import Iterator
 
 from . import abc
 from ._itertools import only
-from .compat.py39 import ZipPath
 
 
 def remove_duplicates(items):
@@ -57,7 +57,7 @@ class ZipReader(abc.TraversableResources):
         return target.is_file() and target.exists()
 
     def files(self):
-        return ZipPath(self.archive, self.prefix)
+        return zipfile.Path(self.archive, self.prefix)
 
 
 class MultiplexedPath(abc.Traversable):
@@ -170,7 +170,7 @@ class NamespaceReader(abc.TraversableResources):
                 PermissionError,
             ):
                 inner = path_str[match.end() :].replace('\\', '/') + '/'
-                yield ZipPath(path_str[: match.start()], inner.lstrip('/'))
+                yield zipfile.Path(path_str[: match.start()], inner.lstrip('/'))
 
     def resource_path(self, resource):
         """

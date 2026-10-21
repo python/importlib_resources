@@ -2,12 +2,13 @@ import contextlib
 import pathlib
 import unittest
 
+from test.support import os_helper
+
 import importlib_resources as resources
 
 from .. import abc
 from ..abc import ResourceReader, TraversableResources
 from . import util
-from .compat.py39 import os_helper
 
 
 class SimpleLoader:
