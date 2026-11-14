@@ -1,6 +1,7 @@
 import importlib
 import os
 import unittest
+from unittest import mock
 
 from test.support import warnings_helper
 
@@ -30,14 +31,12 @@ class FunctionalAPIBase:
         self.load_fixture('data02')
 
     def _gen_resourcetxt_path_parts(self):
-        """Yield various names of a text file in anchor02, each in a subTest"""
-        for path_parts in (
+        """Yield various names of a text file in anchor02."""
+        yield from (
             ('subdirectory', 'subsubdir', 'resource.txt'),
             ('subdirectory/subsubdir/resource.txt',),
             ('subdirectory/subsubdir', 'resource.txt'),
-        ):
-            with self.subTest(path_parts=path_parts):
-                yield path_parts
+        )
 
     @staticmethod
     def remove_utf16_bom(string):
@@ -66,14 +65,15 @@ class FunctionalAPIBase:
             == 'a resource'
         )
         for path_parts in self._gen_resourcetxt_path_parts():
-            assert (
-                resources.read_text(
-                    self.anchor02,
-                    *path_parts,
-                    encoding='utf-8',
+            with self.subTest(path_parts=path_parts):
+                assert (
+                    resources.read_text(
+                        self.anchor02,
+                        *path_parts,
+                        encoding='utf-8',
+                    )
+                    == 'a resource'
                 )
-                == 'a resource'
-            )
         # Use generic OSError, since e.g. attempting to read a directory can
         # fail with PermissionError rather than IsADirectoryError
         with self.assertRaises(OSError):
@@ -106,17 +106,23 @@ class FunctionalAPIBase:
             == b'Hello, UTF-8 world!\n'
         )
         for path_parts in self._gen_resourcetxt_path_parts():
-            assert resources.read_binary(self.anchor02, *path_parts) == b'a resource'
+            with self.subTest(path_parts=path_parts):
+                assert (
+                    resources.read_binary(self.anchor02, *path_parts) == b'a resource'
+                )
 
     def test_open_text(self):
         with resources.open_text(self.anchor01, 'utf-8.file') as f:
             assert f.read() == 'Hello, UTF-8 world!\n'
         for path_parts in self._gen_resourcetxt_path_parts():
-            with resources.open_text(
-                self.anchor02,
-                *path_parts,
-                encoding='utf-8',
-            ) as f:
+            with (
+                self.subTest(path_parts=path_parts),
+                resources.open_text(
+                    self.anchor02,
+                    *path_parts,
+                    encoding='utf-8',
+                ) as f,
+            ):
                 assert f.read() == 'a resource'
         # Use generic OSError, since e.g. attempting to read a directory can
         # fail with PermissionError rather than IsADirectoryError
@@ -148,10 +154,13 @@ class FunctionalAPIBase:
         with resources.open_binary(self.anchor01, 'utf-8.file') as f:
             assert f.read() == b'Hello, UTF-8 world!\n'
         for path_parts in self._gen_resourcetxt_path_parts():
-            with resources.open_binary(
-                self.anchor02,
-                *path_parts,
-            ) as f:
+            with (
+                self.subTest(path_parts=path_parts),
+                resources.open_binary(
+                    self.anchor02,
+                    *path_parts,
+                ) as f,
+            ):
                 assert f.read() == b'a resource'
 
     def test_path(self):
@@ -169,7 +178,8 @@ class FunctionalAPIBase:
         assert not is_resource(self.anchor01)
         assert not is_resource(self.anchor01, 'subdirectory')
         for path_parts in self._gen_resourcetxt_path_parts():
-            assert is_resource(self.anchor02, *path_parts)
+            with self.subTest(path_parts=path_parts):
+                assert is_resource(self.anchor02, *path_parts)
 
     def test_contents(self):
         with warnings_helper.check_warnings((".*contents.*", DeprecationWarning)):
@@ -186,6 +196,7 @@ class FunctionalAPIBase:
 
         for path_parts in self._gen_resourcetxt_path_parts():
             with (
+                self.subTest(path_parts=path_parts),
                 self.assertRaises((OSError, resources.abc.TraversalError)),
                 warnings_helper.check_warnings((
                     ".*contents.*",
@@ -260,3 +271,24 @@ class FunctionalAPITest_StringAnchor_Memory(
     unittest.TestCase,
 ):
     pass
+
+
+class FunctionalAPISubtestTest(unittest.TestCase):
+    def test_path_variants_continue_after_failure(self):
+        case = FunctionalAPITest_StringAnchor_Memory('test_read_binary')
+        result = unittest.TestResult()
+        result.failfast = False
+        read_binary = resources.read_binary
+
+        def mismatched_resource(anchor, *path_parts):
+            if anchor == case.anchor02:
+                return b'unexpected resource'
+            return read_binary(anchor, *path_parts)
+
+        with mock.patch.object(resources, 'read_binary', mismatched_resource):
+            case.run(result)
+
+        path_parts = list(case._gen_resourcetxt_path_parts())
+        assert len(result.failures) == len(path_parts) == 3
+        assert not result.errors
+        assert [test.params['path_parts'] for test, _ in result.failures] == path_parts
