@@ -72,7 +72,7 @@ tests live in ``email/tests/test_email.py``.
 
 Your test could read the data file by doing something like::
 
-    data_dir = os.path.join(os.path.dirname(__file__), 'tests', 'data')
+    data_dir = os.path.join(os.path.dirname(__file__), 'data')
     data_path = os.path.join(data_dir, 'message.eml')
     with open(data_path, encoding='utf-8') as fp:
         eml = fp.read()
@@ -106,7 +106,7 @@ using ``importlib_resources`` would look like::
 
     from importlib_resources import files
     # Reads contents with UTF-8 encoding and returns str.
-    eml = files('email.tests.data').joinpath('message.eml').read_text()
+    eml = files('email.tests.data').joinpath('message.eml').read_text(encoding='utf-8')
 
 
 Anchors
@@ -118,8 +118,10 @@ module object.  If a string is passed in, it must name an importable Python
 module, which is imported prior to loading any resources. Thus the above
 example could also be written as::
 
+    from importlib_resources import files
     import email.tests.data
-    eml = files(email.tests.data).joinpath('message.eml').read_text()
+
+    eml = files(email.tests.data).joinpath('message.eml').read_text(encoding='utf-8')
 
 
 Namespace Packages
@@ -161,7 +163,7 @@ returned is a context manager for use in a ``with``-statement::
 
     from importlib_resources import files, as_file
 
-    source = files(email.tests.data).joinpath('message.eml')
+    source = files('email.tests.data').joinpath('message.eml')
     with as_file(source) as eml:
         third_party_api_requiring_file_system_path(eml)
 
